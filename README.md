@@ -25,13 +25,12 @@ Virtual property management platform that handles what traditional property mana
 ### From Source
 ```bash
 git clone https://github.com/super3/padtask.git && cd padtask
-cd server && npm install           # Install backend dependencies
+npm install                        # Install dependencies
 ```
 
 ## Usage
 
 ```bash
-cd server
 npm start                          # Start server (production)
 npm run dev                        # Start with auto-reload (development)
 npm test                           # Run test suite
@@ -41,10 +40,10 @@ npm test                           # Run test suite
 
 ### Adding New Features
 
-1. Create controller function in `server/src/controllers/`
-2. Add route in `server/src/routes/`
+1. Create controller function in `src/controllers/`
+2. Add route in `src/routes/`
 3. Apply `requireAuth` middleware for protected routes
-4. Write tests in `server/__tests__/`
+4. Write tests in `__tests__/`
 5. Run tests with `npm test`
 
 ### Current Features

@@ -25,14 +25,9 @@ From your Clerk dashboard:
 
 ## Step 3: Configure Backend Environment Variables
 
-1. Navigate to the `server` directory:
-   ```bash
-   cd server
-   ```
+1. Open the `.env` file in the project root (created from `.env.example`)
 
-2. Open the `.env` file (created from `.env.example`)
-
-3. Replace the placeholder values:
+2. Replace the placeholder values:
    ```bash
    PORT=3001
 
@@ -79,17 +74,12 @@ Make the same changes to `dashboard.html` (around line 10-15).
 
 ## Step 5: Start the Backend Server
 
-1. Make sure you're in the `server` directory:
-   ```bash
-   cd server
-   ```
-
-2. Install dependencies (if not already done):
+1. Install dependencies (if not already done):
    ```bash
    npm install
    ```
 
-3. Start the server:
+2. Start the server:
    ```bash
    npm start
    ```
@@ -142,7 +132,7 @@ npx http-server -p 8000
 
 ### "No authorization token provided" Error
 - Make sure the backend server is running on port 3001
-- Check that your Clerk keys are correctly set in `server/.env`
+- Check that your Clerk keys are correctly set in `.env`
 - Verify the API_BASE URL in `dashboard.html` matches your backend URL
 
 ### Clerk.js Not Loading
