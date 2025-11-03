@@ -81,7 +81,7 @@ describe('Authentication Middleware', () => {
     });
 
     test('should authenticate user with valid token using sub claim fallback', async () => {
-      const token = createMockToken({ sub: mockUser.id }); // No session ID
+      const token = createMockToken({ sub: mockUser.id, sid: undefined, sess: undefined }); // No session ID
       req.headers.authorization = `Bearer ${token}`;
 
       await requireAuth(req, res, next);
@@ -137,6 +137,45 @@ describe('Authentication Middleware', () => {
 
       expect(res.status).toHaveBeenCalledWith(401);
       expect(res.json).toHaveBeenCalled();
+      expect(next).not.toHaveBeenCalled();
+    });
+
+    test('should handle outer try-catch errors with 500', async () => {
+      // Create a request object that throws an error when accessing headers
+      const errorReq = {
+        get headers() {
+          throw new Error('Unexpected error accessing headers');
+        }
+      };
+
+      await requireAuth(errorReq, res, next);
+
+      expect(res.status).toHaveBeenCalledWith(500);
+      expect(res.json).toHaveBeenCalledWith({
+        error: 'Authentication error'
+      });
+      expect(next).not.toHaveBeenCalled();
+    });
+
+    test('should handle error when getting user via sub claim', async () => {
+      // Clear previous mocks
+      mockClerkClient.users.getUser.mockClear();
+
+      // Make getUser throw an error for sub claim path
+      mockClerkClient.users.getUser.mockRejectedValueOnce(
+        new Error('User service unavailable')
+      );
+
+      const token = createMockToken({ sub: mockUser.id, sid: undefined, sess: undefined }); // No sid, will use sub
+      req.headers.authorization = `Bearer ${token}`;
+
+      await requireAuth(req, res, next);
+
+      expect(mockClerkClient.users.getUser).toHaveBeenCalledWith(mockUser.id);
+      expect(res.status).toHaveBeenCalledWith(401);
+      expect(res.json).toHaveBeenCalledWith({
+        error: 'Invalid or expired token'
+      });
       expect(next).not.toHaveBeenCalled();
     });
   });

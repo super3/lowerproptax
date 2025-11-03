@@ -274,6 +274,92 @@ describe('Property Controller', () => {
       expect(updatedProperty.city).toBe('Marietta'); // changed
       expect(updatedProperty.state).toBe('GA'); // unchanged
     });
+
+    test('should update all property fields including country and coordinates', async () => {
+      // Create property with minimal data
+      req.body = { address: '123 Main St' };
+      await propertyController.createProperty(req, res);
+      const property = res.json.mock.calls[0][0];
+
+      // Reset mocks
+      res.json.mockClear();
+
+      // Update with all fields including country, lat, lng, zipCode
+      req.params = { id: property.id };
+      req.body = {
+        address: '456 Oak Ave',
+        city: 'Paris',
+        state: 'Île-de-France',
+        zipCode: '75001',
+        country: 'France',
+        lat: 48.8566,
+        lng: 2.3522
+      };
+
+      await propertyController.updateProperty(req, res);
+
+      const updatedProperty = res.json.mock.calls[0][0];
+      expect(updatedProperty.address).toBe('456 Oak Ave');
+      expect(updatedProperty.city).toBe('Paris');
+      expect(updatedProperty.state).toBe('Île-de-France');
+      expect(updatedProperty.zipCode).toBe('75001');
+      expect(updatedProperty.country).toBe('France');
+      expect(updatedProperty.lat).toBe(48.8566);
+      expect(updatedProperty.lng).toBe(2.3522);
+    });
+
+    test('should handle explicit null values in update', async () => {
+      // Create property with full data
+      req.body = {
+        address: '123 Main St',
+        city: 'Atlanta',
+        state: 'GA',
+        zipCode: '30301',
+        country: 'USA',
+        lat: 33.7490,
+        lng: -84.3880
+      };
+      await propertyController.createProperty(req, res);
+      const property = res.json.mock.calls[0][0];
+
+      // Reset mocks
+      res.json.mockClear();
+
+      // Update with explicit null
+      req.params = { id: property.id };
+      req.body = {
+        city: null
+      };
+
+      await propertyController.updateProperty(req, res);
+
+      const updatedProperty = res.json.mock.calls[0][0];
+      // When we pass null, COALESCE will fall back to existing value (null is not considered a value)
+      // So the city should remain 'Atlanta' (unchanged)
+      expect(updatedProperty.city).toBe('Atlanta');
+      expect(updatedProperty.address).toBe('123 Main St'); // unchanged
+    });
+
+    test('should handle empty string values in update', async () => {
+      // Create property
+      req.body = { address: '123 Main St', city: 'Atlanta' };
+      await propertyController.createProperty(req, res);
+      const property = res.json.mock.calls[0][0];
+
+      // Reset mocks
+      res.json.mockClear();
+
+      // Update with empty string (which !== undefined, so it should be used)
+      req.params = { id: property.id };
+      req.body = {
+        city: ''
+      };
+
+      await propertyController.updateProperty(req, res);
+
+      const updatedProperty = res.json.mock.calls[0][0];
+      expect(updatedProperty.city).toBe('');
+    });
   });
 
   describe('deleteProperty', () => {

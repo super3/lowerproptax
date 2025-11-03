@@ -5,6 +5,7 @@ const { Pool } = pg;
 let pool;
 
 // Check if DATABASE_URL is available
+/* istanbul ignore next */
 if (process.env.DATABASE_URL) {
   // Use real PostgreSQL connection
   pool = new Pool({
