@@ -1,6 +1,11 @@
 // In-memory storage for now (replace with database later)
 const properties = new Map();
 
+// Test helper to reset storage
+export function resetProperties() {
+  properties.clear();
+}
+
 // Get all properties for the authenticated user
 export async function getProperties(req, res) {
   try {
