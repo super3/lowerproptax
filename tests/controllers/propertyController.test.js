@@ -11,9 +11,9 @@ const propertyController = await import('../../src/controllers/propertyControlle
 describe('Property Controller', () => {
   let req, res;
 
-  beforeEach(() => {
+  beforeEach(async () => {
     // Reset properties storage before each test
-    propertyController.resetProperties();
+    await propertyController.resetProperties();
 
     req = createMockRequest({
       user: { id: mockUser.id }
@@ -164,6 +164,7 @@ describe('Property Controller', () => {
         city: 'Atlanta',
         state: 'GA',
         zipCode: '30301',
+        country: 'United States',
         lat: 33.7490,
         lng: -84.3880
       };
@@ -176,6 +177,7 @@ describe('Property Controller', () => {
       expect(property.city).toBe('Atlanta');
       expect(property.state).toBe('GA');
       expect(property.zipCode).toBe('30301');
+      expect(property.country).toBe('United States');
       expect(property.lat).toBe(33.7490);
       expect(property.lng).toBe(-84.3880);
     });

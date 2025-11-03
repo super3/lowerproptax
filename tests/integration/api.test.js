@@ -26,10 +26,10 @@ describe('Property API Integration Tests', () => {
     validToken = createMockToken({ sid: mockSession.id });
   });
 
-  beforeEach(() => {
+  beforeEach(async () => {
     jest.clearAllMocks();
     // Reset property storage before each test
-    propertyController.resetProperties();
+    await propertyController.resetProperties();
   });
 
   describe('POST /api/properties', () => {

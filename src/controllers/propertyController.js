@@ -1,19 +1,22 @@
-// In-memory storage for now (replace with database later)
-const properties = new Map();
+import pool from '../db/connection.js';
 
 // Test helper to reset storage
-export function resetProperties() {
-  properties.clear();
+export async function resetProperties() {
+  await pool.query('DELETE FROM properties');
 }
 
 // Get all properties for the authenticated user
 export async function getProperties(req, res) {
   try {
     const userId = req.user.id;
-    const userProperties = Array.from(properties.values()).filter(
-      property => property.userId === userId
+    const result = await pool.query(
+      `SELECT id, user_id as "userId", address, city, state,
+              zip_code as "zipCode", country, lat, lng,
+              created_at as "createdAt", updated_at as "updatedAt"
+       FROM properties WHERE user_id = $1 ORDER BY created_at DESC`,
+      [userId]
     );
-    res.json(userProperties);
+    res.json(result.rows);
   } catch (error) {
     console.error('Error getting properties:', error);
     res.status(500).json({ error: 'Failed to get properties' });
@@ -24,11 +27,19 @@ export async function getProperties(req, res) {
 export async function getProperty(req, res) {
   try {
     const { id } = req.params;
-    const property = properties.get(id);
+    const result = await pool.query(
+      `SELECT id, user_id as "userId", address, city, state,
+              zip_code as "zipCode", country, lat, lng,
+              created_at as "createdAt", updated_at as "updatedAt"
+       FROM properties WHERE id = $1`,
+      [id]
+    );
 
-    if (!property) {
+    if (result.rows.length === 0) {
       return res.status(404).json({ error: 'Property not found' });
     }
+
+    const property = result.rows[0];
 
     // Ensure user owns this property
     if (property.userId !== req.user.id) {
@@ -45,28 +56,34 @@ export async function getProperty(req, res) {
 // Create a new property
 export async function createProperty(req, res) {
   try {
-    const { address, city, state, zipCode, lat, lng } = req.body;
+    const { address, city, state, zipCode, country, lat, lng } = req.body;
 
     if (!address) {
       return res.status(400).json({ error: 'Address is required' });
     }
 
     const propertyId = `prop_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-    const newProperty = {
-      id: propertyId,
-      userId: req.user.id,
-      address,
-      city: city || '',
-      state: state || '',
-      zipCode: zipCode || '',
-      lat: lat || null,
-      lng: lng || null,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
-    };
 
-    properties.set(propertyId, newProperty);
-    res.status(201).json(newProperty);
+    const result = await pool.query(
+      `INSERT INTO properties (id, user_id, address, city, state, zip_code, country, lat, lng, created_at, updated_at)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, NOW(), NOW())
+       RETURNING id, user_id as "userId", address, city, state,
+                 zip_code as "zipCode", country, lat, lng,
+                 created_at as "createdAt", updated_at as "updatedAt"`,
+      [
+        propertyId,
+        req.user.id,
+        address,
+        city || '',
+        state || '',
+        zipCode || '',
+        country || '',
+        lat || null,
+        lng || null
+      ]
+    );
+
+    res.status(201).json(result.rows[0]);
   } catch (error) {
     console.error('Error creating property:', error);
     res.status(500).json({ error: 'Failed to create property' });
@@ -77,31 +94,53 @@ export async function createProperty(req, res) {
 export async function updateProperty(req, res) {
   try {
     const { id } = req.params;
-    const property = properties.get(id);
 
-    if (!property) {
+    // First check if property exists and user owns it
+    const checkResult = await pool.query(
+      'SELECT user_id FROM properties WHERE id = $1',
+      [id]
+    );
+
+    if (checkResult.rows.length === 0) {
       return res.status(404).json({ error: 'Property not found' });
     }
 
+    const property = checkResult.rows[0];
+
     // Ensure user owns this property
-    if (property.userId !== req.user.id) {
+    if (property.user_id !== req.user.id) {
       return res.status(403).json({ error: 'Access denied' });
     }
 
-    const { address, city, state, zipCode, lat, lng } = req.body;
-    const updatedProperty = {
-      ...property,
-      address: address !== undefined ? address : property.address,
-      city: city !== undefined ? city : property.city,
-      state: state !== undefined ? state : property.state,
-      zipCode: zipCode !== undefined ? zipCode : property.zipCode,
-      lat: lat !== undefined ? lat : property.lat,
-      lng: lng !== undefined ? lng : property.lng,
-      updatedAt: new Date().toISOString()
-    };
+    const { address, city, state, zipCode, country, lat, lng } = req.body;
 
-    properties.set(id, updatedProperty);
-    res.json(updatedProperty);
+    const result = await pool.query(
+      `UPDATE properties
+       SET address = COALESCE($1, address),
+           city = COALESCE($2, city),
+           state = COALESCE($3, state),
+           zip_code = COALESCE($4, zip_code),
+           country = COALESCE($5, country),
+           lat = COALESCE($6, lat),
+           lng = COALESCE($7, lng),
+           updated_at = NOW()
+       WHERE id = $8
+       RETURNING id, user_id as "userId", address, city, state,
+                 zip_code as "zipCode", country, lat, lng,
+                 created_at as "createdAt", updated_at as "updatedAt"`,
+      [
+        address !== undefined ? address : null,
+        city !== undefined ? city : null,
+        state !== undefined ? state : null,
+        zipCode !== undefined ? zipCode : null,
+        country !== undefined ? country : null,
+        lat !== undefined ? lat : null,
+        lng !== undefined ? lng : null,
+        id
+      ]
+    );
+
+    res.json(result.rows[0]);
   } catch (error) {
     console.error('Error updating property:', error);
     res.status(500).json({ error: 'Failed to update property' });
@@ -112,18 +151,25 @@ export async function updateProperty(req, res) {
 export async function deleteProperty(req, res) {
   try {
     const { id } = req.params;
-    const property = properties.get(id);
 
-    if (!property) {
+    // First check if property exists and user owns it
+    const checkResult = await pool.query(
+      'SELECT user_id FROM properties WHERE id = $1',
+      [id]
+    );
+
+    if (checkResult.rows.length === 0) {
       return res.status(404).json({ error: 'Property not found' });
     }
 
+    const property = checkResult.rows[0];
+
     // Ensure user owns this property
-    if (property.userId !== req.user.id) {
+    if (property.user_id !== req.user.id) {
       return res.status(403).json({ error: 'Access denied' });
     }
 
-    properties.delete(id);
+    await pool.query('DELETE FROM properties WHERE id = $1', [id]);
     res.json({ message: 'Property deleted successfully' });
   } catch (error) {
     console.error('Error deleting property:', error);
