@@ -38,14 +38,6 @@ npm test                           # Run test suite
 
 ## Development
 
-### Adding New Features
-
-1. Create controller function in `src/controllers/`
-2. Add route in `src/routes/`
-3. Apply `requireAuth` middleware for protected routes
-4. Write tests in `__tests__/`
-5. Run tests with `npm test`
-
 ### Current Features
 
 - ✅ User authentication with Clerk

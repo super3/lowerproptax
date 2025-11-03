@@ -113,7 +113,7 @@ npm run test:coverage
 ### Test Structure
 
 ```
-__tests__/
+tests/
 ├── utils/
 │   ├── mockClerk.js         # Mock Clerk SDK and test helpers
 │   └── testServer.js        # Test server setup
@@ -178,7 +178,7 @@ server/
 │   ├── routes/
 │   │   └── propertyRoutes.js       # API route definitions
 │   └── index.js                    # Express server setup
-├── __tests__/                      # Test files
+├── tests/                          # Test files
 ├── jest.config.js                  # Jest configuration
 ├── package.json
 └── .env                           # Environment variables (git-ignored)
@@ -189,7 +189,7 @@ server/
 1. Create controller function in `src/controllers/`
 2. Add route in `src/routes/`
 3. Apply `requireAuth` middleware if authentication is needed
-4. Write tests in `__tests__/`
+4. Write tests in `tests/`
 5. Run tests with `npm test`
 
 ## Troubleshooting
