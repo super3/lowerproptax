@@ -780,13 +780,31 @@
         function createPropertyCard(property, index) {
             const card = document.createElement('div');
             card.className = 'property-card';
+
+            // Extract street address (remove city, state, zip, country)
+            // The full address format from Google is typically: "123 Main St, City, State Zip, Country"
+            let streetAddress = property.address;
+
+            // Try to extract just the street portion before the first comma
+            if (property.address && property.address.includes(',')) {
+                streetAddress = property.address.split(',')[0].trim();
+            }
+
+            // Build location string (City, State)
+            let location = '';
+            if (property.city && property.state) {
+                location = `${property.city}, ${property.state}`;
+            } else if (property.city) {
+                location = property.city;
+            } else if (property.state) {
+                location = property.state;
+            }
+
             card.innerHTML = `
                 <div class="property-header">
                     <div>
-                        <div class="property-address">${property.address}</div>
-                        <div class="property-details">
-                            ${property.city ? property.city + ', ' : ''}${property.state || ''}
-                        </div>
+                        <div class="property-address">${streetAddress}</div>
+                        ${location ? `<div class="property-details">${location}</div>` : ''}
                     </div>
                     <div class="property-actions">
                         <button class="btn-small btn-view" onclick="viewProperty(${index})">View</button>
