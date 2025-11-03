@@ -3,7 +3,7 @@
 Virtual property management platform that handles what traditional property managers won't for just $25/month per property.
 
 [![Test Status](https://img.shields.io/github/actions/workflow/status/super3/padtask/tests.yml?branch=main&label=tests)](https://github.com/super3/padtask/actions/workflows/tests.yml)
-[![Server Tests](https://img.shields.io/badge/server%20tests-40%20passing-brightgreen)](https://github.com/super3/padtask)
+[![Coverage Status](https://coveralls.io/repos/github/super3/padtask/badge.svg?branch=main)](https://coveralls.io/github/super3/padtask?branch=main)
 
 ## Features
 
