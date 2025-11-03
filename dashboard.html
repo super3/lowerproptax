@@ -6,6 +6,14 @@
     <title>PadTask - Dashboard</title>
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🔑</text></svg>">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Clerk.js -->
+    <script
+        async
+        crossorigin="anonymous"
+        data-clerk-publishable-key="your_clerk_publishable_key_here"
+        src="https://your-clerk-domain.clerk.accounts.dev/npm/@clerk/clerk-js@5/dist/clerk.browser.js"
+        type="text/javascript"
+    ></script>
     <style>
         * {
             margin: 0;
@@ -81,17 +89,9 @@
             font-size: 0.95rem;
         }
 
-        .user-avatar {
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            background: #3171ef;
-            color: white;
+        #user-button {
             display: flex;
             align-items: center;
-            justify-content: center;
-            font-weight: 600;
-            font-size: 0.9rem;
         }
 
         /* Google Maps PlaceAutocompleteElement Styling */
@@ -502,8 +502,8 @@
         <a href="index.html" class="logo-link"><div class="logo">🔑 PadTask</div></a>
         <div class="nav-right">
             <div class="user-info">
-                <span class="user-name">John Doe</span>
-                <div class="user-avatar">JD</div>
+                <span class="user-name" id="user-name">Loading...</span>
+                <div id="user-button"></div>
             </div>
         </div>
     </nav>
@@ -569,10 +569,14 @@
     </div>
 
     <script>
+        // API Configuration
+        const API_BASE = 'http://localhost:3001/api';
+
         let autocompleteWidget;
         let selectedPlace = null;
         let autocompleteWidgetAnother;
         let selectedPlaceAnother = null;
+        let clerkLoaded = false;
 
         // Initialize autocomplete when Google Maps API loads
         async function initAutocomplete() {
@@ -794,11 +798,31 @@
         }
 
         // Add property to the list
-        function addProperty(propertyData) {
-            properties.push(propertyData);
-            renderProperties();
-            updatePropertyCount();
-            toggleEmptyState();
+        async function addProperty(propertyData) {
+            try {
+                const token = await window.Clerk.session.getToken();
+                const response = await fetch(`${API_BASE}/properties`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(propertyData)
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to add property');
+                }
+
+                const newProperty = await response.json();
+                properties.push(newProperty);
+                renderProperties();
+                updatePropertyCount();
+                toggleEmptyState();
+            } catch (error) {
+                console.error('Error adding property:', error);
+                alert('Failed to add property. Please try again.');
+            }
         }
 
         // Render all properties
@@ -819,17 +843,93 @@
         }
 
         // Delete property
-        function deleteProperty(index) {
+        async function deleteProperty(index) {
             if (confirm('Are you sure you want to delete this property?')) {
-                properties.splice(index, 1);
+                const property = properties[index];
+                try {
+                    const token = await window.Clerk.session.getToken();
+                    const response = await fetch(`${API_BASE}/properties/${property.id}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'Authorization': `Bearer ${token}`
+                        }
+                    });
+
+                    if (!response.ok) {
+                        throw new Error('Failed to delete property');
+                    }
+
+                    properties.splice(index, 1);
+                    renderProperties();
+                    updatePropertyCount();
+                    toggleEmptyState();
+                } catch (error) {
+                    console.error('Error deleting property:', error);
+                    alert('Failed to delete property. Please try again.');
+                }
+            }
+        }
+
+        // Initialize Clerk and load user data
+        async function initClerk() {
+            try {
+                await window.Clerk.load();
+                clerkLoaded = true;
+
+                // Check if user is signed in
+                if (!window.Clerk.user) {
+                    // Redirect to home page if not signed in
+                    window.location.href = '/index.html';
+                    return;
+                }
+
+                // Display user info
+                const user = window.Clerk.user;
+                const userName = user.firstName || user.username || user.emailAddresses[0]?.emailAddress || 'User';
+                document.getElementById('user-name').textContent = userName;
+
+                // Mount user button
+                const userButtonDiv = document.getElementById('user-button');
+                window.Clerk.mountUserButton(userButtonDiv);
+
+                // Load properties from backend
+                await loadProperties();
+            } catch (error) {
+                console.error('Error initializing Clerk:', error);
+                window.location.href = '/index.html';
+            }
+        }
+
+        // Load properties from backend
+        async function loadProperties() {
+            try {
+                const token = await window.Clerk.session.getToken();
+                const response = await fetch(`${API_BASE}/properties`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to load properties');
+                }
+
+                const loadedProperties = await response.json();
+                properties = loadedProperties;
                 renderProperties();
                 updatePropertyCount();
                 toggleEmptyState();
+            } catch (error) {
+                console.error('Error loading properties:', error);
+                alert('Failed to load properties. Please refresh the page.');
             }
         }
 
         // Handle form submission
         document.addEventListener('DOMContentLoaded', function() {
+            // Initialize Clerk
+            window.addEventListener('load', initClerk);
+
             const form = document.getElementById('add-property-form');
             form.addEventListener('submit', function(event) {
                 event.preventDefault();

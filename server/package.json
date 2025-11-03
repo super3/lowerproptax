@@ -1,0 +1,23 @@
+{
+  "name": "padtask-server",
+  "version": "1.0.0",
+  "description": "PadTask backend server with Clerk authentication",
+  "main": "src/index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "nodemon src/index.js"
+  },
+  "keywords": ["padtask", "property-management", "clerk"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@clerk/clerk-sdk-node": "^4.13.23",
+    "express": "^5.1.0",
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  }
+}

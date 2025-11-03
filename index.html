@@ -6,6 +6,14 @@
     <title>PadTask - Virtual Property Management</title>
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🔑</text></svg>">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Clerk.js -->
+    <script
+        async
+        crossorigin="anonymous"
+        data-clerk-publishable-key="your_clerk_publishable_key_here"
+        src="https://your-clerk-domain.clerk.accounts.dev/npm/@clerk/clerk-js@5/dist/clerk.browser.js"
+        type="text/javascript"
+    ></script>
     <style>
         * {
             margin: 0;
@@ -949,9 +957,9 @@
             <li><a href="#how-it-works">Services</a></li>
             <li><a href="#pricing">Pricing</a></li>
         </ul>
-        <div class="nav-auth">
-            <a href="dashboard.html">Log In</a>
-            <a href="#signup" class="btn-get-started">Get Started</a>
+        <div class="nav-auth" id="nav-auth">
+            <a href="#" id="nav-signin" onclick="handleSignIn(event)">Log In</a>
+            <a href="#" id="nav-signup" class="btn-get-started" onclick="handleSignUp(event)">Get Started</a>
         </div>
         <button class="mobile-menu-btn">☰</button>
     </nav>
@@ -961,7 +969,7 @@
         <div class="hero-content">
             <h1>Let PadTask manage your rental</h1>
             <p class="hero-subtitle">Our virtual property management team handles what traditional managers won't for just $25/month per property.</p>
-            <a href="#signup" class="hero-cta">Get Started</a>
+            <a href="#" class="hero-cta" onclick="handleSignUp(event)">Get Started</a>
         </div>
         <div class="hero-image">
             <div class="dashboard-mockup">
@@ -1127,7 +1135,7 @@
                 <div class="pricing-tier">Full Service</div>
                 <div class="pricing-amount">$25</div>
                 <p class="pricing-period">per property / month</p>
-                <a href="#signup" class="hero-cta">Get Started</a>
+                <a href="#" class="hero-cta" onclick="handleSignUp(event)">Get Started</a>
             </div>
             <div class="pricing-right">
                 <ul class="pricing-features">
@@ -1150,7 +1158,7 @@
         <div class="cta-content">
             <h2>Ready to get started?</h2>
             <p>Let's talk about how we can help manage your properties</p>
-            <a href="#signup" class="btn-white">Get Started</a>
+            <a href="#" class="btn-white" onclick="handleSignUp(event)">Get Started</a>
         </div>
         <div class="cta-preview">
             <div class="interface-placeholder">📊</div>
@@ -1170,16 +1178,73 @@
     </footer>
 
     <script>
+        // Clerk initialization
+        let clerkLoaded = false;
+
+        window.addEventListener('load', async () => {
+            try {
+                // Wait for Clerk to load
+                await window.Clerk.load();
+                clerkLoaded = true;
+
+                // Check if user is already signed in
+                if (window.Clerk.user) {
+                    // User is signed in, update nav to show dashboard link
+                    updateNavForSignedInUser();
+                }
+            } catch (error) {
+                console.error('Error loading Clerk:', error);
+            }
+        });
+
+        function updateNavForSignedInUser() {
+            const navAuth = document.getElementById('nav-auth');
+            navAuth.innerHTML = '<a href="dashboard.html" class="btn-get-started">Go to Dashboard</a>';
+        }
+
+        async function handleSignIn(event) {
+            event.preventDefault();
+            if (!clerkLoaded) {
+                alert('Authentication is loading, please wait...');
+                return;
+            }
+            try {
+                await window.Clerk.openSignIn({
+                    redirectUrl: '/dashboard.html'
+                });
+            } catch (error) {
+                console.error('Error opening sign in:', error);
+            }
+        }
+
+        async function handleSignUp(event) {
+            event.preventDefault();
+            if (!clerkLoaded) {
+                alert('Authentication is loading, please wait...');
+                return;
+            }
+            try {
+                await window.Clerk.openSignUp({
+                    redirectUrl: '/dashboard.html'
+                });
+            } catch (error) {
+                console.error('Error opening sign up:', error);
+            }
+        }
+
         // Smooth scrolling for navigation links
         document.querySelectorAll('a[href^="#"]').forEach(anchor => {
             anchor.addEventListener('click', function (e) {
-                e.preventDefault();
-                const target = document.querySelector(this.getAttribute('href'));
-                if (target) {
-                    target.scrollIntoView({
-                        behavior: 'smooth',
-                        block: 'start'
-                    });
+                const href = this.getAttribute('href');
+                if (href !== '#' && href.length > 1) {
+                    e.preventDefault();
+                    const target = document.querySelector(href);
+                    if (target) {
+                        target.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'start'
+                        });
+                    }
                 }
             });
         });
