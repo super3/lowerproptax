@@ -14,6 +14,7 @@ Virtual property management platform that handles what traditional property mana
 - 🔐 Secure authentication with Clerk
 - 📊 Real-time property dashboard
 - 🗺️ Google Maps integration for property management
+- 💾 PostgreSQL database for persistent storage
 
 ## Installation
 
@@ -45,10 +46,9 @@ npm test                           # Run test suite
 - ✅ Google Maps address autocomplete
 - ✅ User-specific data isolation
 - ✅ Responsive dashboard design
+- ✅ PostgreSQL database integration
 
 ### Roadmap
-
-- [ ] Database integration (PostgreSQL/MongoDB)
 - [ ] Financial tracking (rent, expenses, taxes)
 - [ ] Maintenance request system
 - [ ] Email notifications
