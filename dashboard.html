@@ -982,7 +982,7 @@
         // View property (placeholder for future functionality)
         function viewProperty(index) {
             const property = properties[index];
-            alert('View property details:\n\n' + property.address + '\n\n(Full details functionality coming soon)');
+            window.location.href = `/property-setup.html?id=${property.id}`;
         }
 
         // Delete property
