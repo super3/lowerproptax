@@ -509,7 +509,21 @@
             border-radius: 8px;
             padding: 1rem;
             margin-bottom: 0.75rem;
-            animation: pulse 1.5s ease-in-out infinite;
+        }
+
+        .skeleton-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .skeleton-left {
+            flex: 1;
+        }
+
+        .skeleton-right {
+            display: flex;
+            gap: 0.5rem;
         }
 
         .skeleton-line {
@@ -517,16 +531,26 @@
             border-radius: 4px;
             height: 16px;
             margin-bottom: 0.5rem;
+            animation: pulse 1.5s ease-in-out infinite;
         }
 
         .skeleton-line.title {
-            width: 60%;
+            width: 50%;
             height: 18px;
         }
 
         .skeleton-line.subtitle {
-            width: 40%;
+            width: 35%;
             height: 14px;
+            margin-bottom: 0;
+        }
+
+        .skeleton-button {
+            background: #e5e5e5;
+            border-radius: 4px;
+            width: 60px;
+            height: 32px;
+            animation: pulse 1.5s ease-in-out infinite;
         }
 
         @keyframes pulse {
@@ -831,8 +855,16 @@
                 const skeleton = document.createElement('div');
                 skeleton.className = 'skeleton-card';
                 skeleton.innerHTML = `
-                    <div class="skeleton-line title"></div>
-                    <div class="skeleton-line subtitle"></div>
+                    <div class="skeleton-header">
+                        <div class="skeleton-left">
+                            <div class="skeleton-line title"></div>
+                            <div class="skeleton-line subtitle"></div>
+                        </div>
+                        <div class="skeleton-right">
+                            <div class="skeleton-button"></div>
+                            <div class="skeleton-button"></div>
+                        </div>
+                    </div>
                 `;
                 loadingState.appendChild(skeleton);
             }
