@@ -493,6 +493,50 @@
                 text-align: center;
             }
         }
+
+        /* Loading skeleton styles */
+        .loading-state {
+            display: none;
+        }
+
+        .loading-state.active {
+            display: block;
+        }
+
+        .skeleton-card {
+            background: white;
+            border: 1px solid #e5e5e5;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 0.75rem;
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+
+        .skeleton-line {
+            background: #e5e5e5;
+            border-radius: 4px;
+            height: 16px;
+            margin-bottom: 0.5rem;
+        }
+
+        .skeleton-line.title {
+            width: 60%;
+            height: 18px;
+        }
+
+        .skeleton-line.subtitle {
+            width: 40%;
+            height: 14px;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.5;
+            }
+        }
     </style>
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDxdYMdPwYKYGtjb5Bw8QhEbk6gKZkG0vM&libraries=places&loading=async&callback=initAutocomplete" async defer></script>
 </head>
@@ -547,11 +591,15 @@
                 </form>
             </div>
 
+            <div class="loading-state" id="loading-state">
+                <!-- Skeleton cards will be added here dynamically -->
+            </div>
+
             <div class="properties-list" id="properties-list">
                 <!-- Properties will be added here dynamically -->
             </div>
 
-            <div class="empty-properties" id="empty-state">
+            <div class="empty-properties hidden" id="empty-state">
                 <h3>🏠 Add your first property</h3>
                 <p>Start tracking rent, expenses, and maintenance for your rental properties.</p>
 
@@ -747,6 +795,9 @@
         // Properties storage
         let properties = [];
 
+        // LocalStorage key for property count
+        const PROPERTY_COUNT_KEY = 'padtask_property_count';
+
         // Update property count
         function updatePropertyCount() {
             const countElement = document.getElementById('property-count');
@@ -754,12 +805,55 @@
             const count = properties.length;
             countElement.textContent = count === 1 ? '1 Property' : `${count} Properties`;
 
+            // Cache the count in localStorage
+            localStorage.setItem(PROPERTY_COUNT_KEY, count.toString());
+
             // Show the add button when there are properties
             if (count > 0) {
                 addButton.classList.remove('hidden');
             } else {
                 addButton.classList.add('hidden');
             }
+        }
+
+        // Get cached property count from localStorage
+        function getCachedPropertyCount() {
+            const cached = localStorage.getItem(PROPERTY_COUNT_KEY);
+            return cached ? parseInt(cached, 10) : 0;
+        }
+
+        // Create skeleton loading cards
+        function createSkeletonCards(count) {
+            const loadingState = document.getElementById('loading-state');
+            loadingState.innerHTML = '';
+
+            for (let i = 0; i < count; i++) {
+                const skeleton = document.createElement('div');
+                skeleton.className = 'skeleton-card';
+                skeleton.innerHTML = `
+                    <div class="skeleton-line title"></div>
+                    <div class="skeleton-line subtitle"></div>
+                `;
+                loadingState.appendChild(skeleton);
+            }
+        }
+
+        // Show loading state
+        function showLoadingState(count) {
+            const loadingState = document.getElementById('loading-state');
+            const propertiesList = document.getElementById('properties-list');
+            const emptyState = document.getElementById('empty-state');
+
+            createSkeletonCards(count);
+            loadingState.classList.add('active');
+            propertiesList.classList.remove('active');
+            emptyState.classList.add('hidden');
+        }
+
+        // Hide loading state
+        function hideLoadingState() {
+            const loadingState = document.getElementById('loading-state');
+            loadingState.classList.remove('active');
         }
 
         // Toggle between empty state and properties list
@@ -891,6 +985,20 @@
         // Initialize Clerk and load user data
         async function initClerk() {
             try {
+                // Check cached property count and show appropriate initial state
+                const cachedCount = getCachedPropertyCount();
+                if (cachedCount > 0) {
+                    // Show loading skeleton with cached count
+                    showLoadingState(cachedCount);
+                    // Update count display with cached value
+                    document.getElementById('property-count').textContent =
+                        cachedCount === 1 ? '1 Property' : `${cachedCount} Properties`;
+                    document.getElementById('add-property-btn').classList.remove('hidden');
+                } else {
+                    // Show empty state
+                    toggleEmptyState();
+                }
+
                 await window.Clerk.load();
                 clerkLoaded = true;
 
@@ -934,11 +1042,16 @@
 
                 const loadedProperties = await response.json();
                 properties = loadedProperties;
+
+                // Hide loading state before showing properties
+                hideLoadingState();
+
                 renderProperties();
                 updatePropertyCount();
                 toggleEmptyState();
             } catch (error) {
                 console.error('Error loading properties:', error);
+                hideLoadingState();
                 alert('Failed to load properties. Please refresh the page.');
             }
         }
