@@ -277,7 +277,7 @@
 
         .stat-card {
             background: #f8f9fa;
-            padding: 0.75rem;
+            padding: 0.875rem;
             border-radius: 8px;
             border: 1px solid #e5e5e5;
         }
@@ -330,6 +330,9 @@
             padding: 0.25rem 0.5rem;
             border-radius: 4px;
             font-weight: 600;
+            text-align: center;
+            display: inline-block;
+            min-width: 80px;
         }
 
         .property-status.active {
@@ -340,6 +343,26 @@
         .property-status.pending {
             background: #fff3e0;
             color: #f57c00;
+        }
+
+        .comparable-card {
+            background: #f8f9fa;
+        }
+
+        .comparable-card h4 {
+            color: #666;
+        }
+
+        .comparable-price {
+            background: #e3f2fd;
+            color: #1976d2;
+            font-size: 0.7rem;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-weight: 600;
+            width: 80px;
+            text-align: center;
+            display: inline-block;
         }
 
         /* Financial Tracking Mockup */
@@ -366,13 +389,13 @@
         }
 
         .financial-summary {
-            display: flex;
-            gap: 1rem;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.75rem;
             margin-bottom: 1.5rem;
         }
 
         .financial-stat {
-            flex: 1;
             background: #f8f9fa;
             padding: 0.875rem;
             border-radius: 8px;
@@ -411,7 +434,7 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 0.75rem;
+            padding: 0.875rem;
             background: white;
             border: 1px solid #e5e5e5;
             border-radius: 8px;
@@ -921,7 +944,7 @@
             }
 
             .financial-summary {
-                flex-direction: column;
+                grid-template-columns: 1fr;
             }
 
             .transaction-item {
@@ -1004,19 +1027,19 @@
                     <div style="padding: 0.25rem 0 0.25rem 0; margin: 0;">
                         <div style="font-size: 0.65rem; color: #999; text-transform: uppercase; letter-spacing: 0.5px; margin: 0; font-weight: 600;">Comparable Properties</div>
                     </div>
-                    <div class="property-card" style="background: #f8f9fa;">
+                    <div class="property-card comparable-card">
                         <div class="property-info">
-                            <h4 style="font-size: 0.8rem; color: #666;">118 Oak Street</h4>
+                            <h4>118 Oak Street</h4>
                             <p>3 bed, 2 bath • 1,900 sq ft</p>
                         </div>
-                        <span class="property-status active" style="background: #e3f2fd; color: #1976d2;">$338,500</span>
+                        <span class="comparable-price">$338,500</span>
                     </div>
-                    <div class="property-card" style="background: #f8f9fa;">
+                    <div class="property-card comparable-card">
                         <div class="property-info">
-                            <h4 style="font-size: 0.8rem; color: #666;">215 Elm Drive</h4>
+                            <h4>215 Elm Drive</h4>
                             <p>3 bed, 2 bath • 1,820 sq ft</p>
                         </div>
-                        <span class="property-status active" style="background: #e3f2fd; color: #1976d2;">$345,900</span>
+                        <span class="comparable-price">$345,900</span>
                     </div>
                 </div>
             </div>
