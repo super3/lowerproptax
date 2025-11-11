@@ -1270,6 +1270,13 @@
                 return;
             }
             try {
+                // If user is already signed in, redirect to dashboard
+                if (window.Clerk.user) {
+                    window.location.href = '/dashboard.html';
+                    return;
+                }
+
+                // Otherwise, open sign in modal
                 await window.Clerk.openSignIn({
                     redirectUrl: '/dashboard.html'
                 });
@@ -1285,6 +1292,13 @@
                 return;
             }
             try {
+                // If user is already signed in, redirect to dashboard
+                if (window.Clerk.user) {
+                    window.location.href = '/dashboard.html';
+                    return;
+                }
+
+                // Otherwise, open sign up modal
                 await window.Clerk.openSignUp({
                     redirectUrl: '/dashboard.html'
                 });
