@@ -52,12 +52,6 @@
             color: #1a1a1a;
         }
 
-        .nav-right {
-            display: flex;
-            gap: 1rem;
-            align-items: center;
-        }
-
         .back-button {
             background: #f0f4ff;
             color: #3171ef;
@@ -73,9 +67,44 @@
             background: #e0e7ff;
         }
 
+        /* Main Container */
+        .container {
+            max-width: 1000px;
+            margin: 3rem auto;
+            padding: 0 2rem;
+        }
+
+        .property-detail {
+            background: white;
+            border-radius: 12px;
+            padding: 2.5rem;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+
+        .property-header {
+            margin-bottom: 2rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 2px solid #f0f0f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+
+        .property-info {
+            flex: 1;
+        }
+
+        .property-address {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: #1a1a1a;
+            margin-bottom: 0.5rem;
+        }
+
         /* Three-dot menu */
         .menu-container {
             position: relative;
+            margin-left: 1rem;
         }
 
         .menu-button {
@@ -125,33 +154,6 @@
         .menu-item:hover {
             background: #f8f9fa;
             color: #ef3131;
-        }
-
-        /* Main Container */
-        .container {
-            max-width: 1000px;
-            margin: 3rem auto;
-            padding: 0 2rem;
-        }
-
-        .property-detail {
-            background: white;
-            border-radius: 12px;
-            padding: 2.5rem;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-        }
-
-        .property-header {
-            margin-bottom: 2rem;
-            padding-bottom: 1.5rem;
-            border-bottom: 2px solid #f0f0f0;
-        }
-
-        .property-address {
-            font-size: 1.75rem;
-            font-weight: 700;
-            color: #1a1a1a;
-            margin-bottom: 0.5rem;
         }
 
         .property-location {
@@ -272,24 +274,24 @@
     <!-- Navigation -->
     <nav>
         <a href="index.html" class="logo-link"><div class="logo">🏡 PadTask</div></a>
-        <div class="nav-right">
-            <a href="dashboard.html" class="back-button">← Back to Dashboard</a>
-            <div class="menu-container">
-                <button class="menu-button" id="menu-button">⋮</button>
-                <div class="menu-dropdown" id="menu-dropdown">
-                    <button class="menu-item" id="delete-property">Delete Property</button>
-                </div>
-            </div>
-        </div>
+        <a href="dashboard.html" class="back-button">← Back to Dashboard</a>
     </nav>
 
     <!-- Main Content -->
     <div class="container">
         <div class="property-detail" id="property-detail">
             <div class="property-header">
-                <div class="property-address" id="property-address">Loading...</div>
-                <div class="property-location" id="property-location"></div>
-                <span class="property-status" id="property-status"></span>
+                <div class="property-info">
+                    <div class="property-address" id="property-address">Loading...</div>
+                    <div class="property-location" id="property-location"></div>
+                    <span class="property-status" id="property-status"></span>
+                </div>
+                <div class="menu-container">
+                    <button class="menu-button" id="menu-button">⋮</button>
+                    <div class="menu-dropdown" id="menu-dropdown">
+                        <button class="menu-item" id="delete-property">Delete Property</button>
+                    </div>
+                </div>
             </div>
 
             <div class="status-message" id="status-message"></div>
