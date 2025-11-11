@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PadTask - Admin</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🏡</text></svg>">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Clerk.js -->
+    <script
+        async
+        crossorigin="anonymous"
+        data-clerk-publishable-key="pk_test_b3JnYW5pYy10YXJwb24tNzUuY2xlcmsuYWNjb3VudHMuZGV2JA"
+        src="https://organic-tarpon-75.clerk.accounts.dev/npm/@clerk/clerk-js@5/dist/clerk.browser.js"
+        type="text/javascript"
+    ></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', Arial, sans-serif;
+            line-height: 1.6;
+            color: #1a1a1a;
+            background: #f8f9fa;
+        }
+
+        /* Navigation */
+        nav {
+            background: white;
+            padding: 0 7%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #e5e5e5;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+            height: 72px;
+        }
+
+        .logo-link {
+            text-decoration: none;
+            color: inherit;
+            display: block;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #1a1a1a;
+        }
+
+        .nav-right {
+            display: flex;
+            gap: 2.5rem;
+            align-items: center;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .user-name {
+            font-weight: 500;
+            color: #1a1a1a;
+            font-size: 0.95rem;
+        }
+
+        #user-button {
+            display: flex;
+            align-items: center;
+        }
+
+        /* Main Container */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 3rem 7%;
+        }
+
+        /* Dashboard Mockup */
+        .dashboard-mockup {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+            margin-bottom: 2rem;
+        }
+
+        .mockup-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid #e5e5e5;
+        }
+
+        .mockup-header h2 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #1a1a1a;
+        }
+
+        .mockup-header-right {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .mockup-header span {
+            font-size: 0.9rem;
+            color: #999;
+        }
+
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: #fafbfc;
+            padding: 1.25rem;
+            border-radius: 8px;
+            border: 1px solid #e5e5e5;
+        }
+
+        .stat-card label {
+            font-size: 0.75rem;
+            color: #999;
+            display: block;
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .stat-card .value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #1a1a1a;
+        }
+
+        .properties-table {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        thead {
+            border-bottom: 2px solid #e5e5e5;
+        }
+
+        th {
+            text-align: left;
+            padding: 1rem;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        td {
+            padding: 1rem;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        tbody tr:hover {
+            background: #f8f9fa;
+        }
+
+        .property-address {
+            font-weight: 600;
+            color: #1a1a1a;
+        }
+
+        .user-email {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .time-pending {
+            font-size: 0.9rem;
+        }
+
+        .time-warning {
+            color: #e67e22;
+            font-weight: 600;
+        }
+
+        .time-critical {
+            color: #ef3131;
+            font-weight: 600;
+        }
+
+        .btn-mark-ready {
+            background: #27ae60;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            border: none;
+            font-weight: 600;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-mark-ready:hover {
+            background: #229954;
+            transform: translateY(-1px);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: #666;
+        }
+
+        .empty-state h3 {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+            color: #1a1a1a;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 3rem;
+            color: #666;
+        }
+
+        @media (max-width: 968px) {
+            nav {
+                padding: 0 5%;
+            }
+
+            .container {
+                padding: 2rem 5%;
+            }
+
+            .dashboard-mockup {
+                padding: 1.5rem;
+            }
+
+            .mockup-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.75rem;
+            }
+
+            .mockup-header-right {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.5rem;
+                width: 100%;
+            }
+
+            .stats-row {
+                grid-template-columns: 1fr;
+            }
+
+            .stat-card {
+                padding: 1rem;
+            }
+
+            .properties-table {
+                padding: 1rem;
+            }
+
+            table {
+                font-size: 0.85rem;
+            }
+
+            th, td {
+                padding: 0.75rem 0.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav>
+        <a href="index.html" class="logo-link"><div class="logo">🏡 PadTask</div></a>
+        <div class="nav-right">
+            <div class="user-info">
+                <span class="user-name" id="user-name">Loading...</span>
+                <div id="user-button"></div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container">
+        <!-- Assessments Section -->
+        <div class="dashboard-mockup">
+            <div class="mockup-header">
+                <h2>Assessments</h2>
+            </div>
+
+            <div class="stats-row">
+                <div class="stat-card">
+                    <label>Total Pending</label>
+                    <div class="value" id="total-pending">0</div>
+                </div>
+                <div class="stat-card">
+                    <label>Total Completed</label>
+                    <div class="value" id="total-completed">0</div>
+                </div>
+            </div>
+
+            <div class="properties-table">
+                <div class="loading" id="loading">Loading assessments...</div>
+                <div class="empty-state hidden" id="empty-state">
+                    <h3>No assessments yet</h3>
+                    <p>Assessments will appear here as properties are added.</p>
+                </div>
+                <table id="properties-table" class="hidden">
+                    <thead>
+                        <tr>
+                            <th>Address</th>
+                            <th>User Email</th>
+                            <th>Status</th>
+                            <th>Added</th>
+                            <th>Time Elapsed</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="properties-tbody">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // API Configuration
+        const API_BASE = 'https://padtask-production.up.railway.app/api';
+        const isDevelopment = window.location.protocol === 'file:' || window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+
+        let clerkLoaded = false;
+        let allProperties = [];
+
+        // Calculate time difference in hours
+        function getHoursSince(dateString) {
+            const date = new Date(dateString);
+            const now = new Date();
+            const diffMs = now - date;
+            const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+            return diffHours;
+        }
+
+        // Format time pending display
+        function formatTimePending(hours) {
+            if (hours < 1) {
+                return 'Less than 1 hour';
+            } else if (hours === 1) {
+                return '1 hour';
+            } else if (hours < 24) {
+                return `${hours} hours`;
+            } else {
+                const days = Math.floor(hours / 24);
+                const remainingHours = hours % 24;
+                if (remainingHours === 0) {
+                    return `${days} day${days > 1 ? 's' : ''}`;
+                }
+                return `${days} day${days > 1 ? 's' : ''}, ${remainingHours} hour${remainingHours > 1 ? 's' : ''}`;
+            }
+        }
+
+        // Load all properties
+        async function loadProperties() {
+            try {
+                const token = await window.Clerk.session.getToken();
+
+                // Load pending properties
+                const pendingResponse = await fetch(`${API_BASE}/admin/pending-properties`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (!pendingResponse.ok) {
+                    throw new Error('Failed to load pending properties');
+                }
+
+                const pendingProperties = await pendingResponse.json();
+
+                // Load completed properties
+                const completedResponse = await fetch(`${API_BASE}/admin/completed-properties`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (!completedResponse.ok) {
+                    throw new Error('Failed to load completed properties');
+                }
+
+                const completedProperties = await completedResponse.json();
+
+                // Combine both arrays with pending first
+                allProperties = [...pendingProperties, ...completedProperties];
+
+                displayProperties();
+            } catch (error) {
+                console.error('Error loading properties:', error);
+                document.getElementById('loading').textContent = 'Failed to load assessments. Please try again.';
+            }
+        }
+
+        // Display all properties
+        function displayProperties() {
+            const loading = document.getElementById('loading');
+            const emptyState = document.getElementById('empty-state');
+            const table = document.getElementById('properties-table');
+            const tbody = document.getElementById('properties-tbody');
+
+            loading.classList.add('hidden');
+
+            if (allProperties.length === 0) {
+                emptyState.classList.remove('hidden');
+                table.classList.add('hidden');
+                updateStats(0, 0, 0);
+                return;
+            }
+
+            emptyState.classList.add('hidden');
+            table.classList.remove('hidden');
+
+            // Calculate stats
+            let totalPending = 0;
+            let totalCompleted = 0;
+
+            tbody.innerHTML = '';
+            allProperties.forEach((property) => {
+                const isPending = property.status === 'preparing';
+                const hours = getHoursSince(property.created_at);
+
+                if (isPending) {
+                    totalPending++;
+                } else {
+                    totalCompleted++;
+                }
+
+                const row = document.createElement('tr');
+
+                let timeClass = '';
+                let statusBadge = '';
+                let actionButton = '';
+
+                if (isPending) {
+                    if (hours >= 48) timeClass = 'time-critical';
+                    else if (hours >= 24) timeClass = 'time-warning';
+                    statusBadge = '<span style="background: #fff4e6; color: #e67e22; padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.8rem; font-weight: 600;">Preparing</span>';
+                    actionButton = `<button class="btn-mark-ready" onclick="markAsReady('${property.id}')">Mark Ready</button>`;
+                } else {
+                    statusBadge = '<span style="background: #e8f5e9; color: #27ae60; padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.8rem; font-weight: 600;">Ready</span>';
+                    actionButton = '-';
+                }
+
+                row.innerHTML = `
+                    <td class="property-address">${property.address}</td>
+                    <td class="user-email">${property.user_email || 'N/A'}</td>
+                    <td>${statusBadge}</td>
+                    <td>${new Date(property.created_at).toLocaleDateString()} ${new Date(property.created_at).toLocaleTimeString()}</td>
+                    <td class="time-pending ${timeClass}">${formatTimePending(hours)}</td>
+                    <td>${actionButton}</td>
+                `;
+                tbody.appendChild(row);
+            });
+
+            updateStats(totalPending, totalCompleted);
+        }
+
+        // Update stats display
+        function updateStats(totalPending, totalCompleted) {
+            document.getElementById('total-pending').textContent = totalPending;
+            document.getElementById('total-completed').textContent = totalCompleted;
+        }
+
+        // Mark property as ready
+        async function markAsReady(propertyId) {
+            if (!confirm('Mark this property assessment as ready?')) {
+                return;
+            }
+
+            try {
+                const token = await window.Clerk.session.getToken();
+                const response = await fetch(`${API_BASE}/admin/properties/${propertyId}/mark-ready`, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to mark property as ready');
+                }
+
+                alert('Property marked as ready!');
+                // Reload both lists
+                await loadProperties();
+            } catch (error) {
+                console.error('Error marking property as ready:', error);
+                alert('Failed to mark property as ready. Please try again.');
+            }
+        }
+
+        // Initialize Clerk
+        async function initClerk() {
+            try {
+                // Skip Clerk authentication in development mode
+                if (isDevelopment) {
+                    console.log('Development mode: Skipping Clerk authentication');
+                    document.getElementById('user-name').textContent = 'Developer';
+                    document.getElementById('user-button').innerHTML = '<span style="color: #666;">Dev Mode</span>';
+                    await loadProperties();
+                    return;
+                }
+
+                await window.Clerk.load();
+                clerkLoaded = true;
+
+                // Check if user is signed in
+                if (!window.Clerk.user && !isDevelopment) {
+                    window.location.href = '/index.html';
+                    return;
+                }
+
+                // Display user info
+                const user = window.Clerk.user;
+                const userName = user.firstName || user.username || user.emailAddresses[0]?.emailAddress || 'User';
+                document.getElementById('user-name').textContent = userName;
+
+                // Mount user button
+                const userButtonDiv = document.getElementById('user-button');
+                window.Clerk.mountUserButton(userButtonDiv);
+
+                // Load properties
+                await loadProperties();
+            } catch (error) {
+                console.error('Error initializing:', error);
+                if (!isDevelopment) {
+                    window.location.href = '/index.html';
+                }
+            }
+        }
+
+        // Initialize when Clerk is ready
+        window.addEventListener('load', async () => {
+            if (window.Clerk) {
+                await initClerk();
+            } else {
+                document.addEventListener('clerk:loaded', initClerk);
+            }
+        });
+
+        // Add hidden class utility
+        document.querySelectorAll('.hidden').forEach(el => {
+            el.style.display = 'none';
+        });
+    </script>
+
+    <style>
+        .hidden {
+            display: none !important;
+        }
+    </style>
+</body>
+</html>
