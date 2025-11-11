@@ -642,6 +642,7 @@
     <script>
         // API Configuration
         const API_BASE = 'https://padtask-production.up.railway.app/api';
+        const isDevelopment = window.location.protocol === 'file:' || window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
 
         let autocompleteWidget;
         let selectedPlace = null;
@@ -1034,8 +1035,8 @@
                 clerkLoaded = true;
 
                 // Check if user is signed in
-                if (!window.Clerk.user) {
-                    // Redirect to home page if not signed in
+                if (!window.Clerk.user && !isDevelopment) {
+                    // Redirect to home page if not signed in (except in development)
                     window.location.href = '/index.html';
                     return;
                 }
@@ -1053,7 +1054,9 @@
                 await loadProperties();
             } catch (error) {
                 console.error('Error initializing Clerk:', error);
-                window.location.href = '/index.html';
+                if (!isDevelopment) {
+                    window.location.href = '/index.html';
+                }
             }
         }
 
