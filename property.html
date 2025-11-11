@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Property Details - PadTask</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🏡</text></svg>">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Clerk.js -->
+    <script
+        async
+        crossorigin="anonymous"
+        data-clerk-publishable-key="pk_test_b3JnYW5pYy10YXJwb24tNzUuY2xlcmsuYWNjb3VudHMuZGV2JA"
+        src="https://organic-tarpon-75.clerk.accounts.dev/npm/@clerk/clerk-js@5/dist/clerk.browser.js"
+        type="text/javascript"
+    ></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', Arial, sans-serif;
+            line-height: 1.6;
+            color: #1a1a1a;
+            background: #f8f9fa;
+        }
+
+        /* Navigation */
+        nav {
+            background: white;
+            padding: 0 7%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #e5e5e5;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+            height: 72px;
+        }
+
+        .logo-link {
+            text-decoration: none;
+            color: inherit;
+            display: block;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #1a1a1a;
+        }
+
+        .back-button {
+            background: #f0f4ff;
+            color: #3171ef;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+        }
+
+        .back-button:hover {
+            background: #e0e7ff;
+        }
+
+        /* Main Container */
+        .container {
+            max-width: 1000px;
+            margin: 3rem auto;
+            padding: 0 2rem;
+        }
+
+        .property-detail {
+            background: white;
+            border-radius: 12px;
+            padding: 2.5rem;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+
+        .property-header {
+            margin-bottom: 2rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .property-address {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: #1a1a1a;
+            margin-bottom: 0.5rem;
+        }
+
+        .property-location {
+            font-size: 1.1rem;
+            color: #666;
+            margin-bottom: 1rem;
+        }
+
+        .property-status {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .status-preparing {
+            background: #fff4e6;
+            color: #e67e22;
+        }
+
+        .status-ready {
+            background: #e8f5e9;
+            color: #27ae60;
+        }
+
+        .status-message {
+            background: #f0f4ff;
+            border-left: 4px solid #3171ef;
+            padding: 1.25rem;
+            margin: 1.5rem 0;
+            border-radius: 6px;
+            font-size: 0.95rem;
+            color: #444;
+        }
+
+        .property-data {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .data-card {
+            background: #fafbfc;
+            padding: 1.5rem;
+            border-radius: 8px;
+            border: 1px solid #e5e5e5;
+        }
+
+        .data-card label {
+            font-size: 0.8rem;
+            color: #666;
+            display: block;
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .data-card .value {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: #1a1a1a;
+        }
+
+        .data-card .value.preparing {
+            color: #999;
+            font-style: italic;
+        }
+
+        .btn-download {
+            background: #3171ef;
+            color: white;
+            padding: 1rem 2rem;
+            border-radius: 6px;
+            border: none;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-block;
+            margin-top: 2rem;
+            text-decoration: none;
+        }
+
+        .btn-download:hover {
+            background: #2560d9;
+            transform: translateY(-1px);
+        }
+
+        .btn-download:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 0 1rem;
+                margin: 2rem auto;
+            }
+
+            .property-detail {
+                padding: 1.5rem;
+            }
+
+            .property-address {
+                font-size: 1.5rem;
+            }
+
+            .property-data {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav>
+        <a href="index.html" class="logo-link"><div class="logo">🏡 PadTask</div></a>
+        <a href="dashboard.html" class="back-button">← Back to Dashboard</a>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container">
+        <div class="property-detail" id="property-detail">
+            <div class="property-header">
+                <div class="property-address" id="property-address">Loading...</div>
+                <div class="property-location" id="property-location"></div>
+                <span class="property-status" id="property-status"></span>
+            </div>
+
+            <div class="status-message" id="status-message"></div>
+
+            <div class="property-data">
+                <div class="data-card">
+                    <label>Assessed Value (2025)</label>
+                    <div class="value preparing" id="assessed-value">--</div>
+                </div>
+                <div class="data-card">
+                    <label>Estimated Annual Tax</label>
+                    <div class="value preparing" id="annual-tax">--</div>
+                </div>
+                <div class="data-card">
+                    <label>Bedrooms</label>
+                    <div class="value preparing" id="bedrooms">--</div>
+                </div>
+                <div class="data-card">
+                    <label>Bathrooms</label>
+                    <div class="value preparing" id="bathrooms">--</div>
+                </div>
+                <div class="data-card">
+                    <label>Square Feet</label>
+                    <div class="value preparing" id="square-feet">--</div>
+                </div>
+                <div class="data-card">
+                    <label>Potential Annual Savings</label>
+                    <div class="value preparing" id="potential-savings">--</div>
+                </div>
+            </div>
+
+            <button class="btn-download" id="download-report" disabled>Download Report ($49)</button>
+        </div>
+    </div>
+
+    <script>
+        // API Configuration
+        const API_BASE = 'https://padtask-production.up.railway.app/api';
+        const isDevelopment = window.location.protocol === 'file:' || window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+
+        let clerkLoaded = false;
+        let propertyId = null;
+
+        // Get property ID from URL
+        const urlParams = new URLSearchParams(window.location.search);
+        propertyId = urlParams.get('id');
+
+        if (!propertyId) {
+            alert('Property ID not found');
+            window.location.href = '/dashboard.html';
+        }
+
+        // Load property data
+        async function loadProperty() {
+            try {
+                const token = await window.Clerk.session.getToken();
+                const response = await fetch(`${API_BASE}/properties/${propertyId}`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to load property');
+                }
+
+                const property = await response.json();
+                displayProperty(property);
+            } catch (error) {
+                console.error('Error loading property:', error);
+                alert('Failed to load property details');
+            }
+        }
+
+        // Display property information
+        function displayProperty(property) {
+            // Address
+            document.getElementById('property-address').textContent = property.address;
+
+            // Location
+            let location = '';
+            if (property.city && property.state) {
+                location = `${property.city}, ${property.state}`;
+            } else if (property.city) {
+                location = property.city;
+            } else if (property.state) {
+                location = property.state;
+            }
+            if (property.zip_code) {
+                location += ` ${property.zip_code}`;
+            }
+            document.getElementById('property-location').textContent = location;
+
+            // Status
+            const status = property.status || 'preparing';
+            const statusEl = document.getElementById('property-status');
+            statusEl.className = `property-status status-${status}`;
+            statusEl.textContent = status === 'preparing' ? 'Preparing Assessment...' : 'Assessment Ready';
+
+            // Status message
+            const messageEl = document.getElementById('status-message');
+            if (status === 'preparing') {
+                messageEl.textContent = "We're gathering data on your property. This usually takes 24 hours. We'll send you an email when your assessment is ready!";
+            } else {
+                messageEl.textContent = "Your assessment is complete! Review the details below and download your full report.";
+            }
+
+            // Property data (mock data for now - in production this would come from backend)
+            if (status === 'ready') {
+                document.getElementById('assessed-value').textContent = '$485,000';
+                document.getElementById('assessed-value').classList.remove('preparing');
+
+                document.getElementById('annual-tax').textContent = '$9,700';
+                document.getElementById('annual-tax').classList.remove('preparing');
+
+                document.getElementById('bedrooms').textContent = '3';
+                document.getElementById('bedrooms').classList.remove('preparing');
+
+                document.getElementById('bathrooms').textContent = '2.5';
+                document.getElementById('bathrooms').classList.remove('preparing');
+
+                document.getElementById('square-feet').textContent = '2,100';
+                document.getElementById('square-feet').classList.remove('preparing');
+
+                document.getElementById('potential-savings').textContent = '$1,240';
+                document.getElementById('potential-savings').classList.remove('preparing');
+
+                // Enable download button
+                document.getElementById('download-report').disabled = false;
+            }
+        }
+
+        // Initialize Clerk
+        async function initClerk() {
+            try {
+                // Skip Clerk authentication in development mode
+                if (isDevelopment) {
+                    console.log('Development mode: Skipping Clerk authentication');
+                    await loadProperty();
+                    return;
+                }
+
+                await window.Clerk.load();
+                clerkLoaded = true;
+
+                // Check if user is signed in
+                if (!window.Clerk.user && !isDevelopment) {
+                    window.location.href = '/index.html';
+                    return;
+                }
+
+                // Load property
+                await loadProperty();
+            } catch (error) {
+                console.error('Error initializing:', error);
+                if (!isDevelopment) {
+                    window.location.href = '/index.html';
+                }
+            }
+        }
+
+        // Initialize when Clerk is ready
+        window.addEventListener('load', async () => {
+            if (window.Clerk) {
+                await initClerk();
+            } else {
+                document.addEventListener('clerk:loaded', initClerk);
+            }
+        });
+
+        // Download report button
+        document.getElementById('download-report').addEventListener('click', () => {
+            alert('Payment integration coming soon! This will redirect to a payment page for the $49 PDF report.');
+        });
+    </script>
+</body>
+</html>

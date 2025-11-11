@@ -17,6 +17,7 @@ export async function initDatabase() {
         country VARCHAR(100),
         lat DECIMAL(10, 8),
         lng DECIMAL(11, 8),
+        status VARCHAR(50) DEFAULT 'preparing',
         created_at TIMESTAMP DEFAULT NOW(),
         updated_at TIMESTAMP DEFAULT NOW()
       );
