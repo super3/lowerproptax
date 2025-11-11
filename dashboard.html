@@ -933,7 +933,6 @@
                         ${location ? `<div class="property-details">${location}</div>` : ''}
                     </div>
                     <div class="property-actions">
-                        <button class="btn-small btn-view" onclick="viewProperty(${index})">View</button>
                         <button class="btn-small btn-delete" onclick="deleteProperty(${index})">Delete</button>
                     </div>
                 </div>
@@ -978,12 +977,6 @@
                 const card = createPropertyCard(property, index);
                 propertiesList.appendChild(card);
             });
-        }
-
-        // View property (placeholder for future functionality)
-        function viewProperty(index) {
-            const property = properties[index];
-            window.location.href = `/property-setup.html?id=${property.id}`;
         }
 
         // Delete property
