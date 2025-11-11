@@ -6,7 +6,7 @@ import { clerkClient } from '@clerk/clerk-sdk-node';
  */
 export async function requireAdmin(req, res, next) {
   try {
-    const userId = req.auth.userId;
+    const userId = req.user?.id;
 
     if (!userId) {
       return res.status(401).json({ error: 'Unauthorized' });
