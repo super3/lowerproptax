@@ -403,15 +403,6 @@
             // Set header
             document.getElementById('property-address').textContent = currentProperty.address;
 
-            const statusBadge = document.getElementById('property-status');
-            if (currentProperty.status === 'preparing') {
-                statusBadge.textContent = 'Preparing Assessment...';
-                statusBadge.className = 'property-status status-preparing';
-            } else {
-                statusBadge.textContent = 'Assessment Ready';
-                statusBadge.className = 'property-status status-ready';
-            }
-
             // Populate property fields
             document.getElementById('bedrooms').value = currentProperty.bedrooms || '';
             document.getElementById('bathrooms').value = currentProperty.bathrooms || '';
@@ -419,6 +410,16 @@
 
             // Populate assessment fields from currentAssessment
             const assessment = currentProperty.currentAssessment || {};
+
+            // Update status badge based on assessment status
+            const statusBadge = document.getElementById('property-status');
+            if (assessment.status === 'preparing') {
+                statusBadge.textContent = 'Preparing Assessment...';
+                statusBadge.className = 'property-status status-preparing';
+            } else {
+                statusBadge.textContent = 'Assessment Ready';
+                statusBadge.className = 'property-status status-ready';
+            }
             document.getElementById('year').value = assessment.year || new Date().getFullYear();
             document.getElementById('appraised_value').value = assessment.appraised_value || '';
             document.getElementById('annual_tax').value = assessment.annual_tax || '';
