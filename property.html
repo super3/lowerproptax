@@ -388,24 +388,43 @@
                 messageEl.textContent = "Your assessment is complete! Review the details below and download your full report.";
             }
 
-            // Property data (mock data for now - in production this would come from backend)
+            // Property data - display actual values from database
             if (status === 'ready') {
-                document.getElementById('assessed-value').textContent = '$485,000';
-                document.getElementById('assessed-value').classList.remove('preparing');
+                // Appraised Value
+                if (property.appraised_value) {
+                    document.getElementById('assessed-value').textContent = '$' + Number(property.appraised_value).toLocaleString();
+                    document.getElementById('assessed-value').classList.remove('preparing');
+                }
 
-                document.getElementById('annual-tax').textContent = '$9,700';
-                document.getElementById('annual-tax').classList.remove('preparing');
+                // Annual Tax
+                if (property.annual_tax) {
+                    document.getElementById('annual-tax').textContent = '$' + Number(property.annual_tax).toLocaleString();
+                    document.getElementById('annual-tax').classList.remove('preparing');
+                }
 
-                document.getElementById('bedrooms').textContent = '3';
-                document.getElementById('bedrooms').classList.remove('preparing');
+                // Bedrooms
+                if (property.bedrooms) {
+                    document.getElementById('bedrooms').textContent = property.bedrooms;
+                    document.getElementById('bedrooms').classList.remove('preparing');
+                }
 
-                document.getElementById('bathrooms').textContent = '2.5';
-                document.getElementById('bathrooms').classList.remove('preparing');
+                // Bathrooms (combine full and half bathrooms)
+                if (property.bathrooms || property.half_bathrooms) {
+                    const fullBaths = property.bathrooms || 0;
+                    const halfBaths = property.half_bathrooms || 0;
+                    const totalBaths = halfBaths > 0 ? `${fullBaths}.${halfBaths}` : fullBaths;
+                    document.getElementById('bathrooms').textContent = totalBaths;
+                    document.getElementById('bathrooms').classList.remove('preparing');
+                }
 
-                document.getElementById('square-feet').textContent = '2,100';
-                document.getElementById('square-feet').classList.remove('preparing');
+                // Square Feet
+                if (property.sqft) {
+                    document.getElementById('square-feet').textContent = Number(property.sqft).toLocaleString();
+                    document.getElementById('square-feet').classList.remove('preparing');
+                }
 
-                document.getElementById('potential-savings').textContent = '$1,240';
+                // Potential Savings (placeholder for now - would need calculation logic)
+                document.getElementById('potential-savings').textContent = 'TBD';
                 document.getElementById('potential-savings').classList.remove('preparing');
 
                 // Enable download button
