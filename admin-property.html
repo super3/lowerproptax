@@ -340,6 +340,26 @@
                             <label for="annual_tax">Annual Tax</label>
                             <input type="number" id="annual_tax" name="annual_tax" min="0" step="0.01" placeholder="$">
                         </div>
+
+                        <div class="data-card">
+                            <label for="estimated_appraised_value">Our Estimated Appraised Value</label>
+                            <input type="number" id="estimated_appraised_value" name="estimated_appraised_value" min="0" step="0.01" placeholder="$">
+                        </div>
+
+                        <div class="data-card">
+                            <label for="estimated_annual_tax">Our Estimated Annual Tax</label>
+                            <input type="number" id="estimated_annual_tax" name="estimated_annual_tax" min="0" step="0.01" placeholder="$">
+                        </div>
+
+                        <div class="data-card">
+                            <label for="annual_savings">Annual Savings</label>
+                            <input type="text" id="annual_savings" name="annual_savings" readonly style="background: #f0f0f0; cursor: not-allowed;" placeholder="$0">
+                        </div>
+
+                        <div class="data-card" style="grid-column: span 3;">
+                            <label for="report_url">Assessment Report URL</label>
+                            <input type="url" id="report_url" name="report_url" placeholder="https://" style="font-size: 1rem; font-weight: 400;">
+                        </div>
                     </div>
                 </div>
 
@@ -423,11 +443,30 @@
             document.getElementById('year').value = assessment.year || new Date().getFullYear();
             document.getElementById('appraised_value').value = assessment.appraised_value || '';
             document.getElementById('annual_tax').value = assessment.annual_tax || '';
+            document.getElementById('estimated_appraised_value').value = assessment.estimated_appraised_value || '';
+            document.getElementById('estimated_annual_tax').value = assessment.estimated_annual_tax || '';
+            document.getElementById('report_url').value = assessment.report_url || '';
+
+            // Calculate and display annual savings
+            calculateAnnualSavings();
 
             // Update button visibility
             const markReadyBtn = document.getElementById('mark-ready-btn');
             if (assessment.status === 'ready') {
                 markReadyBtn.style.display = 'none';
+            }
+        }
+
+        // Calculate annual savings
+        function calculateAnnualSavings() {
+            const annualTax = parseFloat(document.getElementById('annual_tax').value) || 0;
+            const estimatedAnnualTax = parseFloat(document.getElementById('estimated_annual_tax').value) || 0;
+            const savings = annualTax - estimatedAnnualTax;
+
+            if (savings > 0) {
+                document.getElementById('annual_savings').value = '$' + savings.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            } else {
+                document.getElementById('annual_savings').value = '$0.00';
             }
         }
 
@@ -443,7 +482,10 @@
                     sqft: document.getElementById('sqft').value ? parseInt(document.getElementById('sqft').value) : null,
                     year: document.getElementById('year').value ? parseInt(document.getElementById('year').value) : null,
                     appraised_value: document.getElementById('appraised_value').value ? parseFloat(document.getElementById('appraised_value').value) : null,
-                    annual_tax: document.getElementById('annual_tax').value ? parseFloat(document.getElementById('annual_tax').value) : null
+                    annual_tax: document.getElementById('annual_tax').value ? parseFloat(document.getElementById('annual_tax').value) : null,
+                    estimated_appraised_value: document.getElementById('estimated_appraised_value').value ? parseFloat(document.getElementById('estimated_appraised_value').value) : null,
+                    estimated_annual_tax: document.getElementById('estimated_annual_tax').value ? parseFloat(document.getElementById('estimated_annual_tax').value) : null,
+                    report_url: document.getElementById('report_url').value || null
                 };
 
                 const response = await fetch(`${API_BASE}/admin/properties/${propertyId}`, {
@@ -540,6 +582,10 @@
         // Event listeners
         document.getElementById('property-form').addEventListener('submit', saveProperty);
         document.getElementById('mark-ready-btn').addEventListener('click', markAsReady);
+
+        // Recalculate savings when tax values change
+        document.getElementById('annual_tax').addEventListener('input', calculateAnnualSavings);
+        document.getElementById('estimated_annual_tax').addEventListener('input', calculateAnnualSavings);
 
         // Initialize when Clerk is ready
         window.addEventListener('load', async () => {

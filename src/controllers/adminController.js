@@ -109,7 +109,8 @@ export async function getPropertyDetails(req, res) {
 
     // Get assessments for this property
     const assessmentsResult = await pool.query(
-      `SELECT id, year, appraised_value, annual_tax, status, created_at, updated_at
+      `SELECT id, year, appraised_value, annual_tax, estimated_appraised_value,
+              estimated_annual_tax, report_url, status, created_at, updated_at
        FROM assessments
        WHERE property_id = $1
        ORDER BY year DESC`,
@@ -126,6 +127,9 @@ export async function getPropertyDetails(req, res) {
       year: currentYear,
       appraised_value: null,
       annual_tax: null,
+      estimated_appraised_value: null,
+      estimated_annual_tax: null,
+      report_url: null,
       status: 'preparing'
     };
 
@@ -147,6 +151,9 @@ export async function updatePropertyDetails(req, res) {
       year,
       appraised_value,
       annual_tax,
+      estimated_appraised_value,
+      estimated_annual_tax,
+      report_url,
       status
     } = req.body;
 
@@ -177,13 +184,18 @@ export async function updatePropertyDetails(req, res) {
     const assessmentYear = year || new Date().getFullYear();
 
     const assessmentQuery = `
-      INSERT INTO assessments (id, property_id, year, appraised_value, annual_tax, status, created_at, updated_at)
-      VALUES ($1, $2, $3, $4, $5, $6, NOW(), NOW())
+      INSERT INTO assessments (id, property_id, year, appraised_value, annual_tax,
+                               estimated_appraised_value, estimated_annual_tax, report_url,
+                               status, created_at, updated_at)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, NOW(), NOW())
       ON CONFLICT (property_id, year)
       DO UPDATE SET
         appraised_value = COALESCE($4, assessments.appraised_value),
         annual_tax = COALESCE($5, assessments.annual_tax),
-        status = COALESCE($6, assessments.status),
+        estimated_appraised_value = COALESCE($6, assessments.estimated_appraised_value),
+        estimated_annual_tax = COALESCE($7, assessments.estimated_annual_tax),
+        report_url = COALESCE($8, assessments.report_url),
+        status = COALESCE($9, assessments.status),
         updated_at = NOW()
       RETURNING *
     `;
@@ -195,6 +207,9 @@ export async function updatePropertyDetails(req, res) {
       assessmentYear,
       appraised_value !== undefined ? appraised_value : null,
       annual_tax !== undefined ? annual_tax : null,
+      estimated_appraised_value !== undefined ? estimated_appraised_value : null,
+      estimated_annual_tax !== undefined ? estimated_annual_tax : null,
+      report_url !== undefined ? report_url : null,
       status !== undefined ? status : null
     ]);
 

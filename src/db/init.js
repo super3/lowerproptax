@@ -114,6 +114,22 @@ export async function initDatabase() {
       }
     }
 
+    // Migration: Add estimated values and report URL to assessments table
+    const assessmentMigrations = [
+      `ALTER TABLE assessments ADD COLUMN IF NOT EXISTS estimated_appraised_value DECIMAL(15, 2)`,
+      `ALTER TABLE assessments ADD COLUMN IF NOT EXISTS estimated_annual_tax DECIMAL(15, 2)`,
+      `ALTER TABLE assessments ADD COLUMN IF NOT EXISTS report_url VARCHAR(500)`
+    ];
+
+    for (const migration of assessmentMigrations) {
+      try {
+        await pool.query(migration);
+      } catch (error) {
+        // Ignore errors if column already exists
+        console.log('Assessment migration step completed or already applied');
+      }
+    }
+
     console.log('Database initialized successfully');
   } catch (error) {
     console.error('Error initializing database:', error);
