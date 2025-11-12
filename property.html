@@ -388,46 +388,48 @@
                 messageEl.textContent = "Your assessment is complete! Review the details below and download your full report.";
             }
 
-            // Property data - display actual values from database
+            // Property data - display actual values from database (if available)
+            // Appraised Value
+            if (property.appraised_value) {
+                document.getElementById('assessed-value').textContent = '$' + Number(property.appraised_value).toLocaleString();
+                document.getElementById('assessed-value').classList.remove('preparing');
+            }
+
+            // Annual Tax
+            if (property.annual_tax) {
+                document.getElementById('annual-tax').textContent = '$' + Number(property.annual_tax).toLocaleString();
+                document.getElementById('annual-tax').classList.remove('preparing');
+            }
+
+            // Bedrooms
+            if (property.bedrooms) {
+                document.getElementById('bedrooms').textContent = property.bedrooms;
+                document.getElementById('bedrooms').classList.remove('preparing');
+            }
+
+            // Bathrooms (combine full and half bathrooms)
+            if (property.bathrooms || property.half_bathrooms) {
+                const fullBaths = property.bathrooms || 0;
+                const halfBaths = property.half_bathrooms || 0;
+                const totalBaths = halfBaths > 0 ? `${fullBaths}.${halfBaths}` : fullBaths;
+                document.getElementById('bathrooms').textContent = totalBaths;
+                document.getElementById('bathrooms').classList.remove('preparing');
+            }
+
+            // Square Feet
+            if (property.sqft) {
+                document.getElementById('square-feet').textContent = Number(property.sqft).toLocaleString();
+                document.getElementById('square-feet').classList.remove('preparing');
+            }
+
+            // Potential Savings (only show when ready)
             if (status === 'ready') {
-                // Appraised Value
-                if (property.appraised_value) {
-                    document.getElementById('assessed-value').textContent = '$' + Number(property.appraised_value).toLocaleString();
-                    document.getElementById('assessed-value').classList.remove('preparing');
-                }
-
-                // Annual Tax
-                if (property.annual_tax) {
-                    document.getElementById('annual-tax').textContent = '$' + Number(property.annual_tax).toLocaleString();
-                    document.getElementById('annual-tax').classList.remove('preparing');
-                }
-
-                // Bedrooms
-                if (property.bedrooms) {
-                    document.getElementById('bedrooms').textContent = property.bedrooms;
-                    document.getElementById('bedrooms').classList.remove('preparing');
-                }
-
-                // Bathrooms (combine full and half bathrooms)
-                if (property.bathrooms || property.half_bathrooms) {
-                    const fullBaths = property.bathrooms || 0;
-                    const halfBaths = property.half_bathrooms || 0;
-                    const totalBaths = halfBaths > 0 ? `${fullBaths}.${halfBaths}` : fullBaths;
-                    document.getElementById('bathrooms').textContent = totalBaths;
-                    document.getElementById('bathrooms').classList.remove('preparing');
-                }
-
-                // Square Feet
-                if (property.sqft) {
-                    document.getElementById('square-feet').textContent = Number(property.sqft).toLocaleString();
-                    document.getElementById('square-feet').classList.remove('preparing');
-                }
-
-                // Potential Savings (placeholder for now - would need calculation logic)
                 document.getElementById('potential-savings').textContent = 'TBD';
                 document.getElementById('potential-savings').classList.remove('preparing');
+            }
 
-                // Enable download button
+            // Enable download button only when ready
+            if (status === 'ready') {
                 document.getElementById('download-report').disabled = false;
             }
         }
