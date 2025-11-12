@@ -56,7 +56,7 @@ describe('Admin Controller', () => {
 
       await adminController.getPendingProperties(req, res);
 
-      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining("WHERE p.status = 'preparing'"));
+      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining("WHERE a.status = 'preparing' OR a.status IS NULL"));
       expect(res.json).toHaveBeenCalledWith(
         expect.arrayContaining([
           expect.objectContaining({
@@ -109,7 +109,7 @@ describe('Admin Controller', () => {
 
       await adminController.getCompletedProperties(req, res);
 
-      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining("WHERE p.status = 'ready'"));
+      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining("WHERE a.status = 'ready'"));
       expect(res.json).toHaveBeenCalledWith(
         expect.arrayContaining([
           expect.objectContaining({

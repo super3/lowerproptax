@@ -10,11 +10,13 @@ export async function getPendingProperties(req, res) {
         p.city,
         p.state,
         p.zip_code,
-        p.status,
+        a.status,
         p.created_at,
         p.user_id
       FROM properties p
-      WHERE p.status = 'preparing'
+      LEFT JOIN assessments a ON p.id = a.property_id
+        AND a.year = (SELECT MAX(year) FROM assessments WHERE property_id = p.id)
+      WHERE a.status = 'preparing' OR a.status IS NULL
       ORDER BY p.created_at ASC
     `;
 
@@ -24,6 +26,7 @@ export async function getPendingProperties(req, res) {
     // In production, you'd join with a users table or fetch from Clerk
     const properties = result.rows.map(prop => ({
       ...prop,
+      status: prop.status || 'preparing',
       user_email: null  // TODO: Fetch from Clerk API using user_id
     }));
 
@@ -44,12 +47,14 @@ export async function getCompletedProperties(req, res) {
         p.city,
         p.state,
         p.zip_code,
-        p.status,
+        a.status,
         p.created_at,
         p.updated_at,
         p.user_id
       FROM properties p
-      WHERE p.status = 'ready'
+      LEFT JOIN assessments a ON p.id = a.property_id
+        AND a.year = (SELECT MAX(year) FROM assessments WHERE property_id = p.id)
+      WHERE a.status = 'ready'
       ORDER BY p.updated_at DESC
     `;
 
