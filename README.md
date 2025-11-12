@@ -1,6 +1,6 @@
 # PadTask
 
-Virtual property management platform that handles what traditional property managers won't for just $25/month per property.
+Property tax assessment platform that helps homeowners discover if they're overpaying on property taxes and provides detailed assessment reports.
 
 [![Frontend Status](https://img.shields.io/github/actions/workflow/status/super3/padtask/frontend.yml?branch=main&label=frontend)](https://github.com/super3/padtask/actions/workflows/frontend.yml)
 [![Test Status](https://img.shields.io/github/actions/workflow/status/super3/padtask/tests.yml?branch=main&label=tests)](https://github.com/super3/padtask/actions/workflows/tests.yml)
@@ -8,12 +8,14 @@ Virtual property management platform that handles what traditional property mana
 
 ## Features
 
-- 🏠 Track properties, rent, and expenses in one place
-- 💰 Financial tracking with rent payment and expense categorization
-- 🔧 Maintenance request coordination and work order tracking
-- 🔐 Secure authentication with Clerk
-- 📊 Real-time property dashboard
-- 🗺️ Google Maps integration for property management
+- 🏠 Free property tax assessments
+- 💰 Identify potential annual tax savings
+- 📊 Track property assessment status (preparing/ready)
+- 📧 Email notifications when assessments are complete
+- 📄 Downloadable PDF reports ($49)
+- 🔐 Secure authentication with Clerk (Google, Apple, Email)
+- 🗺️ Google Maps address autocomplete
+- 👨‍💼 Admin dashboard for assessment management
 - 💾 PostgreSQL database for persistent storage
 
 ## Installation
@@ -21,7 +23,8 @@ Virtual property management platform that handles what traditional property mana
 ### Prerequisites
 - Node.js 18+ and npm 10+
 - Clerk account (https://clerk.com)
-- Google Maps API key
+- Google Maps API key (https://console.cloud.google.com)
+- PostgreSQL database (Railway, Supabase, etc.)
 
 ### From Source
 ```bash
@@ -41,18 +44,22 @@ npm test                           # Run test suite
 
 ### Current Features
 
-- ✅ User authentication with Clerk
-- ✅ Property CRUD operations
+- ✅ User authentication with Clerk (Google, Apple, Email)
+- ✅ Property management (add, view, delete)
 - ✅ Google Maps address autocomplete
+- ✅ Assessment status tracking (preparing/ready)
 - ✅ User-specific data isolation
 - ✅ Responsive dashboard design
+- ✅ Admin dashboard for assessment management
+- ✅ Admin role-based access control
 - ✅ PostgreSQL database integration
 
 ### Roadmap
-- [ ] Financial tracking (rent, expenses, taxes)
-- [ ] Maintenance request system
-- [ ] Email notifications
-- [ ] Document storage
-- [ ] Tenant management
-- [ ] Payment processing integration
+- [ ] Automated property data collection (assessor records)
+- [ ] PDF report generation
+- [ ] Email notifications for completed assessments
+- [ ] Payment processing (Stripe) for report downloads
+- [ ] Property tax appeal guidance
+- [ ] Historical tax data tracking
+- [ ] Multi-property portfolio analysis
 - [ ] Mobile app
