@@ -148,8 +148,7 @@ describe('Admin Controller', () => {
         state: 'GA',
         zip_code: '30301',
         bedrooms: 3,
-        bathrooms: 2,
-        half_bathrooms: 1,
+        bathrooms: 2.5,
         sqft: 1500,
         appraised_value: 250000,
         annual_tax: 5000,
@@ -195,7 +194,7 @@ describe('Admin Controller', () => {
       req.params.id = 'prop1';
       req.body = {
         bedrooms: 4,
-        bathrooms: 3,
+        bathrooms: 3.5,
         sqft: 2000,
         appraised_value: 300000
       };
@@ -203,7 +202,7 @@ describe('Admin Controller', () => {
       const mockUpdatedProperty = {
         id: 'prop1',
         bedrooms: 4,
-        bathrooms: 3,
+        bathrooms: 3.5,
         sqft: 2000,
         appraised_value: 300000,
         updated_at: new Date()
@@ -215,7 +214,7 @@ describe('Admin Controller', () => {
 
       expect(mockQuery).toHaveBeenCalledWith(
         expect.stringContaining('UPDATE properties'),
-        expect.arrayContaining([4, 3, null, 2000, 300000, null, null, 'prop1'])
+        expect.arrayContaining([4, 3.5, 2000, 300000, null, null, 'prop1'])
       );
       expect(res.json).toHaveBeenCalledWith(mockUpdatedProperty);
     });

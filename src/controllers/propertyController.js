@@ -12,7 +12,7 @@ export async function getProperties(req, res) {
     const result = await pool.query(
       `SELECT id, user_id as "userId", address, city, state,
               zip_code as "zipCode", country, lat, lng,
-              bedrooms, bathrooms, half_bathrooms, sqft,
+              bedrooms, bathrooms, sqft,
               appraised_value, annual_tax, status,
               created_at as "createdAt", updated_at as "updatedAt"
        FROM properties WHERE user_id = $1 ORDER BY created_at DESC`,
@@ -32,7 +32,7 @@ export async function getProperty(req, res) {
     const result = await pool.query(
       `SELECT id, user_id as "userId", address, city, state,
               zip_code as "zipCode", country, lat, lng,
-              bedrooms, bathrooms, half_bathrooms, sqft,
+              bedrooms, bathrooms, sqft,
               appraised_value, annual_tax, status,
               created_at as "createdAt", updated_at as "updatedAt"
        FROM properties WHERE id = $1`,

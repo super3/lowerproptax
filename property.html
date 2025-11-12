@@ -407,12 +407,9 @@
                 document.getElementById('bedrooms').classList.remove('preparing');
             }
 
-            // Bathrooms (combine full and half bathrooms)
-            if (property.bathrooms || property.half_bathrooms) {
-                const fullBaths = property.bathrooms || 0;
-                const halfBaths = property.half_bathrooms || 0;
-                const totalBaths = halfBaths > 0 ? `${fullBaths}.${halfBaths}` : fullBaths;
-                document.getElementById('bathrooms').textContent = totalBaths;
+            // Bathrooms
+            if (property.bathrooms) {
+                document.getElementById('bathrooms').textContent = property.bathrooms;
                 document.getElementById('bathrooms').classList.remove('preparing');
             }
 

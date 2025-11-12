@@ -86,7 +86,6 @@ export async function getPropertyDetails(req, res) {
         lng,
         bedrooms,
         bathrooms,
-        half_bathrooms,
         sqft,
         appraised_value,
         annual_tax,
@@ -118,7 +117,6 @@ export async function updatePropertyDetails(req, res) {
     const {
       bedrooms,
       bathrooms,
-      half_bathrooms,
       sqft,
       appraised_value,
       annual_tax,
@@ -130,20 +128,18 @@ export async function updatePropertyDetails(req, res) {
       SET
         bedrooms = COALESCE($1, bedrooms),
         bathrooms = COALESCE($2, bathrooms),
-        half_bathrooms = COALESCE($3, half_bathrooms),
-        sqft = COALESCE($4, sqft),
-        appraised_value = COALESCE($5, appraised_value),
-        annual_tax = COALESCE($6, annual_tax),
-        status = COALESCE($7, status),
+        sqft = COALESCE($3, sqft),
+        appraised_value = COALESCE($4, appraised_value),
+        annual_tax = COALESCE($5, annual_tax),
+        status = COALESCE($6, status),
         updated_at = NOW()
-      WHERE id = $8
+      WHERE id = $7
       RETURNING *
     `;
 
     const result = await pool.query(query, [
       bedrooms !== undefined ? bedrooms : null,
       bathrooms !== undefined ? bathrooms : null,
-      half_bathrooms !== undefined ? half_bathrooms : null,
       sqft !== undefined ? sqft : null,
       appraised_value !== undefined ? appraised_value : null,
       annual_tax !== undefined ? annual_tax : null,

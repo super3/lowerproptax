@@ -317,13 +317,8 @@
                         </div>
 
                         <div class="data-card">
-                            <label for="bathrooms">Bathrooms</label>
+                            <label for="bathrooms">Bathrooms (e.g. 2.5)</label>
                             <input type="number" id="bathrooms" name="bathrooms" min="0" step="0.5" placeholder="--">
-                        </div>
-
-                        <div class="data-card">
-                            <label for="half_bathrooms">Half Bathrooms</label>
-                            <input type="number" id="half_bathrooms" name="half_bathrooms" min="0" step="1" placeholder="--">
                         </div>
 
                         <div class="data-card">
@@ -415,7 +410,6 @@
             // Populate form fields
             document.getElementById('bedrooms').value = currentProperty.bedrooms || '';
             document.getElementById('bathrooms').value = currentProperty.bathrooms || '';
-            document.getElementById('half_bathrooms').value = currentProperty.half_bathrooms || '';
             document.getElementById('sqft').value = currentProperty.sqft || '';
             document.getElementById('appraised_value').value = currentProperty.appraised_value || '';
             document.getElementById('annual_tax').value = currentProperty.annual_tax || '';
@@ -435,8 +429,7 @@
                 const token = await window.Clerk.session.getToken();
                 const formData = {
                     bedrooms: document.getElementById('bedrooms').value ? parseInt(document.getElementById('bedrooms').value) : null,
-                    bathrooms: document.getElementById('bathrooms').value ? parseInt(document.getElementById('bathrooms').value) : null,
-                    half_bathrooms: document.getElementById('half_bathrooms').value ? parseInt(document.getElementById('half_bathrooms').value) : null,
+                    bathrooms: document.getElementById('bathrooms').value ? parseFloat(document.getElementById('bathrooms').value) : null,
                     sqft: document.getElementById('sqft').value ? parseInt(document.getElementById('sqft').value) : null,
                     appraised_value: document.getElementById('appraised_value').value ? parseFloat(document.getElementById('appraised_value').value) : null,
                     annual_tax: document.getElementById('annual_tax').value ? parseFloat(document.getElementById('annual_tax').value) : null
