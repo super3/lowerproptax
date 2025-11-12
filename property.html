@@ -425,9 +425,14 @@
                 document.getElementById('square-feet').classList.remove('preparing');
             }
 
-            // Potential Savings (only show when ready)
-            if (assessmentStatus === 'ready') {
-                document.getElementById('potential-savings').textContent = 'TBD';
+            // Potential Savings (calculate from annualTax - estimatedAnnualTax)
+            if (latestAssessment && latestAssessment.annualTax && latestAssessment.estimatedAnnualTax) {
+                const savings = latestAssessment.annualTax - latestAssessment.estimatedAnnualTax;
+                if (savings > 0) {
+                    document.getElementById('potential-savings').textContent = '$' + savings.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                } else {
+                    document.getElementById('potential-savings').textContent = '$0.00';
+                }
                 document.getElementById('potential-savings').classList.remove('preparing');
             }
 

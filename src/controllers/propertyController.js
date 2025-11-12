@@ -17,7 +17,28 @@ export async function getProperties(req, res) {
        FROM properties WHERE user_id = $1 ORDER BY created_at DESC`,
       [userId]
     );
-    res.json(result.rows);
+
+    // Get latest assessment for each property
+    const properties = await Promise.all(result.rows.map(async (property) => {
+      const assessmentResult = await pool.query(
+        `SELECT id, year, appraised_value as "appraisedValue",
+                annual_tax as "annualTax", estimated_appraised_value as "estimatedAppraisedValue",
+                estimated_annual_tax as "estimatedAnnualTax", report_url as "reportUrl",
+                status, created_at as "createdAt", updated_at as "updatedAt"
+         FROM assessments
+         WHERE property_id = $1
+         ORDER BY year DESC
+         LIMIT 1`,
+        [property.id]
+      );
+
+      return {
+        ...property,
+        latestAssessment: assessmentResult.rows[0] || null
+      };
+    }));
+
+    res.json(properties);
   } catch (error) {
     console.error('Error getting properties:', error);
     res.status(500).json({ error: 'Failed to get properties' });
@@ -51,8 +72,9 @@ export async function getProperty(req, res) {
     // Get all assessments for this property
     const assessmentsResult = await pool.query(
       `SELECT id, year, appraised_value as "appraisedValue",
-              annual_tax as "annualTax", status,
-              created_at as "createdAt", updated_at as "updatedAt"
+              annual_tax as "annualTax", estimated_appraised_value as "estimatedAppraisedValue",
+              estimated_annual_tax as "estimatedAnnualTax", report_url as "reportUrl",
+              status, created_at as "createdAt", updated_at as "updatedAt"
        FROM assessments
        WHERE property_id = $1
        ORDER BY year DESC`,

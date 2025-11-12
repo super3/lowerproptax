@@ -949,7 +949,7 @@
                 location = property.state;
             }
 
-            const status = property.status || 'preparing';
+            const status = property.latestAssessment?.status || 'preparing';
             const statusText = status === 'preparing' ? 'Preparing Assessment...' : 'Assessment Ready';
             const statusClass = status === 'preparing' ? 'status-preparing' : 'status-ready';
 
@@ -1083,11 +1083,45 @@
 
                 renderProperties();
                 updatePropertyCount();
+                updateAggregateStats();
                 toggleEmptyState();
             } catch (error) {
                 console.error('Error loading properties:', error);
                 hideLoadingState();
                 alert('Failed to load properties. Please refresh the page.');
+            }
+        }
+
+        // Update aggregate statistics
+        function updateAggregateStats() {
+            let totalEstimatedTax = 0;
+            let totalSavings = 0;
+            let propertiesWithData = 0;
+
+            properties.forEach(property => {
+                const assessment = property.latestAssessment;
+                if (assessment && assessment.estimatedAnnualTax) {
+                    totalEstimatedTax += parseFloat(assessment.estimatedAnnualTax);
+                    propertiesWithData++;
+
+                    // Calculate savings if both values exist
+                    if (assessment.annualTax) {
+                        const savings = assessment.annualTax - assessment.estimatedAnnualTax;
+                        if (savings > 0) {
+                            totalSavings += savings;
+                        }
+                    }
+                }
+            });
+
+            // Update the DOM
+            const statsRow = document.querySelector('.stats-row');
+            if (statsRow) {
+                const statCards = statsRow.querySelectorAll('.stat-card .value');
+                if (statCards.length >= 2) {
+                    statCards[0].textContent = '$' + totalEstimatedTax.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                    statCards[1].textContent = '$' + totalSavings.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                }
             }
         }
 
