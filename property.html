@@ -302,7 +302,7 @@
                     <div class="value preparing" id="assessed-value">--</div>
                 </div>
                 <div class="data-card">
-                    <label>Estimated Annual Tax</label>
+                    <label id="annual-tax-label">Annual Tax</label>
                     <div class="value preparing" id="annual-tax">--</div>
                 </div>
                 <div class="data-card">
@@ -439,6 +439,7 @@
             // Update assessed value label to show year if available
             if (latestAssessment && latestAssessment.year) {
                 document.getElementById('assessed-value-label').textContent = `Assessed Value (${latestAssessment.year})`;
+                document.getElementById('annual-tax-label').textContent = `Annual Tax (${latestAssessment.year})`;
             }
         }
 
