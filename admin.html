@@ -326,9 +326,7 @@
                     <thead>
                         <tr>
                             <th>Address</th>
-                            <th>User Email</th>
                             <th>Status</th>
-                            <th>Added</th>
                             <th>Time Elapsed</th>
                             <th>Action</th>
                         </tr>
@@ -460,7 +458,7 @@
                     if (hours >= 48) timeClass = 'time-critical';
                     else if (hours >= 24) timeClass = 'time-warning';
                     statusBadge = '<span style="background: #fff4e6; color: #e67e22; padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.8rem; font-weight: 600;">Preparing</span>';
-                    actionButton = `<button class="btn-mark-ready" onclick="markAsReady('${property.id}')">Mark Ready</button>`;
+                    actionButton = `<button class="btn-mark-ready" onclick="markAsReady('${property.id}')">Ready</button>`;
                 } else {
                     statusBadge = '<span style="background: #e8f5e9; color: #27ae60; padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.8rem; font-weight: 600;">Ready</span>';
                     actionButton = '-';
@@ -468,9 +466,7 @@
 
                 row.innerHTML = `
                     <td class="property-address">${property.address}</td>
-                    <td class="user-email">${property.user_email || 'N/A'}</td>
                     <td>${statusBadge}</td>
-                    <td>${new Date(property.created_at).toLocaleDateString()} ${new Date(property.created_at).toLocaleTimeString()}</td>
                     <td class="time-pending ${timeClass}">${formatTimePending(hours)}</td>
                     <td>${actionButton}</td>
                 `;
