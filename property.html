@@ -298,7 +298,7 @@
 
             <div class="property-data">
                 <div class="data-card">
-                    <label>Assessed Value (2025)</label>
+                    <label id="assessed-value-label">Assessed Value</label>
                     <div class="value preparing" id="assessed-value">--</div>
                 </div>
                 <div class="data-card">
@@ -388,18 +388,24 @@
                 messageEl.textContent = "Your assessment is complete! Review the details below and download your full report.";
             }
 
+            // Get most recent assessment
+            const latestAssessment = property.assessments && property.assessments.length > 0 ? property.assessments[0] : null;
+
             // Property data - display actual values from database (if available)
-            // Appraised Value
-            if (property.appraised_value) {
-                document.getElementById('assessed-value').textContent = '$' + Number(property.appraised_value).toLocaleString();
+            // Appraised Value (from assessment)
+            if (latestAssessment && latestAssessment.appraisedValue) {
+                document.getElementById('assessed-value').textContent = '$' + Number(latestAssessment.appraisedValue).toLocaleString();
                 document.getElementById('assessed-value').classList.remove('preparing');
             }
 
-            // Annual Tax
-            if (property.annual_tax) {
-                document.getElementById('annual-tax').textContent = '$' + Number(property.annual_tax).toLocaleString();
+            // Annual Tax (from assessment)
+            if (latestAssessment && latestAssessment.annualTax) {
+                document.getElementById('annual-tax').textContent = '$' + Number(latestAssessment.annualTax).toLocaleString();
                 document.getElementById('annual-tax').classList.remove('preparing');
             }
+
+            // Use assessment status if available, otherwise 'preparing'
+            const assessmentStatus = latestAssessment ? latestAssessment.status : 'preparing';
 
             // Bedrooms
             if (property.bedrooms) {
@@ -420,14 +426,19 @@
             }
 
             // Potential Savings (only show when ready)
-            if (status === 'ready') {
+            if (assessmentStatus === 'ready') {
                 document.getElementById('potential-savings').textContent = 'TBD';
                 document.getElementById('potential-savings').classList.remove('preparing');
             }
 
-            // Enable download button only when ready
-            if (status === 'ready') {
+            // Enable download button only when assessment is ready
+            if (assessmentStatus === 'ready') {
                 document.getElementById('download-report').disabled = false;
+            }
+
+            // Update assessed value label to show year if available
+            if (latestAssessment && latestAssessment.year) {
+                document.getElementById('assessed-value-label').textContent = `Assessed Value (${latestAssessment.year})`;
             }
         }
 

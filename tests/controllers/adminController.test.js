@@ -150,14 +150,25 @@ describe('Admin Controller', () => {
         bedrooms: 3,
         bathrooms: 2.5,
         sqft: 1500,
-        appraised_value: 250000,
-        annual_tax: 5000,
-        status: 'preparing',
         created_at: new Date(),
         user_id: 'user1'
       };
 
-      mockQuery.mockResolvedValue({ rows: [mockProperty] });
+      const mockAssessments = [
+        {
+          id: 'assess_prop1_2025',
+          year: 2025,
+          appraised_value: 250000,
+          annual_tax: 5000,
+          status: 'preparing',
+          created_at: new Date(),
+          updated_at: new Date()
+        }
+      ];
+
+      mockQuery
+        .mockResolvedValueOnce({ rows: [mockProperty] })
+        .mockResolvedValueOnce({ rows: mockAssessments });
 
       await adminController.getPropertyDetails(req, res);
 
@@ -165,7 +176,16 @@ describe('Admin Controller', () => {
         expect.stringContaining('SELECT'),
         ['prop1']
       );
-      expect(res.json).toHaveBeenCalledWith(mockProperty);
+      expect(res.json).toHaveBeenCalledWith(
+        expect.objectContaining({
+          ...mockProperty,
+          assessments: mockAssessments,
+          currentAssessment: expect.objectContaining({
+            year: 2025,
+            appraised_value: 250000
+          })
+        })
+      );
     });
 
     it('should return 404 if property does not exist', async () => {
@@ -196,7 +216,8 @@ describe('Admin Controller', () => {
         bedrooms: 4,
         bathrooms: 3.5,
         sqft: 2000,
-        appraised_value: 300000
+        appraised_value: 300000,
+        annual_tax: 6000
       };
 
       const mockUpdatedProperty = {
@@ -204,19 +225,36 @@ describe('Admin Controller', () => {
         bedrooms: 4,
         bathrooms: 3.5,
         sqft: 2000,
-        appraised_value: 300000,
         updated_at: new Date()
       };
 
-      mockQuery.mockResolvedValue({ rows: [mockUpdatedProperty] });
+      const mockAssessment = {
+        id: 'assess_prop1_2025',
+        property_id: 'prop1',
+        year: 2025,
+        appraised_value: 300000,
+        annual_tax: 6000,
+        status: null,
+        created_at: new Date(),
+        updated_at: new Date()
+      };
+
+      mockQuery
+        .mockResolvedValueOnce({ rows: [mockUpdatedProperty] })
+        .mockResolvedValueOnce({ rows: [mockAssessment] });
 
       await adminController.updatePropertyDetails(req, res);
 
       expect(mockQuery).toHaveBeenCalledWith(
         expect.stringContaining('UPDATE properties'),
-        expect.arrayContaining([4, 3.5, 2000, 300000, null, null, 'prop1'])
+        expect.arrayContaining([4, 3.5, 2000, 'prop1'])
       );
-      expect(res.json).toHaveBeenCalledWith(mockUpdatedProperty);
+      expect(res.json).toHaveBeenCalledWith(
+        expect.objectContaining({
+          ...mockUpdatedProperty,
+          currentAssessment: mockAssessment
+        })
+      );
     });
 
     it('should handle partial updates', async () => {
@@ -231,11 +269,29 @@ describe('Admin Controller', () => {
         updated_at: new Date()
       };
 
-      mockQuery.mockResolvedValue({ rows: [mockUpdatedProperty] });
+      const mockAssessment = {
+        id: 'assess_prop1_2025',
+        property_id: 'prop1',
+        year: 2025,
+        appraised_value: null,
+        annual_tax: null,
+        status: null,
+        created_at: new Date(),
+        updated_at: new Date()
+      };
+
+      mockQuery
+        .mockResolvedValueOnce({ rows: [mockUpdatedProperty] })
+        .mockResolvedValueOnce({ rows: [mockAssessment] });
 
       await adminController.updatePropertyDetails(req, res);
 
-      expect(res.json).toHaveBeenCalledWith(mockUpdatedProperty);
+      expect(res.json).toHaveBeenCalledWith(
+        expect.objectContaining({
+          ...mockUpdatedProperty,
+          currentAssessment: mockAssessment
+        })
+      );
     });
 
     it('should return 404 if property does not exist', async () => {

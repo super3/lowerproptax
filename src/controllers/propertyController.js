@@ -13,7 +13,6 @@ export async function getProperties(req, res) {
       `SELECT id, user_id as "userId", address, city, state,
               zip_code as "zipCode", country, lat, lng,
               bedrooms, bathrooms, sqft,
-              appraised_value, annual_tax, status,
               created_at as "createdAt", updated_at as "updatedAt"
        FROM properties WHERE user_id = $1 ORDER BY created_at DESC`,
       [userId]
@@ -33,7 +32,6 @@ export async function getProperty(req, res) {
       `SELECT id, user_id as "userId", address, city, state,
               zip_code as "zipCode", country, lat, lng,
               bedrooms, bathrooms, sqft,
-              appraised_value, annual_tax, status,
               created_at as "createdAt", updated_at as "updatedAt"
        FROM properties WHERE id = $1`,
       [id]
@@ -49,6 +47,19 @@ export async function getProperty(req, res) {
     if (property.userId !== req.user.id) {
       return res.status(403).json({ error: 'Access denied' });
     }
+
+    // Get all assessments for this property
+    const assessmentsResult = await pool.query(
+      `SELECT id, year, appraised_value as "appraisedValue",
+              annual_tax as "annualTax", status,
+              created_at as "createdAt", updated_at as "updatedAt"
+       FROM assessments
+       WHERE property_id = $1
+       ORDER BY year DESC`,
+      [id]
+    );
+
+    property.assessments = assessmentsResult.rows;
 
     res.json(property);
   } catch (error) {
