@@ -138,6 +138,130 @@ describe('Admin Controller', () => {
     });
   });
 
+  describe('getPropertyDetails', () => {
+    it('should return property details by ID', async () => {
+      req.params.id = 'prop1';
+      const mockProperty = {
+        id: 'prop1',
+        address: '123 Main St',
+        city: 'Atlanta',
+        state: 'GA',
+        zip_code: '30301',
+        bedrooms: 3,
+        bathrooms: 2,
+        half_bathrooms: 1,
+        sqft: 1500,
+        appraised_value: 250000,
+        annual_tax: 5000,
+        status: 'preparing',
+        created_at: new Date(),
+        user_id: 'user1'
+      };
+
+      mockQuery.mockResolvedValue({ rows: [mockProperty] });
+
+      await adminController.getPropertyDetails(req, res);
+
+      expect(mockQuery).toHaveBeenCalledWith(
+        expect.stringContaining('SELECT'),
+        ['prop1']
+      );
+      expect(res.json).toHaveBeenCalledWith(mockProperty);
+    });
+
+    it('should return 404 if property does not exist', async () => {
+      req.params.id = 'nonexistent';
+      mockQuery.mockResolvedValue({ rows: [] });
+
+      await adminController.getPropertyDetails(req, res);
+
+      expect(res.status).toHaveBeenCalledWith(404);
+      expect(res.json).toHaveBeenCalledWith({ error: 'Property not found' });
+    });
+
+    it('should handle database errors', async () => {
+      req.params.id = 'prop1';
+      mockQuery.mockRejectedValue(new Error('Database error'));
+
+      await adminController.getPropertyDetails(req, res);
+
+      expect(res.status).toHaveBeenCalledWith(500);
+      expect(res.json).toHaveBeenCalledWith({ error: 'Failed to fetch property details' });
+    });
+  });
+
+  describe('updatePropertyDetails', () => {
+    it('should update property details', async () => {
+      req.params.id = 'prop1';
+      req.body = {
+        bedrooms: 4,
+        bathrooms: 3,
+        sqft: 2000,
+        appraised_value: 300000
+      };
+
+      const mockUpdatedProperty = {
+        id: 'prop1',
+        bedrooms: 4,
+        bathrooms: 3,
+        sqft: 2000,
+        appraised_value: 300000,
+        updated_at: new Date()
+      };
+
+      mockQuery.mockResolvedValue({ rows: [mockUpdatedProperty] });
+
+      await adminController.updatePropertyDetails(req, res);
+
+      expect(mockQuery).toHaveBeenCalledWith(
+        expect.stringContaining('UPDATE properties'),
+        expect.arrayContaining([4, 3, null, 2000, 300000, null, null, 'prop1'])
+      );
+      expect(res.json).toHaveBeenCalledWith(mockUpdatedProperty);
+    });
+
+    it('should handle partial updates', async () => {
+      req.params.id = 'prop1';
+      req.body = {
+        bedrooms: 3
+      };
+
+      const mockUpdatedProperty = {
+        id: 'prop1',
+        bedrooms: 3,
+        updated_at: new Date()
+      };
+
+      mockQuery.mockResolvedValue({ rows: [mockUpdatedProperty] });
+
+      await adminController.updatePropertyDetails(req, res);
+
+      expect(res.json).toHaveBeenCalledWith(mockUpdatedProperty);
+    });
+
+    it('should return 404 if property does not exist', async () => {
+      req.params.id = 'nonexistent';
+      req.body = { bedrooms: 3 };
+      mockQuery.mockResolvedValue({ rows: [] });
+
+      await adminController.updatePropertyDetails(req, res);
+
+      expect(res.status).toHaveBeenCalledWith(404);
+      expect(res.json).toHaveBeenCalledWith({ error: 'Property not found' });
+    });
+
+    it('should handle database errors', async () => {
+      req.params.id = 'prop1';
+      req.body = { bedrooms: 3 };
+      mockQuery.mockRejectedValue(new Error('Database error'));
+
+      await adminController.updatePropertyDetails(req, res);
+
+      expect(res.status).toHaveBeenCalledWith(500);
+      expect(res.json).toHaveBeenCalledWith({ error: 'Failed to update property details' });
+    });
+  });
+
   describe('markPropertyAsReady', () => {
     it('should mark property as ready', async () => {
       req.params.id = 'prop1';

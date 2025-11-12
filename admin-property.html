@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PadTask - Edit Property</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🏡</text></svg>">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Clerk.js -->
+    <script
+        async
+        crossorigin="anonymous"
+        data-clerk-publishable-key="pk_test_b3JnYW5pYy10YXJwb24tNzUuY2xlcmsuYWNjb3VudHMuZGV2JA"
+        src="https://organic-tarpon-75.clerk.accounts.dev/npm/@clerk/clerk-js@5/dist/clerk.browser.js"
+        type="text/javascript"
+    ></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', Arial, sans-serif;
+            line-height: 1.6;
+            color: #1a1a1a;
+            background: #f8f9fa;
+        }
+
+        /* Navigation */
+        nav {
+            background: white;
+            padding: 0 7%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #e5e5e5;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+            height: 72px;
+        }
+
+        .logo-link {
+            text-decoration: none;
+            color: inherit;
+            display: block;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #1a1a1a;
+        }
+
+        .nav-right {
+            display: flex;
+            gap: 2.5rem;
+            align-items: center;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .user-name {
+            font-weight: 500;
+            color: #1a1a1a;
+            font-size: 0.95rem;
+        }
+
+        #user-button {
+            display: flex;
+            align-items: center;
+        }
+
+        /* Main Container */
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 3rem 7%;
+        }
+
+        /* Back Button */
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #666;
+            text-decoration: none;
+            margin-bottom: 2rem;
+            font-size: 0.95rem;
+            transition: color 0.2s;
+        }
+
+        .back-link:hover {
+            color: #1a1a1a;
+        }
+
+        /* Property Card */
+        .property-card {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        .property-header {
+            margin-bottom: 2rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid #e5e5e5;
+        }
+
+        .property-header h1 {
+            font-size: 1.75rem;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 0.5rem;
+        }
+
+        .property-status {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .status-preparing {
+            background: #fff4e6;
+            color: #e67e22;
+        }
+
+        .status-ready {
+            background: #e8f5e9;
+            color: #27ae60;
+        }
+
+        /* Form */
+        .form-section {
+            margin-bottom: 2rem;
+        }
+
+        .form-section h2 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 1rem;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group.full-width {
+            grid-column: 1 / -1;
+        }
+
+        label {
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: #333;
+            margin-bottom: 0.5rem;
+        }
+
+        input[type="number"],
+        input[type="text"] {
+            padding: 0.75rem;
+            border: 1px solid #e5e5e5;
+            border-radius: 6px;
+            font-size: 1rem;
+            font-family: 'Inter', Arial, sans-serif;
+            transition: border-color 0.2s;
+        }
+
+        input[type="number"]:focus,
+        input[type="text"]:focus {
+            outline: none;
+            border-color: #1a1a1a;
+        }
+
+        /* Buttons */
+        .button-row {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: 6px;
+            border: none;
+            font-weight: 600;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: 'Inter', Arial, sans-serif;
+        }
+
+        .btn-primary {
+            background: #1a1a1a;
+            color: white;
+            flex: 1;
+        }
+
+        .btn-primary:hover {
+            background: #333;
+            transform: translateY(-1px);
+        }
+
+        .btn-success {
+            background: #27ae60;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #229954;
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background: #f0f0f0;
+            color: #1a1a1a;
+        }
+
+        .btn-secondary:hover {
+            background: #e5e5e5;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 3rem;
+            color: #666;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        @media (max-width: 768px) {
+            nav {
+                padding: 0 5%;
+            }
+
+            .container {
+                padding: 2rem 5%;
+            }
+
+            .property-card {
+                padding: 1.5rem;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .button-row {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav>
+        <a href="index.html" class="logo-link"><div class="logo">🏡 PadTask</div></a>
+        <div class="nav-right">
+            <div class="user-info">
+                <span class="user-name" id="user-name">Loading...</span>
+                <div id="user-button"></div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container">
+        <a href="admin.html" class="back-link">← Back to Dashboard</a>
+
+        <div class="loading" id="loading">Loading property details...</div>
+
+        <div class="property-card hidden" id="property-card">
+            <div class="property-header">
+                <h1 id="property-address">Loading...</h1>
+                <span class="property-status" id="property-status"></span>
+            </div>
+
+            <form id="property-form">
+                <div class="form-section">
+                    <h2>Property Details</h2>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="bedrooms">Bedrooms</label>
+                            <input type="number" id="bedrooms" name="bedrooms" min="0" step="1">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="bathrooms">Full Bathrooms</label>
+                            <input type="number" id="bathrooms" name="bathrooms" min="0" step="1">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="half_bathrooms">Half Bathrooms</label>
+                            <input type="number" id="half_bathrooms" name="half_bathrooms" min="0" step="1">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="sqft">Square Feet</label>
+                            <input type="number" id="sqft" name="sqft" min="0" step="1">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="appraised_value">Appraised Value ($)</label>
+                            <input type="number" id="appraised_value" name="appraised_value" min="0" step="0.01">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="annual_tax">Annual Tax ($)</label>
+                            <input type="number" id="annual_tax" name="annual_tax" min="0" step="0.01">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="button-row">
+                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                    <button type="button" class="btn btn-success" id="mark-ready-btn">Mark as Ready</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // API Configuration
+        const API_BASE = 'https://padtask-production.up.railway.app/api';
+        const isDevelopment = window.location.protocol === 'file:' || window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+
+        let propertyId = null;
+        let currentProperty = null;
+
+        // Get property ID from URL
+        function getPropertyIdFromURL() {
+            const params = new URLSearchParams(window.location.search);
+            return params.get('id');
+        }
+
+        // Load property details
+        async function loadPropertyDetails() {
+            try {
+                propertyId = getPropertyIdFromURL();
+                if (!propertyId) {
+                    alert('No property ID provided');
+                    window.location.href = 'admin.html';
+                    return;
+                }
+
+                const token = await window.Clerk.session.getToken();
+                const response = await fetch(`${API_BASE}/admin/properties/${propertyId}`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to load property details');
+                }
+
+                currentProperty = await response.json();
+                displayProperty();
+            } catch (error) {
+                console.error('Error loading property:', error);
+                alert('Failed to load property. Returning to dashboard.');
+                window.location.href = 'admin.html';
+            }
+        }
+
+        // Display property details
+        function displayProperty() {
+            document.getElementById('loading').classList.add('hidden');
+            document.getElementById('property-card').classList.remove('hidden');
+
+            // Set header
+            document.getElementById('property-address').textContent = currentProperty.address;
+
+            const statusBadge = document.getElementById('property-status');
+            if (currentProperty.status === 'preparing') {
+                statusBadge.textContent = 'Preparing';
+                statusBadge.className = 'property-status status-preparing';
+            } else {
+                statusBadge.textContent = 'Ready';
+                statusBadge.className = 'property-status status-ready';
+            }
+
+            // Populate form fields
+            document.getElementById('bedrooms').value = currentProperty.bedrooms || '';
+            document.getElementById('bathrooms').value = currentProperty.bathrooms || '';
+            document.getElementById('half_bathrooms').value = currentProperty.half_bathrooms || '';
+            document.getElementById('sqft').value = currentProperty.sqft || '';
+            document.getElementById('appraised_value').value = currentProperty.appraised_value || '';
+            document.getElementById('annual_tax').value = currentProperty.annual_tax || '';
+
+            // Update button visibility
+            const markReadyBtn = document.getElementById('mark-ready-btn');
+            if (currentProperty.status === 'ready') {
+                markReadyBtn.style.display = 'none';
+            }
+        }
+
+        // Save property changes
+        async function saveProperty(event) {
+            event.preventDefault();
+
+            try {
+                const token = await window.Clerk.session.getToken();
+                const formData = {
+                    bedrooms: document.getElementById('bedrooms').value ? parseInt(document.getElementById('bedrooms').value) : null,
+                    bathrooms: document.getElementById('bathrooms').value ? parseInt(document.getElementById('bathrooms').value) : null,
+                    half_bathrooms: document.getElementById('half_bathrooms').value ? parseInt(document.getElementById('half_bathrooms').value) : null,
+                    sqft: document.getElementById('sqft').value ? parseInt(document.getElementById('sqft').value) : null,
+                    appraised_value: document.getElementById('appraised_value').value ? parseFloat(document.getElementById('appraised_value').value) : null,
+                    annual_tax: document.getElementById('annual_tax').value ? parseFloat(document.getElementById('annual_tax').value) : null
+                };
+
+                const response = await fetch(`${API_BASE}/admin/properties/${propertyId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(formData)
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to save property');
+                }
+
+                currentProperty = await response.json();
+                alert('Property saved successfully!');
+            } catch (error) {
+                console.error('Error saving property:', error);
+                alert('Failed to save property. Please try again.');
+            }
+        }
+
+        // Mark property as ready
+        async function markAsReady() {
+            if (!confirm('Mark this property as ready? Make sure all details are correct.')) {
+                return;
+            }
+
+            try {
+                const token = await window.Clerk.session.getToken();
+
+                // Update status to ready
+                const response = await fetch(`${API_BASE}/admin/properties/${propertyId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ status: 'ready' })
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to mark property as ready');
+                }
+
+                alert('Property marked as ready!');
+                window.location.href = 'admin.html';
+            } catch (error) {
+                console.error('Error marking property as ready:', error);
+                alert('Failed to mark property as ready. Please try again.');
+            }
+        }
+
+        // Initialize Clerk
+        async function initClerk() {
+            try {
+                // Skip Clerk authentication in development mode
+                if (isDevelopment) {
+                    console.log('Development mode: Skipping Clerk authentication');
+                    document.getElementById('user-name').textContent = 'Developer';
+                    document.getElementById('user-button').innerHTML = '<span style="color: #666;">Dev Mode</span>';
+                    await loadPropertyDetails();
+                    return;
+                }
+
+                await window.Clerk.load();
+
+                // Check if user is signed in
+                if (!window.Clerk.user) {
+                    window.location.href = '/index.html';
+                    return;
+                }
+
+                // Display user info
+                const user = window.Clerk.user;
+                const userName = user.firstName || user.username || user.emailAddresses[0]?.emailAddress || 'User';
+                document.getElementById('user-name').textContent = userName;
+
+                // Mount user button
+                const userButtonDiv = document.getElementById('user-button');
+                window.Clerk.mountUserButton(userButtonDiv);
+
+                // Load property details
+                await loadPropertyDetails();
+            } catch (error) {
+                console.error('Error initializing:', error);
+                if (!isDevelopment) {
+                    window.location.href = '/index.html';
+                }
+            }
+        }
+
+        // Event listeners
+        document.getElementById('property-form').addEventListener('submit', saveProperty);
+        document.getElementById('mark-ready-btn').addEventListener('click', markAsReady);
+
+        // Initialize when Clerk is ready
+        window.addEventListener('load', async () => {
+            if (window.Clerk) {
+                await initClerk();
+            } else {
+                document.addEventListener('clerk:loaded', initClerk);
+            }
+        });
+    </script>
+</body>
+</html>

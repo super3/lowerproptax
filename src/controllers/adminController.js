@@ -69,7 +69,100 @@ export async function getCompletedProperties(req, res) {
   }
 }
 
-// Mark property as ready
+// Get a single property details for admin editing
+export async function getPropertyDetails(req, res) {
+  try {
+    const { id } = req.params;
+
+    const query = `
+      SELECT
+        id,
+        address,
+        city,
+        state,
+        zip_code,
+        country,
+        lat,
+        lng,
+        bedrooms,
+        bathrooms,
+        half_bathrooms,
+        sqft,
+        appraised_value,
+        annual_tax,
+        status,
+        created_at,
+        updated_at,
+        user_id
+      FROM properties
+      WHERE id = $1
+    `;
+
+    const result = await pool.query(query, [id]);
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'Property not found' });
+    }
+
+    res.json(result.rows[0]);
+  } catch (error) {
+    console.error('Error fetching property details:', error);
+    res.status(500).json({ error: 'Failed to fetch property details' });
+  }
+}
+
+// Update property details
+export async function updatePropertyDetails(req, res) {
+  try {
+    const { id } = req.params;
+    const {
+      bedrooms,
+      bathrooms,
+      half_bathrooms,
+      sqft,
+      appraised_value,
+      annual_tax,
+      status
+    } = req.body;
+
+    const query = `
+      UPDATE properties
+      SET
+        bedrooms = COALESCE($1, bedrooms),
+        bathrooms = COALESCE($2, bathrooms),
+        half_bathrooms = COALESCE($3, half_bathrooms),
+        sqft = COALESCE($4, sqft),
+        appraised_value = COALESCE($5, appraised_value),
+        annual_tax = COALESCE($6, annual_tax),
+        status = COALESCE($7, status),
+        updated_at = NOW()
+      WHERE id = $8
+      RETURNING *
+    `;
+
+    const result = await pool.query(query, [
+      bedrooms !== undefined ? bedrooms : null,
+      bathrooms !== undefined ? bathrooms : null,
+      half_bathrooms !== undefined ? half_bathrooms : null,
+      sqft !== undefined ? sqft : null,
+      appraised_value !== undefined ? appraised_value : null,
+      annual_tax !== undefined ? annual_tax : null,
+      status !== undefined ? status : null,
+      id
+    ]);
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'Property not found' });
+    }
+
+    res.json(result.rows[0]);
+  } catch (error) {
+    console.error('Error updating property details:', error);
+    res.status(500).json({ error: 'Failed to update property details' });
+  }
+}
+
+// Mark property as ready (legacy function, kept for backward compatibility)
 export async function markPropertyAsReady(req, res) {
   try {
     const { id } = req.params;

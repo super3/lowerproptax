@@ -17,6 +17,12 @@ export async function initDatabase() {
         country VARCHAR(100),
         lat DECIMAL(10, 8),
         lng DECIMAL(11, 8),
+        bedrooms INTEGER,
+        bathrooms INTEGER,
+        half_bathrooms INTEGER,
+        sqft INTEGER,
+        appraised_value DECIMAL(15, 2),
+        annual_tax DECIMAL(15, 2),
         status VARCHAR(50) DEFAULT 'preparing',
         created_at TIMESTAMP DEFAULT NOW(),
         updated_at TIMESTAMP DEFAULT NOW()
@@ -26,6 +32,21 @@ export async function initDatabase() {
     `;
 
     await pool.query(createPropertiesTable);
+
+    // Migration: Add new columns to existing properties table if they don't exist
+    const migrations = [
+      `ALTER TABLE properties ADD COLUMN IF NOT EXISTS bedrooms INTEGER`,
+      `ALTER TABLE properties ADD COLUMN IF NOT EXISTS bathrooms INTEGER`,
+      `ALTER TABLE properties ADD COLUMN IF NOT EXISTS half_bathrooms INTEGER`,
+      `ALTER TABLE properties ADD COLUMN IF NOT EXISTS sqft INTEGER`,
+      `ALTER TABLE properties ADD COLUMN IF NOT EXISTS appraised_value DECIMAL(15, 2)`,
+      `ALTER TABLE properties ADD COLUMN IF NOT EXISTS annual_tax DECIMAL(15, 2)`
+    ];
+
+    for (const migration of migrations) {
+      await pool.query(migration);
+    }
+
     console.log('Database initialized successfully');
   } catch (error) {
     console.error('Error initializing database:', error);
