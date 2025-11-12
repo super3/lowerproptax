@@ -472,7 +472,7 @@
 
             tbody.innerHTML = '';
             allProperties.forEach((property) => {
-                const isPending = property.status === 'preparing';
+                const isPending = property.status === 'preparing' || property.status === null;
                 const hours = getHoursSince(property.created_at);
 
                 if (isPending) {
