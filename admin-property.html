@@ -77,53 +77,55 @@
 
         /* Main Container */
         .container {
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 3rem 7%;
+            max-width: 1000px;
+            margin: 3rem auto;
+            padding: 0 2rem;
         }
 
         /* Back Button */
         .back-link {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            color: #666;
+            display: inline-block;
+            background: #f0f4ff;
+            color: #3171ef;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
             text-decoration: none;
-            margin-bottom: 2rem;
-            font-size: 0.95rem;
-            transition: color 0.2s;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+            margin-bottom: 1.5rem;
         }
 
         .back-link:hover {
-            color: #1a1a1a;
+            background: #e0e7ff;
         }
 
         /* Property Card */
         .property-card {
             background: white;
             border-radius: 12px;
-            padding: 2rem;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+            padding: 2.5rem;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
         }
 
         .property-header {
             margin-bottom: 2rem;
             padding-bottom: 1.5rem;
-            border-bottom: 1px solid #e5e5e5;
+            border-bottom: 2px solid #f0f0f0;
         }
 
-        .property-header h1 {
+        .property-address {
             font-size: 1.75rem;
-            font-weight: 600;
+            font-weight: 700;
             color: #1a1a1a;
             margin-bottom: 0.5rem;
         }
 
         .property-status {
             display: inline-block;
-            padding: 0.25rem 0.75rem;
-            border-radius: 4px;
-            font-size: 0.85rem;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            font-size: 0.9rem;
             font-weight: 600;
         }
 
@@ -146,45 +148,53 @@
             font-size: 1.1rem;
             font-weight: 600;
             color: #1a1a1a;
-            margin-bottom: 1rem;
+            margin-bottom: 1.5rem;
         }
 
-        .form-grid {
+        .property-data {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
             gap: 1.5rem;
+            margin-top: 2rem;
         }
 
-        .form-group {
-            display: flex;
-            flex-direction: column;
+        .data-card {
+            background: #fafbfc;
+            padding: 1.5rem;
+            border-radius: 8px;
+            border: 1px solid #e5e5e5;
         }
 
-        .form-group.full-width {
-            grid-column: 1 / -1;
-        }
-
-        label {
-            font-size: 0.9rem;
-            font-weight: 500;
-            color: #333;
+        .data-card label {
+            font-size: 0.8rem;
+            color: #666;
+            display: block;
             margin-bottom: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
-        input[type="number"],
-        input[type="text"] {
-            padding: 0.75rem;
+        .data-card input {
+            width: 100%;
+            padding: 0.5rem;
             border: 1px solid #e5e5e5;
             border-radius: 6px;
-            font-size: 1rem;
+            font-size: 1.5rem;
+            font-weight: 700;
             font-family: 'Inter', Arial, sans-serif;
+            background: white;
+            color: #1a1a1a;
             transition: border-color 0.2s;
         }
 
-        input[type="number"]:focus,
-        input[type="text"]:focus {
+        .data-card input:focus {
             outline: none;
-            border-color: #1a1a1a;
+            border-color: #3171ef;
+        }
+
+        .data-card input::placeholder {
+            color: #ccc;
+            font-weight: 400;
         }
 
         /* Buttons */
@@ -194,45 +204,40 @@
             margin-top: 2rem;
         }
 
-        .btn {
-            padding: 0.75rem 1.5rem;
+        .btn-primary {
+            background: #3171ef;
+            color: white;
+            padding: 1rem 2rem;
             border-radius: 6px;
             border: none;
             font-weight: 600;
-            font-size: 0.95rem;
+            font-size: 1rem;
             cursor: pointer;
             transition: all 0.2s;
             font-family: 'Inter', Arial, sans-serif;
         }
 
-        .btn-primary {
-            background: #1a1a1a;
-            color: white;
-            flex: 1;
-        }
-
         .btn-primary:hover {
-            background: #333;
+            background: #2560d9;
             transform: translateY(-1px);
         }
 
         .btn-success {
             background: #27ae60;
             color: white;
+            padding: 1rem 2rem;
+            border-radius: 6px;
+            border: none;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: 'Inter', Arial, sans-serif;
         }
 
         .btn-success:hover {
             background: #229954;
             transform: translateY(-1px);
-        }
-
-        .btn-secondary {
-            background: #f0f0f0;
-            color: #1a1a1a;
-        }
-
-        .btn-secondary:hover {
-            background: #e5e5e5;
         }
 
         .loading {
@@ -251,14 +256,19 @@
             }
 
             .container {
-                padding: 2rem 5%;
+                padding: 0 1rem;
+                margin: 2rem auto;
             }
 
             .property-card {
                 padding: 1.5rem;
             }
 
-            .form-grid {
+            .property-address {
+                font-size: 1.5rem;
+            }
+
+            .property-data {
                 grid-template-columns: 1fr;
             }
 
@@ -266,7 +276,8 @@
                 flex-direction: column;
             }
 
-            .btn {
+            .btn-primary,
+            .btn-success {
                 width: 100%;
             }
         }
@@ -292,49 +303,49 @@
 
         <div class="property-card hidden" id="property-card">
             <div class="property-header">
-                <h1 id="property-address">Loading...</h1>
+                <div class="property-address" id="property-address">Loading...</div>
                 <span class="property-status" id="property-status"></span>
             </div>
 
             <form id="property-form">
                 <div class="form-section">
                     <h2>Property Details</h2>
-                    <div class="form-grid">
-                        <div class="form-group">
+                    <div class="property-data">
+                        <div class="data-card">
                             <label for="bedrooms">Bedrooms</label>
-                            <input type="number" id="bedrooms" name="bedrooms" min="0" step="1">
+                            <input type="number" id="bedrooms" name="bedrooms" min="0" step="1" placeholder="--">
                         </div>
 
-                        <div class="form-group">
-                            <label for="bathrooms">Full Bathrooms</label>
-                            <input type="number" id="bathrooms" name="bathrooms" min="0" step="1">
+                        <div class="data-card">
+                            <label for="bathrooms">Bathrooms</label>
+                            <input type="number" id="bathrooms" name="bathrooms" min="0" step="0.5" placeholder="--">
                         </div>
 
-                        <div class="form-group">
+                        <div class="data-card">
                             <label for="half_bathrooms">Half Bathrooms</label>
-                            <input type="number" id="half_bathrooms" name="half_bathrooms" min="0" step="1">
+                            <input type="number" id="half_bathrooms" name="half_bathrooms" min="0" step="1" placeholder="--">
                         </div>
 
-                        <div class="form-group">
+                        <div class="data-card">
                             <label for="sqft">Square Feet</label>
-                            <input type="number" id="sqft" name="sqft" min="0" step="1">
+                            <input type="number" id="sqft" name="sqft" min="0" step="1" placeholder="--">
                         </div>
 
-                        <div class="form-group">
-                            <label for="appraised_value">Appraised Value ($)</label>
-                            <input type="number" id="appraised_value" name="appraised_value" min="0" step="0.01">
+                        <div class="data-card">
+                            <label for="appraised_value">Appraised Value</label>
+                            <input type="number" id="appraised_value" name="appraised_value" min="0" step="0.01" placeholder="$">
                         </div>
 
-                        <div class="form-group">
-                            <label for="annual_tax">Annual Tax ($)</label>
-                            <input type="number" id="annual_tax" name="annual_tax" min="0" step="0.01">
+                        <div class="data-card">
+                            <label for="annual_tax">Annual Tax</label>
+                            <input type="number" id="annual_tax" name="annual_tax" min="0" step="0.01" placeholder="$">
                         </div>
                     </div>
                 </div>
 
                 <div class="button-row">
-                    <button type="submit" class="btn btn-primary">Save Changes</button>
-                    <button type="button" class="btn btn-success" id="mark-ready-btn">Mark as Ready</button>
+                    <button type="submit" class="btn-primary">Save Changes</button>
+                    <button type="button" class="btn-success" id="mark-ready-btn">Mark as Ready</button>
                 </div>
             </form>
         </div>
@@ -394,10 +405,10 @@
 
             const statusBadge = document.getElementById('property-status');
             if (currentProperty.status === 'preparing') {
-                statusBadge.textContent = 'Preparing';
+                statusBadge.textContent = 'Preparing Assessment...';
                 statusBadge.className = 'property-status status-preparing';
             } else {
-                statusBadge.textContent = 'Ready';
+                statusBadge.textContent = 'Assessment Ready';
                 statusBadge.className = 'property-status status-ready';
             }
 
