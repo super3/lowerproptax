@@ -1441,7 +1441,7 @@
                     // Update Potentially Overvalued By
                     const overvaluedValue = statCards[0].querySelector('.value');
                     if (overvaluedValue) {
-                        overvaluedValue.textContent = '$' + totalOvervaluation.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+                        overvaluedValue.textContent = '$' + totalOvervaluation.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
                         if (totalOvervaluation > 0) {
                             statCards[0].classList.add('active');
                         }
