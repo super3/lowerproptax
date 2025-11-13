@@ -239,6 +239,10 @@
             color: #1a1a1a;
         }
 
+        .stat-card.savings .value {
+            color: #27ae60;
+        }
+
         .empty-properties {
             background: linear-gradient(135deg, #f0f4ff 0%, #f8f9ff 100%);
             border-radius: 12px;
@@ -627,7 +631,7 @@
 
             <div class="stats-row">
                 <div class="stat-card">
-                    <label>Estimated Annual Tax</label>
+                    <label>Annual Tax (2025)</label>
                     <div class="value">$0</div>
                 </div>
                 <div class="stat-card">
@@ -1146,6 +1150,7 @@
                         savingsValue.textContent = '$' + totalSavings.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
                         if (totalSavings > 0) {
                             statCards[1].classList.add('active');
+                            statCards[1].classList.add('savings');
                         }
                     }
                 }
