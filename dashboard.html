@@ -1110,18 +1110,18 @@
 
         // Update aggregate statistics
         function updateAggregateStats() {
-            let totalEstimatedTax = 0;
+            let totalAnnualTax = 0;
             let totalSavings = 0;
             let propertiesWithData = 0;
 
             properties.forEach(property => {
                 const assessment = property.latestAssessment;
-                if (assessment && assessment.estimatedAnnualTax) {
-                    totalEstimatedTax += parseFloat(assessment.estimatedAnnualTax);
+                if (assessment && assessment.annualTax) {
+                    totalAnnualTax += parseFloat(assessment.annualTax);
                     propertiesWithData++;
 
                     // Calculate savings if both values exist
-                    if (assessment.annualTax) {
+                    if (assessment.estimatedAnnualTax) {
                         const savings = assessment.annualTax - assessment.estimatedAnnualTax;
                         if (savings > 0) {
                             totalSavings += savings;
@@ -1135,11 +1135,11 @@
             if (statsRow) {
                 const statCards = statsRow.querySelectorAll('.stat-card');
                 if (statCards.length >= 2) {
-                    // Update Estimated Annual Tax
+                    // Update Annual Tax (2025)
                     const taxValue = statCards[0].querySelector('.value');
                     if (taxValue) {
-                        taxValue.textContent = '$' + totalEstimatedTax.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-                        if (totalEstimatedTax > 0) {
+                        taxValue.textContent = '$' + totalAnnualTax.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                        if (totalAnnualTax > 0) {
                             statCards[0].classList.add('active');
                         }
                     }
