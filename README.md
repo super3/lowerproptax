@@ -31,11 +31,11 @@ npm test                           # Run test suite
 ## Development
 
 ### Roadmap
-- [ ] Automated property data collection (assessor records)
-- [ ] PDF report generation
+- [ ] Email notifications for pending assessments (to admin)
 - [ ] Email notifications for completed assessments
 - [ ] Payment processing (Stripe) for report downloads
 - [ ] Property tax appeal guidance
 - [ ] Historical tax data tracking
-- [ ] Multi-property portfolio analysis
-- [ ] Mobile app
+- [ ] Tax deadlines tracking
+- [ ] Mobile app (Android)
+- [ ] Mobile app (iOS)
