@@ -1421,9 +1421,9 @@
             properties.forEach(property => {
                 const assessment = property.latestAssessment;
                 if (assessment) {
-                    // Calculate overvaluation (assessed value - market value)
-                    if (assessment.appraisedValue && assessment.estimatedValue) {
-                        const overvaluation = parseFloat(assessment.appraisedValue) - parseFloat(assessment.estimatedValue);
+                    // Calculate overvaluation (appraised value - estimated appraised value)
+                    if (assessment.appraisedValue && assessment.estimatedAppraisedValue) {
+                        const overvaluation = parseFloat(assessment.appraisedValue) - parseFloat(assessment.estimatedAppraisedValue);
                         if (overvaluation > 0) {
                             totalOvervaluation += overvaluation;
                         }
