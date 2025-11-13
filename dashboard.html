@@ -333,6 +333,10 @@
             display: flex;
             justify-content: space-between;
             align-items: flex-start;
+            margin-bottom: 0;
+        }
+
+        .property-card.has-timeline .property-header {
             margin-bottom: 1.25rem;
         }
 
@@ -370,8 +374,8 @@
 
         /* Progress Timeline */
         .progress-timeline {
-            margin-top: 1rem;
-            padding-top: 1rem;
+            margin-top: 1.5rem;
+            padding-top: 1.5rem;
             border-top: 1px solid #f0f0f0;
         }
 
@@ -380,7 +384,7 @@
             justify-content: space-between;
             align-items: center;
             position: relative;
-            margin-bottom: 1rem;
+            margin-bottom: 1.5rem;
         }
 
         .progress-line {
@@ -463,12 +467,14 @@
         .progress-info {
             display: flex;
             justify-content: space-between;
-            align-items: center;
+            align-items: baseline;
             font-size: 0.8rem;
+            gap: 1rem;
         }
 
         .progress-status {
             color: #666;
+            line-height: 1.4;
         }
 
         .progress-status.active {
@@ -479,6 +485,8 @@
         .progress-eta {
             color: #999;
             font-size: 0.75rem;
+            line-height: 1.4;
+            white-space: nowrap;
         }
 
         .property-actions {
@@ -1068,7 +1076,8 @@
         // Create property card HTML
         function createPropertyCard(property, index) {
             const card = document.createElement('div');
-            card.className = 'property-card';
+            const status = property.latestAssessment?.status || 'preparing';
+            card.className = status === 'preparing' ? 'property-card has-timeline' : 'property-card';
 
             // Extract street address (remove city, state, zip, country)
             // The full address format from Google is typically: "123 Main St, City, State Zip, Country"
@@ -1103,7 +1112,7 @@
                 eta = '';
             } else {
                 currentStep = 2;
-                progressPercent = 66;
+                progressPercent = 50;
                 statusMessage = 'Preparing your assessment...';
                 eta = 'Usually ready in 18-24 hours';
             }
