@@ -31,6 +31,9 @@ npm test                           # Run test suite
 ## Development
 
 ### Roadmap
+- [ ] Terms of Service page
+- [ ] Privacy Policy page
+- [ ] Help page
 - [ ] Email notifications for pending assessments (to admin)
 - [ ] Email notifications for completed assessments
 - [ ] Payment processing (Stripe) for report downloads
