@@ -822,7 +822,7 @@
         let clerkLoaded = false;
 
         // Initialize autocomplete when Google Maps API loads
-        async function initAutocomplete() {
+        window.initAutocomplete = async function() {
             try {
                 const { PlaceAutocompleteElement } = await google.maps.importLibrary("places");
 
@@ -890,7 +890,7 @@
                 console.error('Error initializing Google Maps Autocomplete:', error);
                 // Fallback: form will still work with manual address entry
             }
-        }
+        };
 
         // Initialize autocomplete for "add another" form
         async function initAutocompleteAnother() {
@@ -1076,8 +1076,6 @@
         // Create property card HTML
         function createPropertyCard(property, index) {
             const card = document.createElement('div');
-            const status = property.latestAssessment?.status || 'preparing';
-            card.className = status === 'preparing' ? 'property-card has-timeline' : 'property-card';
 
             // Extract street address (remove city, state, zip, country)
             // The full address format from Google is typically: "123 Main St, City, State Zip, Country"
@@ -1101,6 +1099,9 @@
             const status = property.latestAssessment?.status || 'preparing';
             const statusText = status === 'preparing' ? 'In Progress' : 'Complete';
             const statusClass = status === 'preparing' ? 'status-preparing' : 'status-ready';
+
+            // Set card class based on status
+            card.className = status === 'preparing' ? 'property-card has-timeline' : 'property-card';
 
             // Determine progress based on status from backend
             let currentStep, progressPercent, statusMessage, eta;
