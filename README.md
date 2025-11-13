@@ -28,9 +28,8 @@ npm run dev                        # Start with auto-reload (development)
 npm test                           # Run test suite
 ```
 
-## Development
+## Roadmap
 
-### Roadmap
 - [ ] Terms of Service page
 - [ ] Privacy Policy page
 - [ ] Help page
