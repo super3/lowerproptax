@@ -332,7 +332,8 @@
         .property-header {
             display: flex;
             justify-content: space-between;
-            align-items: center;
+            align-items: flex-start;
+            margin-bottom: 1.25rem;
         }
 
         .property-address {
@@ -354,7 +355,7 @@
             border-radius: 6px;
             font-size: 0.8rem;
             font-weight: 600;
-            margin-top: 0.5rem;
+            white-space: nowrap;
         }
 
         .status-preparing {
@@ -367,11 +368,117 @@
             color: #27ae60;
         }
 
-        .property-message {
-            font-size: 0.85rem;
+        /* Progress Timeline */
+        .progress-timeline {
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid #f0f0f0;
+        }
+
+        .progress-steps {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+            margin-bottom: 1rem;
+        }
+
+        .progress-line {
+            position: absolute;
+            top: 12px;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: #e5e5e5;
+            z-index: 0;
+        }
+
+        .progress-line-fill {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 100%;
+            background: #3171ef;
+            transition: width 0.5s ease;
+        }
+
+        .progress-step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            z-index: 1;
+            flex: 1;
+        }
+
+        .step-circle {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: #e5e5e5;
+            border: 3px solid white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+            font-weight: 700;
+            color: #999;
+            margin-bottom: 0.5rem;
+            transition: all 0.3s;
+        }
+
+        .progress-step.completed .step-circle {
+            background: #3171ef;
+            color: white;
+        }
+
+        .progress-step.active .step-circle {
+            background: #3171ef;
+            color: white;
+            box-shadow: 0 0 0 4px rgba(49, 113, 239, 0.15);
+            animation: pulse-circle 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse-circle {
+            0%, 100% {
+                box-shadow: 0 0 0 4px rgba(49, 113, 239, 0.15);
+            }
+            50% {
+                box-shadow: 0 0 0 8px rgba(49, 113, 239, 0.1);
+            }
+        }
+
+        .step-label {
+            font-size: 0.7rem;
+            color: #999;
+            text-align: center;
+            font-weight: 500;
+        }
+
+        .progress-step.completed .step-label,
+        .progress-step.active .step-label {
+            color: #1a1a1a;
+            font-weight: 600;
+        }
+
+        .progress-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.8rem;
+        }
+
+        .progress-status {
             color: #666;
-            margin-top: 0.5rem;
-            font-style: italic;
+        }
+
+        .progress-status.active {
+            color: #3171ef;
+            font-weight: 600;
+        }
+
+        .progress-eta {
+            color: #999;
+            font-size: 0.75rem;
         }
 
         .property-actions {
@@ -535,6 +642,22 @@
             .btn-show-form {
                 width: 100%;
                 text-align: center;
+            }
+
+            .step-label {
+                font-size: 0.65rem;
+            }
+
+            .progress-info {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.25rem;
+            }
+
+            .step-circle {
+                width: 24px;
+                height: 24px;
+                font-size: 0.65rem;
             }
         }
 
@@ -967,18 +1090,62 @@
             }
 
             const status = property.latestAssessment?.status || 'preparing';
-            const statusText = status === 'preparing' ? 'Preparing Assessment...' : 'Assessment Ready';
+            const statusText = status === 'preparing' ? 'In Progress' : 'Complete';
             const statusClass = status === 'preparing' ? 'status-preparing' : 'status-ready';
+
+            // Determine progress based on status from backend
+            let currentStep, progressPercent, statusMessage, eta;
+
+            if (status === 'ready') {
+                currentStep = 3;
+                progressPercent = 100;
+                statusMessage = 'Assessment complete!';
+                eta = '';
+            } else {
+                currentStep = 2;
+                progressPercent = 66;
+                statusMessage = 'Preparing your assessment...';
+                eta = 'Usually ready in 18-24 hours';
+            }
+
+            const step1Class = 'completed';
+            const step2Class = currentStep >= 2 ? (currentStep === 2 ? 'active' : 'completed') : '';
+            const step3Class = currentStep >= 3 ? 'completed' : '';
 
             card.innerHTML = `
                 <div class="property-header">
                     <div>
                         <div class="property-address">${streetAddress}</div>
                         ${location ? `<div class="property-details">${location}</div>` : ''}
-                        ${status === 'preparing' ? '<div class="property-message">We\'ll email you when your assessment is ready (usually within 24 hours)</div>' : ''}
                     </div>
                     <div class="property-status ${statusClass}">${statusText}</div>
                 </div>
+
+                ${status === 'preparing' ? `
+                <div class="progress-timeline">
+                    <div class="progress-steps">
+                        <div class="progress-line">
+                            <div class="progress-line-fill" style="width: ${progressPercent}%"></div>
+                        </div>
+                        <div class="progress-step ${step1Class}">
+                            <div class="step-circle">✓</div>
+                            <div class="step-label">Added</div>
+                        </div>
+                        <div class="progress-step ${step2Class}">
+                            <div class="step-circle">${currentStep >= 3 ? '✓' : '2'}</div>
+                            <div class="step-label">Preparing</div>
+                        </div>
+                        <div class="progress-step ${step3Class}">
+                            <div class="step-circle">3</div>
+                            <div class="step-label">Ready</div>
+                        </div>
+                    </div>
+                    <div class="progress-info">
+                        <span class="progress-status active">${statusMessage}</span>
+                        ${eta ? `<span class="progress-eta">${eta}</span>` : ''}
+                    </div>
+                </div>
+                ` : ''}
             `;
 
             // Make card clickable
