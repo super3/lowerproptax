@@ -374,8 +374,11 @@
             // Hide location since it's already in the full address
             document.getElementById('property-location').style.display = 'none';
 
-            // Status
-            const status = property.status || 'preparing';
+            // Get most recent assessment
+            const latestAssessment = property.assessments && property.assessments.length > 0 ? property.assessments[0] : null;
+
+            // Status - check assessment status instead of property status
+            const status = latestAssessment?.status || 'preparing';
             const statusEl = document.getElementById('property-status');
             statusEl.className = `property-status status-${status}`;
             statusEl.textContent = status === 'preparing' ? 'Preparing Assessment...' : 'Assessment Ready';
@@ -387,9 +390,6 @@
             } else {
                 messageEl.textContent = "Your assessment is complete! Review the details below and download your full report.";
             }
-
-            // Get most recent assessment
-            const latestAssessment = property.assessments && property.assessments.length > 0 ? property.assessments[0] : null;
 
             // Property data - display actual values from database (if available)
             // Appraised Value (from assessment)
@@ -403,9 +403,6 @@
                 document.getElementById('annual-tax').textContent = '$' + Number(latestAssessment.annualTax).toLocaleString();
                 document.getElementById('annual-tax').classList.remove('preparing');
             }
-
-            // Use assessment status if available, otherwise 'preparing'
-            const assessmentStatus = latestAssessment ? latestAssessment.status : 'preparing';
 
             // Bedrooms
             if (property.bedrooms) {
@@ -437,7 +434,7 @@
             }
 
             // Enable download button only when assessment is ready
-            if (assessmentStatus === 'ready') {
+            if (status === 'ready') {
                 document.getElementById('download-report').disabled = false;
             }
 

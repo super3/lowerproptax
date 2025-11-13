@@ -212,6 +212,10 @@
             opacity: 0.5;
         }
 
+        .stat-card.active {
+            opacity: 1;
+        }
+
         .stat-card label {
             font-size: 0.75rem;
             color: #999;
@@ -221,10 +225,18 @@
             letter-spacing: 0.5px;
         }
 
+        .stat-card.active label {
+            color: #666;
+        }
+
         .stat-card .value {
             font-size: 1.5rem;
             font-weight: 700;
             color: #999;
+        }
+
+        .stat-card.active .value {
+            color: #1a1a1a;
         }
 
         .empty-properties {
@@ -958,9 +970,9 @@
                     <div>
                         <div class="property-address">${streetAddress}</div>
                         ${location ? `<div class="property-details">${location}</div>` : ''}
-                        <div class="property-status ${statusClass}">${statusText}</div>
                         ${status === 'preparing' ? '<div class="property-message">We\'ll email you when your assessment is ready (usually within 24 hours)</div>' : ''}
                     </div>
+                    <div class="property-status ${statusClass}">${statusText}</div>
                 </div>
             `;
 
@@ -1117,10 +1129,25 @@
             // Update the DOM
             const statsRow = document.querySelector('.stats-row');
             if (statsRow) {
-                const statCards = statsRow.querySelectorAll('.stat-card .value');
+                const statCards = statsRow.querySelectorAll('.stat-card');
                 if (statCards.length >= 2) {
-                    statCards[0].textContent = '$' + totalEstimatedTax.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-                    statCards[1].textContent = '$' + totalSavings.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                    // Update Estimated Annual Tax
+                    const taxValue = statCards[0].querySelector('.value');
+                    if (taxValue) {
+                        taxValue.textContent = '$' + totalEstimatedTax.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                        if (totalEstimatedTax > 0) {
+                            statCards[0].classList.add('active');
+                        }
+                    }
+
+                    // Update Potential Annual Savings
+                    const savingsValue = statCards[1].querySelector('.value');
+                    if (savingsValue) {
+                        savingsValue.textContent = '$' + totalSavings.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                        if (totalSavings > 0) {
+                            statCards[1].classList.add('active');
+                        }
+                    }
                 }
             }
         }
