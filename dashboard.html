@@ -490,6 +490,40 @@
             white-space: nowrap;
         }
 
+        /* Savings Highlight for Completed Assessments */
+        .savings-highlight {
+            margin-top: 1rem;
+            padding: 1.25rem;
+            background: linear-gradient(135deg, #e8f5e9 0%, #f1f8f4 100%);
+            border-left: 4px solid #27ae60;
+            border-radius: 8px;
+        }
+
+        .savings-label {
+            font-size: 0.75rem;
+            color: #27ae60;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 0.5rem;
+        }
+
+        .savings-amount {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: #27ae60;
+        }
+
+        .no-savings-message {
+            margin-top: 1rem;
+            padding: 1rem;
+            background: #f8f9fa;
+            border-left: 4px solid #999;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            color: #666;
+        }
+
         .property-actions {
             display: flex;
             gap: 0.5rem;
@@ -1123,6 +1157,29 @@
             const step2Class = currentStep >= 2 ? (currentStep === 2 ? 'active' : 'completed') : '';
             const step3Class = currentStep >= 3 ? 'completed' : '';
 
+            // Calculate savings for completed assessments
+            let savingsInfo = '';
+            if (status === 'ready') {
+                const assessment = property.latestAssessment;
+                if (assessment && assessment.annualTax && assessment.estimatedAnnualTax) {
+                    const savings = assessment.annualTax - assessment.estimatedAnnualTax;
+                    if (savings > 0) {
+                        savingsInfo = `
+                            <div class="savings-highlight">
+                                <div class="savings-label">Potential Annual Savings</div>
+                                <div class="savings-amount">$${savings.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}</div>
+                            </div>
+                        `;
+                    } else {
+                        savingsInfo = `
+                            <div class="no-savings-message">
+                                No savings opportunity found
+                            </div>
+                        `;
+                    }
+                }
+            }
+
             card.innerHTML = `
                 <div class="property-header">
                     <div>
@@ -1131,6 +1188,8 @@
                     </div>
                     <div class="property-status ${statusClass}">${statusText}</div>
                 </div>
+
+                ${savingsInfo}
 
                 ${status === 'preparing' ? `
                 <div class="progress-timeline">
