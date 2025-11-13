@@ -224,6 +224,7 @@
             margin-bottom: 0.5rem;
             text-transform: uppercase;
             letter-spacing: 0.5px;
+            line-height: 1.2;
         }
 
         .stat-card.active label {
@@ -234,6 +235,7 @@
             font-size: 1.5rem;
             font-weight: 700;
             color: #999;
+            line-height: 1.2;
         }
 
         .stat-card.active .value {
@@ -497,6 +499,14 @@
             background: linear-gradient(135deg, #e8f5e9 0%, #f1f8f4 100%);
             border-left: 4px solid #27ae60;
             border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .savings-info {
+            flex: 1;
         }
 
         .savings-label {
@@ -514,14 +524,54 @@
             color: #27ae60;
         }
 
+        .btn-view-report {
+            background: #27ae60;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+
+        .btn-view-report:hover {
+            background: #229954;
+            transform: translateY(-1px);
+        }
+
         .no-savings-message {
             margin-top: 1rem;
-            padding: 1rem;
+            padding: 1rem 1.25rem;
             background: #f8f9fa;
             border-left: 4px solid #999;
             border-radius: 8px;
             font-size: 0.85rem;
             color: #666;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .btn-view-details {
+            background: #666;
+            color: white;
+            padding: 0.65rem 1.25rem;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+
+        .btn-view-details:hover {
+            background: #555;
+            transform: translateY(-1px);
         }
 
         .property-actions {
@@ -1166,14 +1216,18 @@
                     if (savings > 0) {
                         savingsInfo = `
                             <div class="savings-highlight">
-                                <div class="savings-label">Potential Annual Savings</div>
-                                <div class="savings-amount">$${savings.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}</div>
+                                <div class="savings-info">
+                                    <div class="savings-label">Potential Annual Savings</div>
+                                    <div class="savings-amount">$${savings.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
+                                </div>
+                                <button class="btn-view-report" onclick="event.stopPropagation(); viewProperty(${index});">View Report</button>
                             </div>
                         `;
                     } else {
                         savingsInfo = `
                             <div class="no-savings-message">
-                                No savings opportunity found
+                                <span>No savings opportunity found</span>
+                                <button class="btn-view-details" onclick="event.stopPropagation(); viewProperty(${index});">View Details</button>
                             </div>
                         `;
                     }
@@ -1218,9 +1272,11 @@
                 ` : ''}
             `;
 
-            // Make card clickable
-            card.style.cursor = 'pointer';
-            card.onclick = () => viewProperty(index);
+            // Make card clickable only if it's preparing (no button available)
+            if (status === 'preparing') {
+                card.style.cursor = 'pointer';
+                card.onclick = () => viewProperty(index);
+            }
             return card;
         }
 
