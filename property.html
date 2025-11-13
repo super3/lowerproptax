@@ -323,7 +323,7 @@
                 </div>
             </div>
 
-            <button class="btn-download" id="download-report" disabled>Download Report ($49)</button>
+            <a class="btn-download" id="download-report" style="display: none;" target="_blank">Download Report (Free!)</a>
         </div>
     </div>
 
@@ -433,9 +433,11 @@
                 document.getElementById('potential-savings').classList.remove('preparing');
             }
 
-            // Enable download button only when assessment is ready
-            if (status === 'ready') {
-                document.getElementById('download-report').disabled = false;
+            // Show download button and set URL when report is available
+            if (status === 'ready' && latestAssessment && latestAssessment.reportUrl) {
+                const downloadBtn = document.getElementById('download-report');
+                downloadBtn.href = latestAssessment.reportUrl;
+                downloadBtn.style.display = 'inline-block';
             }
 
             // Update assessed value label to show year if available
@@ -495,11 +497,6 @@
         // Close menu when clicking outside
         document.addEventListener('click', () => {
             menuDropdown.classList.remove('show');
-        });
-
-        // Download report button
-        document.getElementById('download-report').addEventListener('click', () => {
-            alert('Payment integration coming soon! This will redirect to a payment page for the $49 PDF report.');
         });
 
         // Delete property button
