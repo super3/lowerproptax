@@ -11,7 +11,7 @@ import {
 
 // Mock the Clerk SDK
 const mockClerkClient = createMockClerkClient();
-jest.unstable_mockModule('@clerk/clerk-sdk-node', () => ({
+jest.unstable_mockModule('@clerk/express', () => ({
   clerkClient: mockClerkClient
 }));
 

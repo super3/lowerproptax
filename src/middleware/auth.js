@@ -1,4 +1,4 @@
-import { clerkClient } from '@clerk/clerk-sdk-node';
+import { clerkClient } from '@clerk/express';
 
 async function requireAuth(req, res, next) {
   try {
@@ -12,8 +12,7 @@ async function requireAuth(req, res, next) {
 
     // Verify the session token with Clerk
     try {
-      // For Clerk v4, we need to decode the JWT to get the session ID
-      // The token from getToken() is a JWT that contains the session info
+      // Decode the JWT to get the session ID
       const tokenParts = sessionToken.split('.');
       if (tokenParts.length !== 3) {
         throw new Error('Invalid token format');

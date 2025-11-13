@@ -2,7 +2,7 @@ import { jest } from '@jest/globals';
 
 // Mock Clerk SDK
 const mockGetUser = jest.fn();
-jest.unstable_mockModule('@clerk/clerk-sdk-node', () => ({
+jest.unstable_mockModule('@clerk/express', () => ({
   clerkClient: {
     users: {
       getUser: mockGetUser

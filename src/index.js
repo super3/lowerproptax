@@ -1,6 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
+import { clerkMiddleware } from '@clerk/express';
 import propertyRoutes from './routes/propertyRoutes.js';
 import adminRoutes from './routes/adminRoutes.js';
 import { initDatabase } from './db/init.js';
@@ -19,6 +20,9 @@ app.use(cors({
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
 app.use(express.json());
+
+// Clerk middleware for authentication
+app.use(clerkMiddleware());
 
 // Health check endpoint
 app.get('/health', (req, res) => {
