@@ -50,89 +50,15 @@ export async function initDatabase() {
 
     await pool.query(createAssessmentsTable);
 
-    // Migration: Add new columns to existing properties table if they don't exist
-    const migrations = [
-      `ALTER TABLE properties ADD COLUMN IF NOT EXISTS bedrooms INTEGER`,
-      `ALTER TABLE properties ADD COLUMN IF NOT EXISTS sqft INTEGER`
-    ];
-
-    for (const migration of migrations) {
-      await pool.query(migration);
-    }
-
-    // Migration: Move appraised_value and annual_tax data to assessments table
-    try {
-      // Get current year
-      const currentYear = new Date().getFullYear();
-
-      // Create assessments for existing properties that have appraised_value or annual_tax
-      await pool.query(`
-        INSERT INTO assessments (id, property_id, year, appraised_value, annual_tax, status, created_at, updated_at)
-        SELECT
-          'assess_' || id || '_' || $1,
-          id,
-          $1,
-          appraised_value,
-          annual_tax,
-          status,
-          created_at,
-          updated_at
-        FROM properties
-        WHERE (appraised_value IS NOT NULL OR annual_tax IS NOT NULL)
-        AND NOT EXISTS (
-          SELECT 1 FROM assessments WHERE assessments.property_id = properties.id AND assessments.year = $1
-        )
-      `, [currentYear]);
-
-      // Drop old columns from properties
-      await pool.query(`ALTER TABLE properties DROP COLUMN IF EXISTS appraised_value`);
-      await pool.query(`ALTER TABLE properties DROP COLUMN IF EXISTS annual_tax`);
-      await pool.query(`ALTER TABLE properties DROP COLUMN IF EXISTS status`);
-    } catch (error) {
-      console.log('Assessment migration completed or already applied');
-    }
-
-    // Migration: Convert bathrooms to DECIMAL and merge half_bathrooms (for existing databases only)
-    // Note: Fresh databases already have bathrooms as DECIMAL(3,1) from CREATE TABLE
-    try {
-      // Check if we need to migrate (old schema had INTEGER bathrooms)
-      const checkColumn = await pool.query(`
-        SELECT data_type
-        FROM information_schema.columns
-        WHERE table_name = 'properties'
-        AND column_name = 'bathrooms'
-      `);
-
-      if (checkColumn.rows.length > 0 && checkColumn.rows[0].data_type === 'integer') {
-        // Old schema detected - need to migrate
-        await pool.query(`ALTER TABLE properties ADD COLUMN IF NOT EXISTS bathrooms_decimal DECIMAL(3, 1)`);
-        await pool.query(`UPDATE properties SET bathrooms_decimal = COALESCE(bathrooms, 0) + COALESCE(half_bathrooms, 0) * 0.5 WHERE bathrooms_decimal IS NULL`);
-        await pool.query(`ALTER TABLE properties DROP COLUMN IF EXISTS bathrooms`);
-        await pool.query(`ALTER TABLE properties DROP COLUMN IF EXISTS half_bathrooms`);
-        await pool.query(`ALTER TABLE properties RENAME COLUMN bathrooms_decimal TO bathrooms`);
-        console.log('Bathrooms migration completed');
-      } else {
-        // New schema or already migrated - just drop half_bathrooms if it exists
-        await pool.query(`ALTER TABLE properties DROP COLUMN IF EXISTS half_bathrooms`);
-      }
-    } catch (error) {
-      console.log('Bathrooms migration completed or already applied');
-    }
-
-    // Migration: Add estimated values and report URL to assessments table
-    const assessmentMigrations = [
+    // Add estimated values and report URL to assessments table
+    const assessmentColumns = [
       `ALTER TABLE assessments ADD COLUMN IF NOT EXISTS estimated_appraised_value DECIMAL(15, 2)`,
       `ALTER TABLE assessments ADD COLUMN IF NOT EXISTS estimated_annual_tax DECIMAL(15, 2)`,
       `ALTER TABLE assessments ADD COLUMN IF NOT EXISTS report_url VARCHAR(500)`
     ];
 
-    for (const migration of assessmentMigrations) {
-      try {
-        await pool.query(migration);
-      } catch (error) {
-        // Ignore errors if column already exists
-        console.log('Assessment migration step completed or already applied');
-      }
+    for (const column of assessmentColumns) {
+      await pool.query(column);
     }
 
     console.log('Database initialized successfully');

@@ -79,6 +79,35 @@ describe('Admin Controller', () => {
       expect(res.json).toHaveBeenCalledWith([]);
     });
 
+    it('should handle null status and set it to preparing', async () => {
+      const mockProperties = [
+        {
+          id: 'prop1',
+          address: '123 Main St',
+          city: 'Atlanta',
+          state: 'GA',
+          zip_code: '30301',
+          status: null, // null status should become 'preparing'
+          created_at: new Date(),
+          user_id: 'user1'
+        }
+      ];
+
+      mockQuery.mockResolvedValue({ rows: mockProperties });
+
+      await adminController.getPendingProperties(req, res);
+
+      expect(res.json).toHaveBeenCalledWith(
+        expect.arrayContaining([
+          expect.objectContaining({
+            id: 'prop1',
+            status: 'preparing',
+            user_email: null
+          })
+        ])
+      );
+    });
+
     it('should handle database errors', async () => {
       mockQuery.mockRejectedValue(new Error('Database error'));
 
@@ -183,6 +212,41 @@ describe('Admin Controller', () => {
           currentAssessment: expect.objectContaining({
             year: 2025,
             appraised_value: 250000
+          })
+        })
+      );
+    });
+
+    it('should handle property with no assessments', async () => {
+      req.params.id = 'prop1';
+      const mockProperty = {
+        id: 'prop1',
+        address: '123 Main St',
+        city: 'Atlanta',
+        state: 'GA',
+        zip_code: '30301',
+        bedrooms: 3,
+        bathrooms: 2.5,
+        sqft: 1500,
+        created_at: new Date(),
+        user_id: 'user1'
+      };
+
+      mockQuery
+        .mockResolvedValueOnce({ rows: [mockProperty] })
+        .mockResolvedValueOnce({ rows: [] }); // No assessments
+
+      await adminController.getPropertyDetails(req, res);
+
+      expect(res.json).toHaveBeenCalledWith(
+        expect.objectContaining({
+          ...mockProperty,
+          assessments: [],
+          currentAssessment: expect.objectContaining({
+            year: new Date().getFullYear(),
+            appraised_value: null,
+            annual_tax: null,
+            status: 'preparing'
           })
         })
       );
@@ -314,6 +378,135 @@ describe('Admin Controller', () => {
 
       expect(res.status).toHaveBeenCalledWith(500);
       expect(res.json).toHaveBeenCalledWith({ error: 'Failed to update property details' });
+    });
+
+    it('should handle undefined values correctly', async () => {
+      req.params.id = 'prop1';
+      req.body = {
+        bedrooms: undefined,
+        bathrooms: undefined,
+        sqft: undefined,
+        appraised_value: undefined,
+        annual_tax: undefined,
+        estimated_appraised_value: undefined,
+        estimated_annual_tax: undefined,
+        report_url: undefined,
+        status: undefined
+      };
+
+      const mockUpdatedProperty = {
+        id: 'prop1',
+        updated_at: new Date()
+      };
+
+      const mockAssessment = {
+        id: 'assess_prop1_2025',
+        property_id: 'prop1',
+        year: 2025,
+        created_at: new Date(),
+        updated_at: new Date()
+      };
+
+      mockQuery
+        .mockResolvedValueOnce({ rows: [mockUpdatedProperty] })
+        .mockResolvedValueOnce({ rows: [mockAssessment] });
+
+      await adminController.updatePropertyDetails(req, res);
+
+      expect(res.json).toHaveBeenCalledWith(
+        expect.objectContaining({
+          ...mockUpdatedProperty,
+          currentAssessment: mockAssessment
+        })
+      );
+    });
+
+    it('should handle mix of defined and undefined assessment values', async () => {
+      req.params.id = 'prop1';
+      req.body = {
+        appraised_value: 300000,
+        annual_tax: 6000,
+        estimated_appraised_value: 280000,
+        estimated_annual_tax: undefined,
+        report_url: 'https://example.com/report.pdf',
+        status: 'ready'
+      };
+
+      const mockUpdatedProperty = {
+        id: 'prop1',
+        updated_at: new Date()
+      };
+
+      const mockAssessment = {
+        id: 'assess_prop1_2025',
+        property_id: 'prop1',
+        year: 2025,
+        appraised_value: 300000,
+        annual_tax: 6000,
+        estimated_appraised_value: 280000,
+        estimated_annual_tax: null,
+        report_url: 'https://example.com/report.pdf',
+        status: 'ready',
+        created_at: new Date(),
+        updated_at: new Date()
+      };
+
+      mockQuery
+        .mockResolvedValueOnce({ rows: [mockUpdatedProperty] })
+        .mockResolvedValueOnce({ rows: [mockAssessment] });
+
+      await adminController.updatePropertyDetails(req, res);
+
+      expect(res.json).toHaveBeenCalledWith(
+        expect.objectContaining({
+          ...mockUpdatedProperty,
+          currentAssessment: mockAssessment
+        })
+      );
+    });
+
+    it('should handle zero and falsy values correctly', async () => {
+      req.params.id = 'prop1';
+      req.body = {
+        appraised_value: 0,
+        annual_tax: 0,
+        estimated_appraised_value: 0,
+        estimated_annual_tax: 0,
+        report_url: '',
+        status: 'preparing'
+      };
+
+      const mockUpdatedProperty = {
+        id: 'prop1',
+        updated_at: new Date()
+      };
+
+      const mockAssessment = {
+        id: 'assess_prop1_2025',
+        property_id: 'prop1',
+        year: 2025,
+        appraised_value: 0,
+        annual_tax: 0,
+        estimated_appraised_value: 0,
+        estimated_annual_tax: 0,
+        report_url: '',
+        status: 'preparing',
+        created_at: new Date(),
+        updated_at: new Date()
+      };
+
+      mockQuery
+        .mockResolvedValueOnce({ rows: [mockUpdatedProperty] })
+        .mockResolvedValueOnce({ rows: [mockAssessment] });
+
+      await adminController.updatePropertyDetails(req, res);
+
+      expect(res.json).toHaveBeenCalledWith(
+        expect.objectContaining({
+          ...mockUpdatedProperty,
+          currentAssessment: mockAssessment
+        })
+      );
     });
   });
 
