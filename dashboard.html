@@ -254,6 +254,14 @@
             color: #d32f2f;
         }
 
+        .stat-card.current-tax.active label {
+            color: #3171ef;
+        }
+
+        .stat-card.current-tax.active .value {
+            color: #3171ef;
+        }
+
         .empty-properties {
             background: linear-gradient(135deg, #f0f4ff 0%, #f8f9ff 100%);
             border-radius: 12px;
@@ -856,11 +864,11 @@
 
             <div class="stats-row">
                 <div class="stat-card overvalued">
-                    <label>Overvalued By</label>
+                    <label>Potentially Overvalued By</label>
                     <div class="value">$0</div>
                 </div>
-                <div class="stat-card">
-                    <label>Potential Annual Savings</label>
+                <div class="stat-card current-tax">
+                    <label>Current Annual Tax</label>
                     <div class="value">$0</div>
                 </div>
             </div>
@@ -1411,7 +1419,7 @@
         // Update aggregate statistics
         function updateAggregateStats() {
             let totalOvervaluation = 0;
-            let totalSavings = 0;
+            let totalCurrentTax = 0;
             let propertiesWithData = 0;
 
             properties.forEach(property => {
@@ -1422,16 +1430,13 @@
                         const overvaluation = parseFloat(assessment.appraisedValue) - parseFloat(assessment.estimatedValue);
                         if (overvaluation > 0) {
                             totalOvervaluation += overvaluation;
-                            propertiesWithData++;
                         }
                     }
 
-                    // Calculate savings if both values exist
-                    if (assessment.annualTax && assessment.estimatedAnnualTax) {
-                        const savings = assessment.annualTax - assessment.estimatedAnnualTax;
-                        if (savings > 0) {
-                            totalSavings += savings;
-                        }
+                    // Calculate current annual tax
+                    if (assessment.annualTax) {
+                        totalCurrentTax += parseFloat(assessment.annualTax);
+                        propertiesWithData++;
                     }
                 }
             });
@@ -1441,7 +1446,7 @@
             if (statsRow) {
                 const statCards = statsRow.querySelectorAll('.stat-card');
                 if (statCards.length >= 2) {
-                    // Update Overvalued By
+                    // Update Potentially Overvalued By
                     const overvaluedValue = statCards[0].querySelector('.value');
                     if (overvaluedValue) {
                         overvaluedValue.textContent = '$' + totalOvervaluation.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
@@ -1450,13 +1455,12 @@
                         }
                     }
 
-                    // Update Potential Annual Savings
-                    const savingsValue = statCards[1].querySelector('.value');
-                    if (savingsValue) {
-                        savingsValue.textContent = '$' + totalSavings.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-                        if (totalSavings > 0) {
+                    // Update Current Annual Tax
+                    const currentTaxValue = statCards[1].querySelector('.value');
+                    if (currentTaxValue) {
+                        currentTaxValue.textContent = '$' + totalCurrentTax.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                        if (totalCurrentTax > 0) {
                             statCards[1].classList.add('active');
-                            statCards[1].classList.add('savings');
                         }
                     }
                 }

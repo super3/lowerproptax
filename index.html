@@ -271,7 +271,7 @@
 
         .stats-row {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
+            grid-template-columns: repeat(2, 1fr);
             gap: 0.75rem;
             margin-bottom: 1rem;
         }
@@ -304,66 +304,190 @@
             gap: 0.75rem;
         }
 
-        .property-card {
+        /* Property Card Mockup */
+        .property-card-mockup {
             background: white;
             border: 1px solid #e5e5e5;
             border-radius: 8px;
-            padding: 0.875rem;
+            padding: 1rem;
+        }
+
+        .property-header-mockup {
             display: flex;
             justify-content: space-between;
             align-items: center;
+            margin-bottom: 1rem;
         }
 
-        .property-info h4 {
-            font-size: 0.875rem;
+        .property-address-mockup {
+            font-size: 0.9rem;
             font-weight: 600;
             color: #1a1a1a;
-            margin-bottom: 0.25rem;
+            margin-bottom: 0.15rem;
         }
 
-        .property-info p {
+        .property-location-mockup {
             font-size: 0.75rem;
             color: #666;
         }
 
-        .property-status {
+        .property-status-mockup {
             font-size: 0.7rem;
-            padding: 0.25rem 0.5rem;
+            padding: 0.3rem 0.65rem;
             border-radius: 4px;
             font-weight: 600;
-            text-align: center;
-            display: inline-block;
-            min-width: 80px;
+            white-space: nowrap;
         }
 
-        .property-status.active {
+        .property-status-mockup.preparing {
+            background: #fff4e6;
+            color: #e67e22;
+        }
+
+        .property-status-mockup.complete {
             background: #e8f5e9;
-            color: #2e7d32;
+            color: #27ae60;
         }
 
-        .property-status.pending {
-            background: #fff3e0;
-            color: #f57c00;
+        /* Progress Timeline Mockup */
+        .progress-timeline-mockup {
+            padding-top: 1rem;
+            border-top: 1px solid #f0f0f0;
         }
 
-        .comparable-card {
-            background: #f8f9fa;
+        .progress-steps-mockup {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+            margin-bottom: 1rem;
         }
 
-        .comparable-card h4 {
-            color: #666;
+        .progress-line-mockup {
+            position: absolute;
+            top: 10px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: #e5e5e5;
+            z-index: 0;
         }
 
-        .comparable-price {
-            background: #e3f2fd;
-            color: #1976d2;
-            font-size: 0.7rem;
-            padding: 0.25rem 0.5rem;
-            border-radius: 4px;
+        .progress-fill-mockup {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 50%;
+            height: 100%;
+            background: #3171ef;
+        }
+
+        .progress-step-mockup {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            z-index: 1;
+            flex: 1;
+        }
+
+        .step-circle-mockup {
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background: #e5e5e5;
+            border: 2px solid white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.6rem;
+            font-weight: 700;
+            color: #999;
+            margin-bottom: 0.4rem;
+        }
+
+        .progress-step-mockup.completed .step-circle-mockup {
+            background: #3171ef;
+            color: white;
+        }
+
+        .progress-step-mockup.active .step-circle-mockup {
+            background: #3171ef;
+            color: white;
+            box-shadow: 0 0 0 3px rgba(49, 113, 239, 0.15);
+        }
+
+        .step-label-mockup {
+            font-size: 0.65rem;
+            color: #999;
+            font-weight: 500;
+        }
+
+        .progress-step-mockup.completed .step-label-mockup,
+        .progress-step-mockup.active .step-label-mockup {
+            color: #1a1a1a;
             font-weight: 600;
-            width: 80px;
-            text-align: center;
-            display: inline-block;
+        }
+
+        .progress-info-mockup {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            font-size: 0.7rem;
+            gap: 0.75rem;
+        }
+
+        .progress-status-mockup {
+            color: #3171ef;
+            font-weight: 600;
+        }
+
+        .progress-eta-mockup {
+            color: #999;
+            font-size: 0.65rem;
+            white-space: nowrap;
+        }
+
+        /* Savings Highlight Mockup */
+        .savings-highlight-mockup {
+            margin-top: 0.75rem;
+            padding: 1rem;
+            background: linear-gradient(135deg, #e8f5e9 0%, #f1f8f4 100%);
+            border-left: 3px solid #27ae60;
+            border-radius: 6px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .savings-info-mockup {
+            flex: 1;
+        }
+
+        .savings-label-mockup {
+            font-size: 0.65rem;
+            color: #27ae60;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            margin-bottom: 0.35rem;
+        }
+
+        .savings-amount-mockup {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: #27ae60;
+        }
+
+        .btn-view-report-mockup {
+            background: #27ae60;
+            color: white;
+            padding: 0.6rem 1.2rem;
+            border-radius: 5px;
+            font-weight: 600;
+            font-size: 0.75rem;
+            border: none;
+            white-space: nowrap;
         }
 
         /* Financial Tracking Mockup */
@@ -1005,42 +1129,31 @@
                 </div>
                 <div class="stats-row">
                     <div class="stat-card">
-                        <label>Assessed Value</label>
-                        <div class="value">$385,000</div>
+                        <label>Potentially Overvalued By</label>
+                        <div class="value" style="color: #d32f2f;">$43,127.00</div>
                     </div>
                     <div class="stat-card">
-                        <label>Market Value</label>
-                        <div class="value">$342,000</div>
-                    </div>
-                    <div class="stat-card">
-                        <label>Annual Savings</label>
-                        <div class="value" style="color: #2e7d32;">$645/yr</div>
+                        <label>Current Annual Tax</label>
+                        <div class="value" style="color: #3171ef;">$3,847.26</div>
                     </div>
                 </div>
                 <div class="property-list">
-                    <div class="property-card">
-                        <div class="property-info">
-                            <h4>Your Property</h4>
-                            <p>123 Oak Street • 3 bed, 2 bath • 1,850 sq ft</p>
+                    <!-- Completed Property Card -->
+                    <div class="property-card-mockup">
+                        <div class="property-header-mockup">
+                            <div>
+                                <div class="property-address-mockup">123 Oak Street</div>
+                                <div class="property-location-mockup">3 bed, 2 bath • 1,850 sq ft</div>
+                            </div>
+                            <span class="property-status-mockup complete">Complete</span>
                         </div>
-                        <span class="property-status pending">Over-Assessed</span>
-                    </div>
-                    <div style="padding: 0.25rem 0 0.25rem 0; margin: 0;">
-                        <div style="font-size: 0.65rem; color: #999; text-transform: uppercase; letter-spacing: 0.5px; margin: 0; font-weight: 600;">Comparable Properties</div>
-                    </div>
-                    <div class="property-card comparable-card">
-                        <div class="property-info">
-                            <h4>118 Oak Street</h4>
-                            <p>3 bed, 2 bath • 1,900 sq ft</p>
+                        <div class="savings-highlight-mockup">
+                            <div class="savings-info-mockup">
+                                <div class="savings-label-mockup">Potential Annual Savings</div>
+                                <div class="savings-amount-mockup">$645.23</div>
+                            </div>
+                            <button class="btn-view-report-mockup">View Report</button>
                         </div>
-                        <span class="comparable-price">$338,500</span>
-                    </div>
-                    <div class="property-card comparable-card">
-                        <div class="property-info">
-                            <h4>215 Elm Drive</h4>
-                            <p>3 bed, 2 bath • 1,820 sq ft</p>
-                        </div>
-                        <span class="comparable-price">$345,900</span>
                     </div>
                 </div>
             </div>
