@@ -133,6 +133,30 @@ export async function getPropertyDetails(req, res) {
       status: 'preparing'
     };
 
+    // Fetch user email from Clerk
+    try {
+      const clerkApiKey = process.env.CLERK_SECRET_KEY;
+      if (clerkApiKey && property.user_id) {
+        const clerkResponse = await fetch(`https://api.clerk.com/v1/users/${property.user_id}`, {
+          headers: {
+            'Authorization': `Bearer ${clerkApiKey}`
+          }
+        });
+
+        if (clerkResponse.ok) {
+          const clerkUser = await clerkResponse.json();
+          property.user_email = clerkUser.email_addresses?.[0]?.email_address || null;
+        } else {
+          property.user_email = null;
+        }
+      } else {
+        property.user_email = null;
+      }
+    } catch (clerkError) {
+      console.error('Error fetching user from Clerk:', clerkError);
+      property.user_email = null;
+    }
+
     res.json(property);
   } catch (error) {
     console.error('Error fetching property details:', error);
