@@ -154,6 +154,23 @@
             margin-bottom: 1.5rem;
         }
 
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .section-header h2 {
+            margin-bottom: 0;
+        }
+
+        .user-email {
+            font-size: 0.9rem;
+            color: #666;
+            font-weight: 400;
+        }
+
         .property-data {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
@@ -312,7 +329,10 @@
 
             <form id="property-form">
                 <div class="form-section">
-                    <h2>Property Details</h2>
+                    <div class="section-header">
+                        <h2>Property Details</h2>
+                        <span class="user-email" id="property-user-email"></span>
+                    </div>
                     <div class="property-data">
                         <div class="data-card">
                             <label for="bedrooms">Bedrooms</label>
@@ -425,6 +445,9 @@
 
             // Set header
             document.getElementById('property-address').textContent = currentProperty.address;
+
+            // Set user email
+            document.getElementById('property-user-email').textContent = currentProperty.user_email || '';
 
             // Populate property fields
             document.getElementById('bedrooms').value = currentProperty.bedrooms || '';
