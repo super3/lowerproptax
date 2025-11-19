@@ -113,13 +113,15 @@
             margin-bottom: 2rem;
             padding-bottom: 1.5rem;
             border-bottom: 2px solid #f0f0f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
         .property-address {
             font-size: 1.75rem;
             font-weight: 700;
             color: #1a1a1a;
-            margin-bottom: 0.5rem;
         }
 
         .property-status {
@@ -435,10 +437,10 @@
             // Update status badge based on assessment status
             const statusBadge = document.getElementById('property-status');
             if (assessment.status === 'preparing') {
-                statusBadge.textContent = 'Preparing Assessment...';
+                statusBadge.textContent = 'Preparing';
                 statusBadge.className = 'property-status status-preparing';
             } else {
-                statusBadge.textContent = 'Assessment Ready';
+                statusBadge.textContent = 'Ready';
                 statusBadge.className = 'property-status status-ready';
             }
             document.getElementById('year').value = assessment.year || new Date().getFullYear();
