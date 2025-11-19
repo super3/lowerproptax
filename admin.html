@@ -219,9 +219,12 @@
             text-decoration: none;
             display: inline-flex;
             align-items: center;
-            gap: 0.5rem;
+            justify-content: center;
             font-weight: 500;
             font-size: 0.85rem;
+            width: 36px;
+            height: 36px;
+            position: relative;
         }
 
         .btn-edit:hover,
@@ -231,13 +234,38 @@
         }
 
         .btn-icon {
-            width: 16px;
-            height: 16px;
+            width: 18px;
+            height: 18px;
             stroke: currentColor;
             fill: none;
             stroke-width: 2;
             stroke-linecap: round;
             stroke-linejoin: round;
+        }
+
+        /* Tooltip on hover */
+        .btn-edit::after,
+        .btn-view::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #1a1a1a;
+            color: white;
+            padding: 0.4rem 0.8rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s;
+            margin-bottom: 0.5rem;
+        }
+
+        .btn-edit:hover::after,
+        .btn-view:hover::after {
+            opacity: 1;
         }
 
         .empty-state {
@@ -493,21 +521,19 @@
                     if (hours >= 48) timeClass = 'time-critical';
                     else if (hours >= 24) timeClass = 'time-warning';
                     statusBadge = '<span style="background: #fff4e6; color: #e67e22; padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.8rem; font-weight: 600;">Preparing</span>';
-                    actionButton = `<a href="admin-property.html?id=${property.id}" class="btn-edit">
+                    actionButton = `<a href="admin-property.html?id=${property.id}" class="btn-edit" data-tooltip="Edit">
                         <svg class="btn-icon" viewBox="0 0 24 24">
                             <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
                             <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
                         </svg>
-                        Edit
                     </a>`;
                 } else {
                     statusBadge = '<span style="background: #e8f5e9; color: #27ae60; padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.8rem; font-weight: 600;">Ready</span>';
-                    actionButton = `<a href="admin-property.html?id=${property.id}" class="btn-view">
+                    actionButton = `<a href="admin-property.html?id=${property.id}" class="btn-view" data-tooltip="View">
                         <svg class="btn-icon" viewBox="0 0 24 24">
                             <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
                             <circle cx="12" cy="12" r="3"></circle>
                         </svg>
-                        View
                     </a>`;
                 }
 
