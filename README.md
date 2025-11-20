@@ -30,8 +30,8 @@ npm test                           # Run test suite
 
 ## Roadmap
 
-- [ ] Terms of Service page
-- [ ] Privacy Policy page
+- [x] Terms of Service page
+- [x] Privacy Policy page
 - [ ] Help page
 - [ ] Email notifications for pending assessments (to admin)
 - [ ] Email notifications for completed assessments
