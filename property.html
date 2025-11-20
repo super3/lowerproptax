@@ -53,7 +53,39 @@
             color: #1a1a1a;
         }
 
-        .back-button {
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .user-name {
+            font-weight: 500;
+            color: #1a1a1a;
+            font-size: 0.95rem;
+        }
+
+        #user-button {
+            display: flex;
+            align-items: center;
+        }
+
+        /* Main Container */
+        .container {
+            max-width: 1000px;
+            margin: 3rem auto;
+            padding: 0 2rem;
+        }
+
+        /* Back Link */
+        .back-link {
+            display: inline-block;
             background: #f0f4ff;
             color: #3171ef;
             padding: 0.5rem 1rem;
@@ -62,17 +94,11 @@
             font-weight: 600;
             font-size: 0.9rem;
             transition: all 0.2s;
+            margin-bottom: 1.5rem;
         }
 
-        .back-button:hover {
+        .back-link:hover {
             background: #e0e7ff;
-        }
-
-        /* Main Container */
-        .container {
-            max-width: 1000px;
-            margin: 3rem auto;
-            padding: 0 2rem;
         }
 
         .property-detail {
@@ -181,6 +207,11 @@
             color: #27ae60;
         }
 
+        .status-invalid {
+            background: #fee;
+            color: #c41e3a;
+        }
+
         .status-message {
             background: #f0f4ff;
             border-left: 4px solid #3171ef;
@@ -275,11 +306,18 @@
     <!-- Navigation -->
     <nav>
         <a href="index.html" class="logo-link"><div class="logo">🏡 PadTask</div></a>
-        <a href="dashboard.html" class="back-button">← Back to Dashboard</a>
+        <div class="nav-right">
+            <div class="user-info">
+                <span class="user-name" id="user-name">Loading...</span>
+                <div id="user-button"></div>
+            </div>
+        </div>
     </nav>
 
     <!-- Main Content -->
     <div class="container">
+        <a href="dashboard.html" class="back-link">← Back to Dashboard</a>
+
         <div class="property-detail" id="property-detail">
             <div class="property-header">
                 <div class="property-info">
@@ -382,11 +420,20 @@
             const status = latestAssessment?.status || 'preparing';
             const statusEl = document.getElementById('property-status');
             statusEl.className = `property-status status-${status}`;
-            statusEl.textContent = status === 'preparing' ? 'Preparing Assessment...' : 'Assessment Ready';
+
+            if (status === 'invalid') {
+                statusEl.textContent = 'Unable to Process';
+            } else if (status === 'preparing') {
+                statusEl.textContent = 'Preparing Assessment...';
+            } else {
+                statusEl.textContent = 'Assessment Ready';
+            }
 
             // Status message
             const messageEl = document.getElementById('status-message');
-            if (status === 'preparing') {
+            if (status === 'invalid') {
+                messageEl.textContent = "This property is outside our service area. We currently only service properties in Georgia.";
+            } else if (status === 'preparing') {
                 messageEl.textContent = "We're gathering data on your property. This usually takes 24 hours. We'll send you an email when your assessment is ready!";
             } else {
                 messageEl.textContent = "Your assessment is complete! Review the details below and download your full report.";
@@ -466,6 +513,15 @@
                     window.location.href = '/index.html';
                     return;
                 }
+
+                // Display user info
+                const user = window.Clerk.user;
+                const userName = user.firstName || user.username || user.emailAddresses[0]?.emailAddress || 'User';
+                document.getElementById('user-name').textContent = userName;
+
+                // Mount user button
+                const userButtonDiv = document.getElementById('user-button');
+                window.Clerk.mountUserButton(userButtonDiv);
 
                 // Load property
                 await loadProperty();

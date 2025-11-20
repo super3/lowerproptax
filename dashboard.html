@@ -389,23 +389,31 @@
         }
 
         .invalid-message {
-            background: #fff5f5;
-            border: 1px solid #fed7d7;
+            margin-top: 1rem;
+            padding: 1.25rem;
+            background: linear-gradient(135deg, #fee 0%, #fff5f5 100%);
+            border-left: 4px solid #c41e3a;
             border-radius: 8px;
-            padding: 1.5rem;
-            margin-top: 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
-        .invalid-message h4 {
+        .invalid-info {
+            flex: 1;
+        }
+
+        .invalid-label {
             color: #c41e3a;
-            font-size: 1rem;
-            margin-bottom: 0.5rem;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 0.25rem;
         }
 
-        .invalid-message p {
+        .invalid-text {
             color: #666;
             font-size: 0.95rem;
-            line-height: 1.6;
+            line-height: 1.5;
         }
 
         /* Progress Timeline */
@@ -1255,8 +1263,10 @@
             if (status === 'invalid') {
                 savingsInfo = `
                     <div class="invalid-message">
-                        <h4>Unable to Process Property</h4>
-                        <p>This property address is outside our service area or could not be processed. We currently only service properties in Georgia.</p>
+                        <div class="invalid-info">
+                            <div class="invalid-label">Unable to Process</div>
+                            <div class="invalid-text">This property is outside our service area. We currently only service properties in Georgia.</div>
+                        </div>
                     </div>
                 `;
             } else if (status === 'ready') {
