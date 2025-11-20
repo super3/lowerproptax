@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Terms of Service - PadTask</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🏡</text></svg>">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Clerk.js -->
+    <script
+        async
+        crossorigin="anonymous"
+        data-clerk-publishable-key="pk_test_b3JnYW5pYy10YXJwb24tNzUuY2xlcmsuYWNjb3VudHMuZGV2JA"
+        src="https://organic-tarpon-75.clerk.accounts.dev/npm/@clerk/clerk-js@5/dist/clerk.browser.js"
+        type="text/javascript"
+    ></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', Arial, sans-serif;
+            line-height: 1.6;
+            color: #1a1a1a;
+            background: #f8f9fa;
+        }
+
+        /* Navigation */
+        nav {
+            background: white;
+            padding: 0 7%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #e5e5e5;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+            height: 72px;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #1a1a1a;
+            text-decoration: none;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2.5rem;
+            list-style: none;
+            align-items: center;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: #1a1a1a;
+            font-weight: 500;
+            font-size: 0.95rem;
+            transition: color 0.2s;
+        }
+
+        .nav-links a:hover {
+            color: #3171ef;
+        }
+
+        .nav-auth {
+            display: flex;
+            gap: 1.5rem;
+            align-items: center;
+        }
+
+        .nav-auth a {
+            text-decoration: none;
+            color: #1a1a1a;
+            font-weight: 500;
+            font-size: 0.95rem;
+        }
+
+        .btn-get-started {
+            background: #3171ef;
+            color: white !important;
+            padding: 0.65rem 1.5rem;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.95rem;
+            transition: background 0.2s;
+        }
+
+        .btn-get-started:hover {
+            background: #2560d9;
+            color: white !important;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+
+        .terms-content {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 1rem;
+            font-size: 2.5rem;
+        }
+
+        .effective-date {
+            color: #666;
+            font-size: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        h2 {
+            color: #2c3e50;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            font-size: 1.5rem;
+            padding-top: 1rem;
+            border-top: 2px solid #e9ecef;
+        }
+
+        h2:first-child {
+            margin-top: 0;
+            padding-top: 0;
+            border-top: none;
+        }
+
+        h3 {
+            color: #495057;
+            margin-top: 1.5rem;
+            margin-bottom: 0.5rem;
+            font-size: 1.1rem;
+        }
+
+        p {
+            margin-bottom: 1rem;
+            color: #495057;
+        }
+
+        ul, ol {
+            margin-left: 2rem;
+            margin-bottom: 1rem;
+            color: #495057;
+        }
+
+        li {
+            margin-bottom: 0.5rem;
+        }
+
+        /* Footer */
+        footer {
+            background: #1a1a1a;
+            color: white;
+            padding: 30px 7%;
+            margin-top: 3rem;
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+        }
+
+        .footer-text {
+            color: #999;
+            font-size: 0.85rem;
+        }
+
+        .footer-links {
+            display: flex;
+            gap: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .footer-links a {
+            color: #999;
+            text-decoration: none;
+            transition: color 0.2s;
+            font-size: 0.85rem;
+        }
+
+        .footer-links a:hover {
+            color: #3171ef;
+        }
+
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+
+            .container {
+                padding: 0 0.5rem;
+            }
+
+            .terms-header, .terms-content {
+                padding: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <a href="index.html" class="logo">🏡 PadTask</a>
+        <div class="nav-auth">
+            <a href="#" id="sign-in-link">Log In</a>
+            <a href="#" id="get-started-link" class="btn-get-started">Get Started</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="terms-content">
+            <h1>Terms of Service</h1>
+            <div class="effective-date">Effective Date: November 20, 2025</div>
+
+            <p><strong>Important Notice:</strong> PadTask provides comparable property listings and data analysis tools only. We do NOT provide legal advice, tax expertise, or appeal filing services. Users are fully responsible for reviewing, editing, and submitting their own property tax appeals.</p>
+            <h2>1. Acceptance of Terms</h2>
+            <p>By accessing or using PadTask's services ("Service"), you agree to be bound by these Terms of Service ("Terms"). If you do not agree to these Terms, do not use our Service.</p>
+            <p>You must be at least 18 years old to use our Service. By using our Service, you represent and warrant that you are at least 18 years of age.</p>
+            <p>We reserve the right to modify these Terms at any time. We will notify users of any material changes via email or through our Service. Your continued use of the Service after such modifications constitutes acceptance of the updated Terms.</p>
+
+            <h2>2. Service Description</h2>
+            <p>PadTask provides the following services:</p>
+            <ul>
+                <li>Access to comparable property listings in your area</li>
+                <li>Property tax assessment analysis tools</li>
+                <li>Data visualization and reporting features</li>
+                <li>Property information aggregation</li>
+            </ul>
+
+            <p><strong>PadTask does NOT provide:</strong></p>
+            <ul>
+                <li>Legal advice or representation</li>
+                <li>Tax advisory or consulting services</li>
+                <li>Appeal filing or submission services</li>
+                <li>Guaranteed outcomes or tax savings</li>
+            </ul>
+
+            <p>Our Service is currently available only for properties located in Georgia, United States. We may expand to additional areas in the future.</p>
+
+            <h2>3. User Accounts</h2>
+            <p>To access our Service, you must create an account. You agree to:</p>
+            <ul>
+                <li>Provide accurate, current, and complete information</li>
+                <li>Maintain and promptly update your account information</li>
+                <li>Maintain the security and confidentiality of your login credentials</li>
+                <li>Accept responsibility for all activities under your account</li>
+                <li>Immediately notify us of any unauthorized use of your account</li>
+            </ul>
+            <p>We reserve the right to suspend or terminate accounts that violate these Terms or for any other reason at our sole discretion.</p>
+
+            <h2>4. Fees and Payment</h2>
+            <p>Access to certain features of our Service requires payment. By purchasing a subscription or service, you agree to:</p>
+            <ul>
+                <li>Pay all applicable fees as described on our website</li>
+                <li>Provide valid payment information</li>
+                <li>Authorize us to charge your payment method</li>
+            </ul>
+
+            <h3>4.1 Refund Policy</h3>
+            <p>All sales are final. No refunds are offered once a property assessment report has been purchased. Please review all available information before making a purchase.</p>
+
+            <h2>5. Property Assessment and Comparables Service</h2>
+
+            <h3>5.1 Nature of Service</h3>
+            <p>We provide access to comparable property data that may be useful for property tax appeals. This data includes:</p>
+            <ul>
+                <li>Recent sales information for similar properties</li>
+                <li>Property characteristics and features</li>
+                <li>Assessment history and trends</li>
+                <li>Market analysis tools</li>
+            </ul>
+
+            <h3>5.2 Data Accuracy Disclaimer</h3>
+            <p><strong>Important:</strong> All data is provided "AS IS" without any guarantee of accuracy, completeness, or timeliness. Property information may contain errors, omissions, or be outdated. Users MUST independently verify all information before using it for any purpose.</p>
+
+            <h3>5.3 Processing Times</h3>
+            <p>Property assessment reports are typically available within 24-48 hours of request. However, processing times may vary and are not guaranteed.</p>
+
+            <h3>5.4 Service Limitations</h3>
+            <p>Our Service may not be able to process certain properties, including:</p>
+            <ul>
+                <li>Properties outside our service area</li>
+                <li>Commercial or industrial properties</li>
+                <li>Properties with insufficient comparable data</li>
+                <li>Recently constructed properties</li>
+            </ul>
+
+            <h2>6. User Responsibilities for Appeals</h2>
+
+            <p><strong>Users are solely responsible for all aspects of their property tax appeals, including but not limited to:</strong></p>
+
+            <h3>6.1 Review and Verification</h3>
+            <ul>
+                <li>Thoroughly reviewing all comparable property data</li>
+                <li>Verifying the accuracy of all information</li>
+                <li>Determining relevance of comparables to their property</li>
+                <li>Understanding local appeal requirements and procedures</li>
+            </ul>
+
+            <h3>6.2 Appeal Preparation</h3>
+            <ul>
+                <li>Customizing and editing any appeal materials</li>
+                <li>Ensuring compliance with local regulations</li>
+                <li>Gathering additional supporting documentation</li>
+                <li>Preparing arguments and justifications</li>
+            </ul>
+
+            <h3>6.3 Filing and Deadlines</h3>
+            <ul>
+                <li>Meeting all appeal filing deadlines</li>
+                <li>Submitting appeals to the correct authority</li>
+                <li>Following proper submission procedures</li>
+                <li>Paying any required filing fees</li>
+            </ul>
+
+            <p><strong>PadTask is NOT responsible for:</strong> Missed deadlines, improper filings, rejected appeals, or any negative outcomes resulting from user's appeal efforts.</p>
+
+            <h2>7. Intellectual Property Rights</h2>
+
+            <h3>7.1 Our Property</h3>
+            <p>All content on our Service, including text, graphics, logos, images, and software, is the property of PadTask or its licensors and is protected by intellectual property laws.</p>
+
+            <h3>7.2 Limited License</h3>
+            <p>We grant you a limited, non-exclusive, non-transferable license to access and use our Service for personal, non-commercial purposes only.</p>
+
+            <h3>7.3 Restrictions</h3>
+            <p>You may not:</p>
+            <ul>
+                <li>Copy, modify, or distribute our content without permission</li>
+                <li>Use our Service for commercial purposes without authorization</li>
+                <li>Reverse engineer or attempt to extract source code</li>
+                <li>Remove any proprietary notices or labels</li>
+            </ul>
+
+            <h2>8. Prohibited Uses</h2>
+
+            <p>You agree not to use our Service to:</p>
+            <ul>
+                <li>Violate any laws or regulations</li>
+                <li>Provide false or misleading information</li>
+                <li>Impersonate any person or entity</li>
+                <li>Interfere with or disrupt the Service</li>
+                <li>Use automated systems or software to extract data (scraping)</li>
+                <li>Attempt to gain unauthorized access to any portion of the Service</li>
+                <li>Resell or commercially distribute comparable property data</li>
+                <li>Harass, abuse, or harm other users</li>
+                <li>Upload viruses or malicious code</li>
+                <li>Engage in any activity that damages our reputation</li>
+            </ul>
+
+            <h2>9. Privacy and Data Protection</h2>
+
+            <p>Your use of our Service is also governed by our Privacy Policy, which is incorporated into these Terms by reference. By using our Service, you consent to our collection and use of your information as described in our Privacy Policy.</p>
+
+            <p>We implement reasonable security measures to protect your data, but cannot guarantee absolute security. You acknowledge the inherent risks of providing information online.</p>
+
+            <h2>10. Important Disclaimers</h2>
+
+            <p><strong>PLEASE READ CAREFULLY:</strong></p>
+            <ul>
+                <li><strong>NO PROFESSIONAL ADVICE:</strong> We do not provide legal, tax, financial, or other professional advice</li>
+                <li><strong>NO GUARANTEES:</strong> We do not guarantee any specific outcomes, tax savings, or appeal success</li>
+                <li><strong>AS-IS SERVICE:</strong> Our Service is provided "AS IS" and "AS AVAILABLE" without warranties of any kind</li>
+                <li><strong>DATA ACCURACY:</strong> We do not warrant the accuracy, completeness, or timeliness of any data</li>
+                <li><strong>USER RESPONSIBILITY:</strong> You bear full responsibility for your use of our Service and any actions taken based on it</li>
+                <li><strong>PROFESSIONAL CONSULTATION:</strong> We recommend consulting with qualified professionals for legal and tax matters</li>
+            </ul>
+
+            <h2>11. Limitation of Liability</h2>
+
+            <p><strong>To the maximum extent permitted by law, PadTask and its affiliates, officers, directors, employees, and agents shall not be liable for:</strong></p>
+            <ul>
+                <li>Any indirect, incidental, special, consequential, or punitive damages</li>
+                <li>Loss of profits, data, use, or other intangible losses</li>
+                <li>Damages resulting from your use or inability to use the Service</li>
+                <li>Damages resulting from errors or omissions in property data</li>
+                <li>Damages resulting from missed appeal deadlines or rejected appeals</li>
+                <li>Any unauthorized access to or alteration of your data</li>
+            </ul>
+
+            <p>In no event shall our total liability exceed the amount you paid to us in the three months preceding the claim.</p>
+
+            <h3>11.1 Indemnification</h3>
+            <p>You agree to indemnify and hold harmless PadTask and its affiliates from any claims, losses, damages, liabilities, and expenses (including legal fees) arising from your use of the Service or violation of these Terms.</p>
+
+            <h2>12. Third-Party Services</h2>
+
+            <p>Our Service may contain links to third-party websites or integrate with third-party services (such as Clerk for authentication). We are not responsible for:</p>
+            <ul>
+                <li>The content, accuracy, or practices of third-party sites</li>
+                <li>Any damages arising from your use of third-party services</li>
+                <li>The privacy practices of third parties</li>
+            </ul>
+
+            <p>Your use of third-party services is governed by their respective terms and policies.</p>
+
+            <h2>13. Dispute Resolution</h2>
+
+            <h3>13.1 Governing Law</h3>
+            <p>These Terms shall be governed by and construed in accordance with the laws of the State of Georgia, United States, without regard to conflict of law principles.</p>
+
+            <h3>13.2 Informal Resolution</h3>
+            <p>Before initiating formal proceedings, we agree to attempt to resolve disputes informally for at least 30 days. Please contact us with your concerns at support@padtask.com.</p>
+
+            <h3>13.3 Binding Arbitration</h3>
+            <p>If informal resolution fails, any dispute shall be resolved through binding arbitration in accordance with the rules of the American Arbitration Association. Arbitration shall take place in Georgia.</p>
+
+            <h3>13.4 Class Action Waiver</h3>
+            <p>You agree to resolve disputes with us on an individual basis and waive any right to bring or participate in a class action lawsuit or class-wide arbitration.</p>
+
+            <h2>14. Termination</h2>
+
+            <p>Either party may terminate this agreement at any time:</p>
+            <ul>
+                <li><strong>By You:</strong> You may terminate by closing your account and ceasing use of the Service</li>
+                <li><strong>By Us:</strong> We may terminate or suspend your access immediately, with or without notice, for any violation of these Terms or for any other reason</li>
+            </ul>
+
+            <p>Upon termination:</p>
+            <ul>
+                <li>Your right to use the Service will immediately cease</li>
+                <li>We may delete your account and data</li>
+                <li>All provisions that should reasonably survive termination will remain in effect</li>
+            </ul>
+
+            <h2>15. General Provisions</h2>
+
+            <h3>15.1 Entire Agreement</h3>
+            <p>These Terms, together with our Privacy Policy, constitute the entire agreement between you and PadTask regarding the Service.</p>
+
+            <h3>15.2 Severability</h3>
+            <p>If any provision of these Terms is found to be unenforceable, the remaining provisions will continue in full force and effect.</p>
+
+            <h3>15.3 No Waiver</h3>
+            <p>Our failure to enforce any right or provision of these Terms shall not constitute a waiver of such right or provision.</p>
+
+            <h3>15.4 Assignment</h3>
+            <p>You may not assign or transfer your rights under these Terms without our prior written consent. We may assign our rights to any successor or affiliate.</p>
+
+            <h3>15.5 Notices</h3>
+            <p>We may provide notices to you via email or through the Service. You agree that electronic communications satisfy any legal requirement for written notice.</p>
+
+            <h2>Contact Information</h2>
+            <p>If you have any questions about these Terms of Service, please contact us at:</p>
+            <p>
+                <strong>PadTask</strong><br>
+                Email: <a href="mailto:support@padtask.com">support@padtask.com</a><br>
+                Website: <a href="https://padtask.com">padtask.com</a>
+            </p>
+        </div>
+    </div>
+
+    <footer>
+        <div class="footer-content">
+            <div class="footer-text">&copy; 2025 PadTask. All rights reserved.</div>
+            <div class="footer-links">
+                <a href="#help">Help</a>
+                <a href="#privacy">Privacy</a>
+                <a href="#terms">Terms</a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Clerk initialization
+        let clerkLoaded = false;
+
+        window.addEventListener('load', async () => {
+            try {
+                // Wait for Clerk to load
+                await window.Clerk.load();
+                clerkLoaded = true;
+
+                // Check if user is signed in
+                if (window.Clerk.user) {
+                    // User is signed in, redirect to dashboard
+                    window.location.href = 'dashboard.html';
+                }
+
+                // Handle sign in link
+                document.getElementById('sign-in-link').addEventListener('click', (e) => {
+                    e.preventDefault();
+                    window.Clerk.openSignIn({
+                        afterSignInUrl: 'dashboard.html',
+                        afterSignUpUrl: 'dashboard.html'
+                    });
+                });
+
+                // Handle get started link
+                document.getElementById('get-started-link').addEventListener('click', (e) => {
+                    e.preventDefault();
+                    window.Clerk.openSignUp({
+                        afterSignInUrl: 'dashboard.html',
+                        afterSignUpUrl: 'dashboard.html'
+                    });
+                });
+            } catch (error) {
+                console.error('Error loading Clerk:', error);
+            }
+        });
+    </script>
+</body>
+</html>
