@@ -37,7 +37,7 @@ export async function getPendingProperties(req, res) {
   }
 }
 
-// Get all completed properties (status = 'ready')
+// Get all completed properties (status = 'ready' or 'invalid')
 export async function getCompletedProperties(req, res) {
   try {
     const query = `
@@ -54,7 +54,7 @@ export async function getCompletedProperties(req, res) {
       FROM properties p
       LEFT JOIN assessments a ON p.id = a.property_id
         AND a.year = (SELECT MAX(year) FROM assessments WHERE property_id = p.id)
-      WHERE a.status = 'ready'
+      WHERE a.status IN ('ready', 'invalid')
       ORDER BY p.updated_at DESC
     `;
 

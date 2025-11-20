@@ -138,7 +138,7 @@ describe('Admin Controller', () => {
 
       await adminController.getCompletedProperties(req, res);
 
-      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining("WHERE a.status = 'ready'"));
+      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining("WHERE a.status IN ('ready', 'invalid')"));
       expect(res.json).toHaveBeenCalledWith(
         expect.arrayContaining([
           expect.objectContaining({

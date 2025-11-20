@@ -485,7 +485,7 @@
             // Update status badge based on assessment status
             const statusBadge = document.getElementById('property-status');
             if (assessment.status === 'invalid') {
-                statusBadge.textContent = 'Invalid';
+                statusBadge.textContent = 'Unable';
                 statusBadge.className = 'property-status status-invalid';
             } else if (assessment.status === 'preparing') {
                 statusBadge.textContent = 'Preparing';
