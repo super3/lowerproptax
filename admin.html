@@ -517,7 +517,17 @@
                 let statusBadge = '';
                 let actionButton = '';
 
-                if (isPending) {
+                const assessmentStatus = property.status;
+
+                if (assessmentStatus === 'invalid') {
+                    statusBadge = '<span style="background: #fee; color: #c41e3a; padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.8rem; font-weight: 600;">Invalid</span>';
+                    actionButton = `<a href="admin-property.html?id=${property.id}" class="btn-view" data-tooltip="View">
+                        <svg class="btn-icon" viewBox="0 0 24 24">
+                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                            <circle cx="12" cy="12" r="3"></circle>
+                        </svg>
+                    </a>`;
+                } else if (isPending) {
                     if (hours >= 48) timeClass = 'time-critical';
                     else if (hours >= 24) timeClass = 'time-warning';
                     statusBadge = '<span style="background: #fff4e6; color: #e67e22; padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.8rem; font-weight: 600;">Preparing</span>';

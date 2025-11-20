@@ -187,11 +187,11 @@ describe('Admin Controller', () => {
         {
           id: 'assess_prop1_2025',
           year: 2025,
-          appraised_value: 250000,
-          annual_tax: 5000,
+          appraisedValue: 250000,
+          annualTax: 5000,
           status: 'preparing',
-          created_at: new Date(),
-          updated_at: new Date()
+          createdAt: new Date(),
+          updatedAt: new Date()
         }
       ];
 
@@ -211,7 +211,7 @@ describe('Admin Controller', () => {
           assessments: mockAssessments,
           currentAssessment: expect.objectContaining({
             year: 2025,
-            appraised_value: 250000
+            appraisedValue: 250000
           })
         })
       );
@@ -244,8 +244,8 @@ describe('Admin Controller', () => {
           assessments: [],
           currentAssessment: expect.objectContaining({
             year: new Date().getFullYear(),
-            appraised_value: null,
-            annual_tax: null,
+            appraisedValue: null,
+            annualTax: null,
             status: 'preparing'
           })
         })
@@ -271,6 +271,149 @@ describe('Admin Controller', () => {
       expect(res.status).toHaveBeenCalledWith(500);
       expect(res.json).toHaveBeenCalledWith({ error: 'Failed to fetch property details' });
     });
+
+    it('should fetch user email from Clerk when CLERK_SECRET_KEY is set', async () => {
+      const originalEnv = process.env.CLERK_SECRET_KEY;
+      process.env.CLERK_SECRET_KEY = 'test_clerk_key';
+
+      req.params.id = 'prop1';
+      const mockProperty = {
+        id: 'prop1',
+        address: '123 Main St',
+        userId: 'user123',
+        city: 'Atlanta',
+        state: 'GA'
+      };
+
+      const mockAssessments = [];
+
+      mockQuery
+        .mockResolvedValueOnce({ rows: [mockProperty] })
+        .mockResolvedValueOnce({ rows: mockAssessments });
+
+      // Mock fetch
+      global.fetch = jest.fn().mockResolvedValue({
+        ok: true,
+        json: async () => ({
+          email_addresses: [{ email_address: 'user@example.com' }]
+        })
+      });
+
+      await adminController.getPropertyDetails(req, res);
+
+      expect(global.fetch).toHaveBeenCalledWith(
+        'https://api.clerk.com/v1/users/user123',
+        expect.objectContaining({
+          headers: {
+            'Authorization': 'Bearer test_clerk_key'
+          }
+        })
+      );
+
+      expect(res.json).toHaveBeenCalledWith(
+        expect.objectContaining({
+          userEmail: 'user@example.com'
+        })
+      );
+
+      process.env.CLERK_SECRET_KEY = originalEnv;
+      delete global.fetch;
+    });
+
+    it('should handle Clerk API failure gracefully', async () => {
+      const originalEnv = process.env.CLERK_SECRET_KEY;
+      process.env.CLERK_SECRET_KEY = 'test_clerk_key';
+
+      req.params.id = 'prop1';
+      const mockProperty = {
+        id: 'prop1',
+        address: '123 Main St',
+        userId: 'user123'
+      };
+
+      mockQuery
+        .mockResolvedValueOnce({ rows: [mockProperty] })
+        .mockResolvedValueOnce({ rows: [] });
+
+      // Mock fetch to return non-ok response
+      global.fetch = jest.fn().mockResolvedValue({
+        ok: false
+      });
+
+      await adminController.getPropertyDetails(req, res);
+
+      expect(res.json).toHaveBeenCalledWith(
+        expect.objectContaining({
+          userEmail: null
+        })
+      );
+
+      process.env.CLERK_SECRET_KEY = originalEnv;
+      delete global.fetch;
+    });
+
+    it('should handle Clerk API errors gracefully', async () => {
+      const originalEnv = process.env.CLERK_SECRET_KEY;
+      process.env.CLERK_SECRET_KEY = 'test_clerk_key';
+
+      req.params.id = 'prop1';
+      const mockProperty = {
+        id: 'prop1',
+        address: '123 Main St',
+        userId: 'user123'
+      };
+
+      mockQuery
+        .mockResolvedValueOnce({ rows: [mockProperty] })
+        .mockResolvedValueOnce({ rows: [] });
+
+      // Mock fetch to throw error
+      global.fetch = jest.fn().mockRejectedValue(new Error('Clerk API error'));
+
+      await adminController.getPropertyDetails(req, res);
+
+      expect(res.json).toHaveBeenCalledWith(
+        expect.objectContaining({
+          userEmail: null
+        })
+      );
+
+      process.env.CLERK_SECRET_KEY = originalEnv;
+      delete global.fetch;
+    });
+
+    it('should handle missing email_addresses in Clerk response', async () => {
+      const originalEnv = process.env.CLERK_SECRET_KEY;
+      process.env.CLERK_SECRET_KEY = 'test_clerk_key';
+
+      req.params.id = 'prop1';
+      const mockProperty = {
+        id: 'prop1',
+        address: '123 Main St',
+        userId: 'user123'
+      };
+
+      mockQuery
+        .mockResolvedValueOnce({ rows: [mockProperty] })
+        .mockResolvedValueOnce({ rows: [] });
+
+      // Mock fetch with no email_addresses
+      global.fetch = jest.fn().mockResolvedValue({
+        ok: true,
+        json: async () => ({})
+      });
+
+      await adminController.getPropertyDetails(req, res);
+
+      expect(res.json).toHaveBeenCalledWith(
+        expect.objectContaining({
+          userEmail: null
+        })
+      );
+
+      process.env.CLERK_SECRET_KEY = originalEnv;
+      delete global.fetch;
+    });
   });
 
   describe('updatePropertyDetails', () => {
@@ -280,8 +423,8 @@ describe('Admin Controller', () => {
         bedrooms: 4,
         bathrooms: 3.5,
         sqft: 2000,
-        appraised_value: 300000,
-        annual_tax: 6000
+        appraisedValue: 300000,
+        annualTax: 6000
       };
 
       const mockUpdatedProperty = {
@@ -296,8 +439,8 @@ describe('Admin Controller', () => {
         id: 'assess_prop1_2025',
         property_id: 'prop1',
         year: 2025,
-        appraised_value: 300000,
-        annual_tax: 6000,
+        appraisedValue: 300000,
+        annualTax: 6000,
         status: null,
         created_at: new Date(),
         updated_at: new Date()
@@ -337,8 +480,8 @@ describe('Admin Controller', () => {
         id: 'assess_prop1_2025',
         property_id: 'prop1',
         year: 2025,
-        appraised_value: null,
-        annual_tax: null,
+        appraisedValue: null,
+        annualTax: null,
         status: null,
         created_at: new Date(),
         updated_at: new Date()
@@ -386,11 +529,11 @@ describe('Admin Controller', () => {
         bedrooms: undefined,
         bathrooms: undefined,
         sqft: undefined,
-        appraised_value: undefined,
-        annual_tax: undefined,
-        estimated_appraised_value: undefined,
-        estimated_annual_tax: undefined,
-        report_url: undefined,
+        appraisedValue: undefined,
+        annualTax: undefined,
+        estimatedAppraisedValue: undefined,
+        estimatedAnnualTax: undefined,
+        reportUrl: undefined,
         status: undefined
       };
 
@@ -424,11 +567,11 @@ describe('Admin Controller', () => {
     it('should handle mix of defined and undefined assessment values', async () => {
       req.params.id = 'prop1';
       req.body = {
-        appraised_value: 300000,
-        annual_tax: 6000,
-        estimated_appraised_value: 280000,
-        estimated_annual_tax: undefined,
-        report_url: 'https://example.com/report.pdf',
+        appraisedValue: 300000,
+        annualTax: 6000,
+        estimatedAppraisedValue: 280000,
+        estimatedAnnualTax: undefined,
+        reportUrl: 'https://example.com/report.pdf',
         status: 'ready'
       };
 
@@ -441,12 +584,46 @@ describe('Admin Controller', () => {
         id: 'assess_prop1_2025',
         property_id: 'prop1',
         year: 2025,
-        appraised_value: 300000,
-        annual_tax: 6000,
-        estimated_appraised_value: 280000,
-        estimated_annual_tax: null,
-        report_url: 'https://example.com/report.pdf',
+        appraisedValue: 300000,
+        annualTax: 6000,
+        estimatedAppraisedValue: 280000,
+        estimatedAnnualTax: null,
+        reportUrl: 'https://example.com/report.pdf',
         status: 'ready',
+        created_at: new Date(),
+        updated_at: new Date()
+      };
+
+      mockQuery
+        .mockResolvedValueOnce({ rows: [mockUpdatedProperty] })
+        .mockResolvedValueOnce({ rows: [mockAssessment] });
+
+      await adminController.updatePropertyDetails(req, res);
+
+      expect(res.json).toHaveBeenCalledWith(
+        expect.objectContaining({
+          ...mockUpdatedProperty,
+          currentAssessment: mockAssessment
+        })
+      );
+    });
+
+    it('should handle invalid status', async () => {
+      req.params.id = 'prop1';
+      req.body = {
+        status: 'invalid'
+      };
+
+      const mockUpdatedProperty = {
+        id: 'prop1',
+        updated_at: new Date()
+      };
+
+      const mockAssessment = {
+        id: 'assess_prop1_2025',
+        property_id: 'prop1',
+        year: 2025,
+        status: 'invalid',
         created_at: new Date(),
         updated_at: new Date()
       };
@@ -468,11 +645,11 @@ describe('Admin Controller', () => {
     it('should handle zero and falsy values correctly', async () => {
       req.params.id = 'prop1';
       req.body = {
-        appraised_value: 0,
-        annual_tax: 0,
-        estimated_appraised_value: 0,
-        estimated_annual_tax: 0,
-        report_url: '',
+        appraisedValue: 0,
+        annualTax: 0,
+        estimatedAppraisedValue: 0,
+        estimatedAnnualTax: 0,
+        reportUrl: '',
         status: 'preparing'
       };
 
@@ -485,11 +662,11 @@ describe('Admin Controller', () => {
         id: 'assess_prop1_2025',
         property_id: 'prop1',
         year: 2025,
-        appraised_value: 0,
-        annual_tax: 0,
-        estimated_appraised_value: 0,
-        estimated_annual_tax: 0,
-        report_url: '',
+        appraisedValue: 0,
+        annualTax: 0,
+        estimatedAppraisedValue: 0,
+        estimatedAnnualTax: 0,
+        reportUrl: '',
         status: 'preparing',
         created_at: new Date(),
         updated_at: new Date()

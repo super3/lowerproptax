@@ -85,16 +85,16 @@ export async function getPropertyDetails(req, res) {
         address,
         city,
         state,
-        zip_code,
+        zip_code as "zipCode",
         country,
         lat,
         lng,
         bedrooms,
         bathrooms,
         sqft,
-        created_at,
-        updated_at,
-        user_id
+        created_at as "createdAt",
+        updated_at as "updatedAt",
+        user_id as "userId"
       FROM properties
       WHERE id = $1
     `;
@@ -109,8 +109,10 @@ export async function getPropertyDetails(req, res) {
 
     // Get assessments for this property
     const assessmentsResult = await pool.query(
-      `SELECT id, year, appraised_value, annual_tax, estimated_appraised_value,
-              estimated_annual_tax, report_url, status, created_at, updated_at
+      `SELECT id, year, appraised_value as "appraisedValue", annual_tax as "annualTax",
+              estimated_appraised_value as "estimatedAppraisedValue",
+              estimated_annual_tax as "estimatedAnnualTax", report_url as "reportUrl",
+              status, created_at as "createdAt", updated_at as "updatedAt"
        FROM assessments
        WHERE property_id = $1
        ORDER BY year DESC`,
@@ -125,19 +127,19 @@ export async function getPropertyDetails(req, res) {
 
     property.currentAssessment = currentAssessment || {
       year: currentYear,
-      appraised_value: null,
-      annual_tax: null,
-      estimated_appraised_value: null,
-      estimated_annual_tax: null,
-      report_url: null,
+      appraisedValue: null,
+      annualTax: null,
+      estimatedAppraisedValue: null,
+      estimatedAnnualTax: null,
+      reportUrl: null,
       status: 'preparing'
     };
 
     // Fetch user email from Clerk
     try {
       const clerkApiKey = process.env.CLERK_SECRET_KEY;
-      if (clerkApiKey && property.user_id) {
-        const clerkResponse = await fetch(`https://api.clerk.com/v1/users/${property.user_id}`, {
+      if (clerkApiKey && property.userId) {
+        const clerkResponse = await fetch(`https://api.clerk.com/v1/users/${property.userId}`, {
           headers: {
             'Authorization': `Bearer ${clerkApiKey}`
           }
@@ -145,16 +147,16 @@ export async function getPropertyDetails(req, res) {
 
         if (clerkResponse.ok) {
           const clerkUser = await clerkResponse.json();
-          property.user_email = clerkUser.email_addresses?.[0]?.email_address || null;
+          property.userEmail = clerkUser.email_addresses?.[0]?.email_address || null;
         } else {
-          property.user_email = null;
+          property.userEmail = null;
         }
       } else {
-        property.user_email = null;
+        property.userEmail = null;
       }
     } catch (clerkError) {
       console.error('Error fetching user from Clerk:', clerkError);
-      property.user_email = null;
+      property.userEmail = null;
     }
 
     res.json(property);
@@ -173,11 +175,11 @@ export async function updatePropertyDetails(req, res) {
       bathrooms,
       sqft,
       year,
-      appraised_value,
-      annual_tax,
-      estimated_appraised_value,
-      estimated_annual_tax,
-      report_url,
+      appraisedValue,
+      annualTax,
+      estimatedAppraisedValue,
+      estimatedAnnualTax,
+      reportUrl,
       status
     } = req.body;
 
@@ -229,11 +231,11 @@ export async function updatePropertyDetails(req, res) {
       assessmentId,
       id,
       assessmentYear,
-      appraised_value !== undefined ? appraised_value : null,
-      annual_tax !== undefined ? annual_tax : null,
-      estimated_appraised_value !== undefined ? estimated_appraised_value : null,
-      estimated_annual_tax !== undefined ? estimated_annual_tax : null,
-      report_url !== undefined ? report_url : null,
+      appraisedValue !== undefined ? appraisedValue : null,
+      annualTax !== undefined ? annualTax : null,
+      estimatedAppraisedValue !== undefined ? estimatedAppraisedValue : null,
+      estimatedAnnualTax !== undefined ? estimatedAnnualTax : null,
+      reportUrl !== undefined ? reportUrl : null,
       status !== undefined ? status : null
     ]);
 

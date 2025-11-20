@@ -260,6 +260,29 @@
             transform: translateY(-1px);
         }
 
+        .btn-danger {
+            background: #c41e3a;
+            color: white;
+            padding: 1rem 2rem;
+            border-radius: 6px;
+            border: none;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: 'Inter', Arial, sans-serif;
+        }
+
+        .btn-danger:hover {
+            background: #a01729;
+            transform: translateY(-1px);
+        }
+
+        .status-invalid {
+            background: #fee;
+            color: #c41e3a;
+        }
+
         .loading {
             text-align: center;
             padding: 3rem;
@@ -297,7 +320,8 @@
             }
 
             .btn-primary,
-            .btn-success {
+            .btn-success,
+            .btn-danger {
                 width: 100%;
             }
         }
@@ -387,8 +411,9 @@
                 </div>
 
                 <div class="button-row">
-                    <button type="submit" class="btn-primary">Save Changes</button>
+                    <button type="submit" class="btn-primary">Save</button>
                     <button type="button" class="btn-success" id="mark-ready-btn">Mark as Ready</button>
+                    <button type="button" class="btn-danger" id="mark-invalid-btn">Mark as Invalid</button>
                 </div>
             </form>
         </div>
@@ -447,7 +472,7 @@
             document.getElementById('property-address').textContent = currentProperty.address;
 
             // Set user email
-            document.getElementById('property-user-email').textContent = currentProperty.user_email || '';
+            document.getElementById('property-user-email').textContent = currentProperty.userEmail || '';
 
             // Populate property fields
             document.getElementById('bedrooms').value = currentProperty.bedrooms || '';
@@ -459,7 +484,10 @@
 
             // Update status badge based on assessment status
             const statusBadge = document.getElementById('property-status');
-            if (assessment.status === 'preparing') {
+            if (assessment.status === 'invalid') {
+                statusBadge.textContent = 'Invalid';
+                statusBadge.className = 'property-status status-invalid';
+            } else if (assessment.status === 'preparing') {
                 statusBadge.textContent = 'Preparing';
                 statusBadge.className = 'property-status status-preparing';
             } else {
@@ -467,19 +495,22 @@
                 statusBadge.className = 'property-status status-ready';
             }
             document.getElementById('year').value = assessment.year || new Date().getFullYear();
-            document.getElementById('appraised_value').value = assessment.appraised_value || '';
-            document.getElementById('annual_tax').value = assessment.annual_tax || '';
-            document.getElementById('estimated_appraised_value').value = assessment.estimated_appraised_value || '';
-            document.getElementById('estimated_annual_tax').value = assessment.estimated_annual_tax || '';
-            document.getElementById('report_url').value = assessment.report_url || '';
+            document.getElementById('appraised_value').value = assessment.appraisedValue || '';
+            document.getElementById('annual_tax').value = assessment.annualTax || '';
+            document.getElementById('estimated_appraised_value').value = assessment.estimatedAppraisedValue || '';
+            document.getElementById('estimated_annual_tax').value = assessment.estimatedAnnualTax || '';
+            document.getElementById('report_url').value = assessment.reportUrl || '';
 
             // Calculate and display annual savings
             calculateAnnualSavings();
 
             // Update button visibility
             const markReadyBtn = document.getElementById('mark-ready-btn');
-            if (assessment.status === 'ready') {
+            const markInvalidBtn = document.getElementById('mark-invalid-btn');
+
+            if (assessment.status === 'ready' || assessment.status === 'invalid') {
                 markReadyBtn.style.display = 'none';
+                markInvalidBtn.style.display = 'none';
             }
         }
 
@@ -507,11 +538,11 @@
                     bathrooms: document.getElementById('bathrooms').value ? parseFloat(document.getElementById('bathrooms').value) : null,
                     sqft: document.getElementById('sqft').value ? parseInt(document.getElementById('sqft').value) : null,
                     year: document.getElementById('year').value ? parseInt(document.getElementById('year').value) : null,
-                    appraised_value: document.getElementById('appraised_value').value ? parseFloat(document.getElementById('appraised_value').value) : null,
-                    annual_tax: document.getElementById('annual_tax').value ? parseFloat(document.getElementById('annual_tax').value) : null,
-                    estimated_appraised_value: document.getElementById('estimated_appraised_value').value ? parseFloat(document.getElementById('estimated_appraised_value').value) : null,
-                    estimated_annual_tax: document.getElementById('estimated_annual_tax').value ? parseFloat(document.getElementById('estimated_annual_tax').value) : null,
-                    report_url: document.getElementById('report_url').value || null
+                    appraisedValue: document.getElementById('appraised_value').value ? parseFloat(document.getElementById('appraised_value').value) : null,
+                    annualTax: document.getElementById('annual_tax').value ? parseFloat(document.getElementById('annual_tax').value) : null,
+                    estimatedAppraisedValue: document.getElementById('estimated_appraised_value').value ? parseFloat(document.getElementById('estimated_appraised_value').value) : null,
+                    estimatedAnnualTax: document.getElementById('estimated_annual_tax').value ? parseFloat(document.getElementById('estimated_annual_tax').value) : null,
+                    reportUrl: document.getElementById('report_url').value || null
                 };
 
                 const response = await fetch(`${API_BASE}/admin/properties/${propertyId}`, {
@@ -566,6 +597,39 @@
             }
         }
 
+        // Mark property as invalid
+        async function markAsInvalid() {
+            if (!confirm('Mark this property as invalid? This indicates the address is outside our service area or not a valid property address.')) {
+                return;
+            }
+
+            try {
+                const token = await window.Clerk.session.getToken();
+
+                // Update status to invalid
+                const response = await fetch(`${API_BASE}/admin/properties/${propertyId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        status: 'invalid'
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to mark property as invalid');
+                }
+
+                alert('Property marked as invalid!');
+                window.location.href = 'admin.html';
+            } catch (error) {
+                console.error('Error marking property as invalid:', error);
+                alert('Failed to mark property as invalid. Please try again.');
+            }
+        }
+
         // Initialize Clerk
         async function initClerk() {
             try {
@@ -608,6 +672,7 @@
         // Event listeners
         document.getElementById('property-form').addEventListener('submit', saveProperty);
         document.getElementById('mark-ready-btn').addEventListener('click', markAsReady);
+        document.getElementById('mark-invalid-btn').addEventListener('click', markAsInvalid);
 
         // Recalculate savings when tax values change
         document.getElementById('annual_tax').addEventListener('input', calculateAnnualSavings);

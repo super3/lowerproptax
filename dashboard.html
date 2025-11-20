@@ -383,6 +383,31 @@
             color: #27ae60;
         }
 
+        .status-invalid {
+            background: #fee;
+            color: #c41e3a;
+        }
+
+        .invalid-message {
+            background: #fff5f5;
+            border: 1px solid #fed7d7;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-top: 1.5rem;
+        }
+
+        .invalid-message h4 {
+            color: #c41e3a;
+            font-size: 1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .invalid-message p {
+            color: #666;
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+
         /* Progress Timeline */
         .progress-timeline {
             margin-top: 1.5rem;
@@ -1190,8 +1215,18 @@
             }
 
             const status = property.latestAssessment?.status || 'preparing';
-            const statusText = status === 'preparing' ? 'In Progress' : 'Complete';
-            const statusClass = status === 'preparing' ? 'status-preparing' : 'status-ready';
+            let statusText, statusClass;
+
+            if (status === 'invalid') {
+                statusText = 'Invalid';
+                statusClass = 'status-invalid';
+            } else if (status === 'preparing') {
+                statusText = 'In Progress';
+                statusClass = 'status-preparing';
+            } else {
+                statusText = 'Complete';
+                statusClass = 'status-ready';
+            }
 
             // Set card class based on status
             card.className = status === 'preparing' ? 'property-card has-timeline' : 'property-card';
@@ -1215,9 +1250,16 @@
             const step2Class = currentStep >= 2 ? (currentStep === 2 ? 'active' : 'completed') : '';
             const step3Class = currentStep >= 3 ? 'completed' : '';
 
-            // Calculate savings for completed assessments
+            // Calculate savings for completed assessments or show invalid message
             let savingsInfo = '';
-            if (status === 'ready') {
+            if (status === 'invalid') {
+                savingsInfo = `
+                    <div class="invalid-message">
+                        <h4>Unable to Process Property</h4>
+                        <p>This property address is outside our service area or could not be processed. We currently only service properties in Georgia.</p>
+                    </div>
+                `;
+            } else if (status === 'ready') {
                 const assessment = property.latestAssessment;
                 if (assessment && assessment.annualTax && assessment.estimatedAnnualTax) {
                     const savings = assessment.annualTax - assessment.estimatedAnnualTax;
