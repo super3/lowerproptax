@@ -413,7 +413,7 @@
                 <div class="button-row">
                     <button type="submit" class="btn-primary">Save</button>
                     <button type="button" class="btn-success" id="mark-ready-btn">Mark as Ready</button>
-                    <button type="button" class="btn-danger" id="mark-invalid-btn">Mark as Invalid</button>
+                    <button type="button" class="btn-danger" id="mark-invalid-btn">Mark as Unable</button>
                 </div>
             </form>
         </div>
@@ -597,9 +597,9 @@
             }
         }
 
-        // Mark property as invalid
+        // Mark property as unable
         async function markAsInvalid() {
-            if (!confirm('Mark this property as invalid? This indicates the address is outside our service area or not a valid property address.')) {
+            if (!confirm('Mark this property as unable to process? This indicates the address is outside our service area or not a valid property address.')) {
                 return;
             }
 
@@ -619,14 +619,14 @@
                 });
 
                 if (!response.ok) {
-                    throw new Error('Failed to mark property as invalid');
+                    throw new Error('Failed to mark property as unable');
                 }
 
-                alert('Property marked as invalid!');
+                alert('Property marked as unable to process!');
                 window.location.href = 'admin.html';
             } catch (error) {
-                console.error('Error marking property as invalid:', error);
-                alert('Failed to mark property as invalid. Please try again.');
+                console.error('Error marking property as unable:', error);
+                alert('Failed to mark property as unable. Please try again.');
             }
         }
 
