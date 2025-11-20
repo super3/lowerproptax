@@ -32,7 +32,8 @@ npm test                           # Run test suite
 
 - [x] Terms of Service page
 - [x] Privacy Policy page
-- [ ] Help page
+- [x] Help page
+- [ ] Create support@padtask.com email account
 - [ ] Email notifications for pending assessments (to admin)
 - [ ] Email notifications for completed assessments
 - [ ] Payment processing (Stripe) for report downloads
