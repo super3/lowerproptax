@@ -38,7 +38,7 @@ npm test                           # Run test suite
 - [ ] Email notifications for completed assessments
 - [ ] Payment processing (Stripe) for report downloads
 - [ ] Property tax appeal guidance
-- [ ] Historical tax data tracking
 - [ ] Tax deadlines tracking
+- [ ] Historical tax data tracking
 - [ ] Mobile app (Android)
 - [ ] Mobile app (iOS)
