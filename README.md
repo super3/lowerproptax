@@ -1,10 +1,10 @@
-# PadTask
+# LowerPropTax
 
 Property tax assessment platform that helps homeowners discover if they're overpaying on property taxes and provides detailed assessment reports.
 
-[![Frontend Status](https://img.shields.io/github/actions/workflow/status/super3/padtask/frontend.yml?branch=main&label=frontend)](https://github.com/super3/padtask/actions/workflows/frontend.yml)
-[![Test Status](https://img.shields.io/github/actions/workflow/status/super3/padtask/tests.yml?branch=main&label=tests)](https://github.com/super3/padtask/actions/workflows/tests.yml)
-[![Coverage Status](https://coveralls.io/repos/github/super3/padtask/badge.svg?branch=main)](https://coveralls.io/github/super3/padtask?branch=main)
+[![Frontend Status](https://img.shields.io/github/actions/workflow/status/super3/lowerproptax/frontend.yml?branch=main&label=frontend)](https://github.com/super3/lowerproptax/actions/workflows/frontend.yml)
+[![Test Status](https://img.shields.io/github/actions/workflow/status/super3/lowerproptax/tests.yml?branch=main&label=tests)](https://github.com/super3/lowerproptax/actions/workflows/tests.yml)
+[![Coverage Status](https://coveralls.io/repos/github/super3/lowerproptax/badge.svg?branch=main)](https://coveralls.io/github/super3/lowerproptax?branch=main)
 
 ## Installation
 
@@ -16,7 +16,7 @@ Property tax assessment platform that helps homeowners discover if they're overp
 
 ### From Source
 ```bash
-git clone https://github.com/super3/padtask.git && cd padtask
+git clone https://github.com/super3/lowerproptax.git && cd lowerproptax
 npm install                        # Install dependencies
 ```
 
@@ -33,7 +33,7 @@ npm test                           # Run test suite
 - [x] Terms of Service page
 - [x] Privacy Policy page
 - [x] Help page
-- [ ] Create support@padtask.com email account
+- [ ] Create support@lowerproptax.com email account
 - [ ] Email notifications for pending assessments (to admin)
 - [ ] Email notifications for completed assessments
 - [ ] Payment processing (Stripe) for report downloads

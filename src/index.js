@@ -14,7 +14,7 @@ const PORT = process.env.PORT || 3001;
 
 // Middleware
 app.use(cors({
-  origin: ['https://padtask.com', 'https://super3.github.io', 'http://localhost:8000'],
+  origin: ['https://lowerproptax.com', 'https://super3.github.io', 'http://localhost:8000'],
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
@@ -26,7 +26,7 @@ app.use(clerkMiddleware());
 
 // Health check endpoint
 app.get('/health', (req, res) => {
-  res.json({ status: 'ok', message: 'PadTask server is running' });
+  res.json({ status: 'ok', message: 'LowerPropTax server is running' });
 });
 
 // API routes
@@ -44,7 +44,7 @@ async function startServer() {
   try {
     await initDatabase();
     app.listen(PORT, '0.0.0.0', () => {
-      console.log(`PadTask server running on http://localhost:${PORT}`);
+      console.log(`LowerPropTax server running on http://localhost:${PORT}`);
       console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
     });
   } catch (error) {

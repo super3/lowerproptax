@@ -1,6 +1,6 @@
-# PadTask API Documentation
+# LowerPropTax API Documentation
 
-Backend API server for PadTask property tax assessment platform with Clerk authentication.
+Backend API server for LowerPropTax property tax assessment platform with Clerk authentication.
 
 ## API Endpoints
 
@@ -9,7 +9,7 @@ Backend API server for PadTask property tax assessment platform with Clerk authe
 #### `GET /health`
 - No authentication required
 - Returns server status
-- Response: `{ status: 'ok', message: 'PadTask server is running' }`
+- Response: `{ status: 'ok', message: 'LowerPropTax server is running' }`
 
 ---
 

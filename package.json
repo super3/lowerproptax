@@ -1,7 +1,7 @@
 {
-  "name": "padtask-server",
+  "name": "lowerproptax-server",
   "version": "1.0.0",
-  "description": "PadTask backend server with Clerk authentication",
+  "description": "LowerPropTax backend server with Clerk authentication",
   "main": "src/index.js",
   "type": "module",
   "scripts": {
@@ -12,7 +12,7 @@
     "test:coverage": "node --experimental-vm-modules node_modules/jest/bin/jest.js --coverage"
   },
   "keywords": [
-    "padtask",
+    "lowerproptax",
     "property-management",
     "clerk"
   ],
