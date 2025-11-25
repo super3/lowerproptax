@@ -37,5 +37,4 @@ npm test                           # Run test suite
 - [ ] Property tax appeal guidance
 - [ ] Tax deadlines tracking
 - [ ] Historical tax data tracking
-- [ ] Mobile app (Android)
-- [ ] Mobile app (iOS)
+- [ ] Mobile app (iOS & Android)
