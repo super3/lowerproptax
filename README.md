@@ -30,10 +30,7 @@ npm test                           # Run test suite
 
 ## Roadmap
 
-- [x] Terms of Service page
-- [x] Privacy Policy page
-- [x] Help page
-- [ ] Create support@lowerproptax.com email account
+- [ ] Create help@lowerproptax.com email account
 - [ ] Email notifications for pending assessments (to admin)
 - [ ] Email notifications for completed assessments
 - [ ] Payment processing (Stripe) for report downloads
