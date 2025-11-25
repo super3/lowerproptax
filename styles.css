@@ -1,6 +1,8 @@
 /* LowerPropTax Common Styles */
 
-/* Reset & Base Styles */
+/* ===========================================
+   Reset & Base Styles
+   =========================================== */
 * {
     margin: 0;
     padding: 0;
@@ -13,7 +15,13 @@ body {
     color: #1a1a1a;
 }
 
-/* Navigation */
+body.bg-gray {
+    background: #f8f9fa;
+}
+
+/* ===========================================
+   Navigation
+   =========================================== */
 nav {
     background: white;
     padding: 0 7%;
@@ -36,13 +44,54 @@ nav {
     text-decoration: none;
     font-size: 1.5rem;
     font-weight: 700;
+    display: block;
 }
 
 .logo-link:hover {
     color: #3171ef;
 }
 
-/* User Info */
+.nav-links {
+    display: flex;
+    gap: 2.5rem;
+    list-style: none;
+    align-items: center;
+}
+
+.nav-links a {
+    text-decoration: none;
+    color: #1a1a1a;
+    font-weight: 500;
+    font-size: 0.95rem;
+    transition: color 0.2s;
+}
+
+.nav-links a:hover {
+    color: #3171ef;
+}
+
+.nav-right {
+    display: flex;
+    gap: 2.5rem;
+    align-items: center;
+}
+
+.nav-auth {
+    display: flex;
+    gap: 1.5rem;
+    align-items: center;
+}
+
+.nav-auth a {
+    text-decoration: none;
+    color: #1a1a1a;
+    font-weight: 500;
+    font-size: 0.95rem;
+}
+
+/* ===========================================
+   User Info (Header)
+   =========================================== */
 .user-info {
     display: flex;
     align-items: center;
@@ -60,26 +109,24 @@ nav {
     align-items: center;
 }
 
-/* Status Badges */
-.status-preparing {
-    background: #fff4e6;
-    color: #e67e22;
-    padding: 0.25rem 0.5rem;
-    border-radius: 4px;
-    font-size: 0.8rem;
-    font-weight: 600;
+/* ===========================================
+   Container
+   =========================================== */
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 3rem 7%;
 }
 
-.status-ready {
-    background: #e8f5e9;
-    color: #27ae60;
-    padding: 0.25rem 0.5rem;
-    border-radius: 4px;
-    font-size: 0.8rem;
-    font-weight: 600;
+.container.narrow {
+    max-width: 1000px;
+    margin: 3rem auto;
+    padding: 0 2rem;
 }
 
-/* Buttons */
+/* ===========================================
+   Buttons
+   =========================================== */
 .btn-primary {
     background: #3171ef;
     color: white;
@@ -92,6 +139,7 @@ nav {
     transition: all 0.2s;
     border: none;
     cursor: pointer;
+    font-family: 'Inter', Arial, sans-serif;
 }
 
 .btn-primary:hover {
@@ -100,8 +148,114 @@ nav {
     box-shadow: 0 4px 12px rgba(49, 113, 239, 0.3);
 }
 
-.back-button,
+.btn-get-started {
+    background: #3171ef;
+    color: white !important;
+    padding: 0.65rem 1.5rem;
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.95rem;
+    transition: background 0.2s;
+}
+
+.btn-get-started:hover {
+    background: #2560d9;
+    color: white !important;
+}
+
+.btn-success {
+    background: #27ae60;
+    color: white;
+    padding: 1rem 2rem;
+    border-radius: 6px;
+    border: none;
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: 'Inter', Arial, sans-serif;
+}
+
+.btn-success:hover {
+    background: #229954;
+    transform: translateY(-1px);
+}
+
+.btn-danger {
+    background: #c41e3a;
+    color: white;
+    padding: 1rem 2rem;
+    border-radius: 6px;
+    border: none;
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: 'Inter', Arial, sans-serif;
+}
+
+.btn-danger:hover {
+    background: #a01729;
+    transform: translateY(-1px);
+}
+
+.btn-small {
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-view {
+    background: #f0f4ff;
+    color: #3171ef;
+}
+
+.btn-view:hover {
+    background: #e0e7ff;
+}
+
+.btn-delete {
+    background: #fff0f0;
+    color: #ef3131;
+}
+
+.btn-delete:hover {
+    background: #ffe0e0;
+}
+
+.btn-download {
+    background: #3171ef;
+    color: white;
+    padding: 1rem 2rem;
+    border-radius: 6px;
+    border: none;
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: inline-block;
+    margin-top: 2rem;
+    text-decoration: none;
+}
+
+.btn-download:hover {
+    background: #2560d9;
+    transform: translateY(-1px);
+}
+
+.btn-download:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+    transform: none;
+}
+
 .back-link {
+    display: inline-block;
     background: #f0f4ff;
     color: #3171ef;
     padding: 0.5rem 1rem;
@@ -110,19 +264,87 @@ nav {
     font-weight: 600;
     font-size: 0.9rem;
     transition: all 0.2s;
-    display: inline-block;
-    border: none;
-    cursor: pointer;
+    margin-bottom: 1.5rem;
 }
 
-.back-button:hover,
 .back-link:hover {
     background: #e0e7ff;
 }
 
-/* Stat Cards */
-.stat-card {
+/* ===========================================
+   Status Badges
+   =========================================== */
+.status-preparing {
+    background: #fff4e6;
+    color: #e67e22;
+}
+
+.status-ready {
+    background: #e8f5e9;
+    color: #27ae60;
+}
+
+.status-invalid {
+    background: #fee;
+    color: #c41e3a;
+}
+
+.property-status {
+    display: inline-block;
+    padding: 0.35rem 0.75rem;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+/* ===========================================
+   Dashboard / Card Components
+   =========================================== */
+.dashboard-mockup {
     background: white;
+    border-radius: 12px;
+    padding: 2rem;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+    margin-bottom: 2rem;
+}
+
+.mockup-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid #e5e5e5;
+}
+
+.mockup-header h2 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #1a1a1a;
+}
+
+.mockup-header-right {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.mockup-header span {
+    font-size: 0.9rem;
+    color: #999;
+}
+
+/* Stats Row */
+.stats-row {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.stat-card {
+    background: #fafbfc;
     padding: 1.25rem;
     border-radius: 8px;
     border: 1px solid #e5e5e5;
@@ -132,7 +354,7 @@ nav {
     font-size: 0.75rem;
     color: #666;
     display: block;
-    margin-bottom: 0.25rem;
+    margin-bottom: 0.5rem;
     text-transform: uppercase;
     letter-spacing: 0.5px;
 }
@@ -140,22 +362,42 @@ nav {
 .stat-card .value {
     font-size: 1.5rem;
     font-weight: 700;
-    color: #3171ef;
+    color: #1a1a1a;
 }
 
-/* Container Styles */
-.dashboard-mockup {
-    background: white;
-    border-radius: 12px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
-    padding: 2rem;
-    margin: 2rem 0;
+/* Data Cards */
+.data-card {
+    background: #fafbfc;
+    padding: 1.5rem;
+    border-radius: 8px;
+    border: 1px solid #e5e5e5;
 }
 
+.data-card label {
+    font-size: 0.8rem;
+    color: #666;
+    display: block;
+    margin-bottom: 0.5rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.data-card .value {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: #1a1a1a;
+}
+
+.data-card .value.preparing {
+    color: #999;
+    font-style: italic;
+}
+
+/* Property Cards */
 .property-card {
     background: white;
     border: 2px solid #e5e5e5;
-    border-radius: 8px;
+    border-radius: 12px;
     padding: 1.5rem;
     transition: all 0.2s;
     cursor: pointer;
@@ -170,14 +412,68 @@ nav {
     transform: translateY(-2px);
 }
 
-.data-card {
-    background: white;
-    border: 1px solid #e5e5e5;
-    border-radius: 8px;
-    padding: 1.5rem;
+.property-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0;
 }
 
-/* Form Inputs */
+.property-address {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #1a1a1a;
+    margin-bottom: 0.25rem;
+}
+
+.property-location {
+    font-size: 1.1rem;
+    color: #666;
+    margin-bottom: 1rem;
+}
+
+.property-details {
+    font-size: 0.9rem;
+    color: #666;
+    margin-bottom: 0.5rem;
+}
+
+/* Property Detail Page */
+.property-detail {
+    background: white;
+    border-radius: 12px;
+    padding: 2.5rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.property-detail .property-header {
+    margin-bottom: 2rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 2px solid #f0f0f0;
+    align-items: flex-start;
+}
+
+.property-detail .property-address {
+    font-size: 1.75rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+}
+
+.property-detail .property-status {
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
+}
+
+.property-data {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+    margin-top: 2rem;
+}
+
+/* ===========================================
+   Form Elements
+   =========================================== */
 .address-input {
     flex: 1;
     padding: 1.15rem 1.5rem;
@@ -197,29 +493,230 @@ nav {
     box-shadow: 0 0 0 4px rgba(49, 113, 239, 0.15);
 }
 
-/* Responsive Design */
+.address-input::placeholder {
+    color: #999;
+}
+
+.button-row {
+    display: flex;
+    gap: 1rem;
+    margin-top: 2rem;
+}
+
+/* ===========================================
+   Utility Classes
+   =========================================== */
+.hidden {
+    display: none !important;
+}
+
+.loading {
+    text-align: center;
+    padding: 3rem;
+    color: #666;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 4rem 2rem;
+    color: #666;
+}
+
+.empty-state h3 {
+    font-size: 1.5rem;
+    margin-bottom: 0.5rem;
+    color: #1a1a1a;
+}
+
+.status-message {
+    background: #f0f4ff;
+    border-left: 4px solid #3171ef;
+    padding: 1.25rem;
+    margin: 1.5rem 0;
+    border-radius: 6px;
+    font-size: 0.95rem;
+    color: #444;
+}
+
+/* ===========================================
+   Footer
+   =========================================== */
+footer {
+    background: #1a1a1a;
+    color: white;
+    padding: 30px 7%;
+}
+
+.footer-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+}
+
+.footer-text {
+    color: #999;
+    font-size: 0.85rem;
+}
+
+.footer-links {
+    display: flex;
+    gap: 2rem;
+    flex-wrap: wrap;
+}
+
+.footer-links a {
+    color: #999;
+    text-decoration: none;
+    transition: color 0.2s;
+    font-size: 0.85rem;
+}
+
+.footer-links a:hover {
+    color: #3171ef;
+}
+
+/* ===========================================
+   Tables
+   =========================================== */
+.properties-table {
+    overflow-x: auto;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+thead {
+    border-bottom: 2px solid #e5e5e5;
+}
+
+th {
+    text-align: left;
+    padding: 1rem;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #666;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+td {
+    padding: 1rem;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+tbody tr {
+    cursor: pointer;
+}
+
+tbody tr:hover {
+    background: #f8f9fa;
+}
+
+/* ===========================================
+   Responsive Design
+   =========================================== */
 @media (max-width: 968px) {
     nav {
         padding: 0 5%;
     }
 
-    .stat-card {
-        padding: 1rem;
+    .nav-links {
+        display: none;
     }
 
-    .stat-card .value {
-        font-size: 1.25rem;
+    .container {
+        padding: 2rem 5%;
+    }
+
+    .container.narrow {
+        padding: 0 1rem;
+        margin: 2rem auto;
     }
 
     .dashboard-mockup {
         padding: 1.5rem;
     }
 
-    .property-card {
-        padding: 1.25rem;
+    .mockup-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.75rem;
     }
 
-    .data-card {
-        padding: 1.25rem;
+    .mockup-header-right {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+        width: 100%;
+    }
+
+    .stats-row {
+        grid-template-columns: 1fr;
+    }
+
+    .stat-card {
+        padding: 1rem;
+    }
+
+    .property-data {
+        grid-template-columns: 1fr;
+    }
+
+    .property-detail {
+        padding: 1.5rem;
+    }
+
+    .property-detail .property-address {
+        font-size: 1.5rem;
+    }
+
+    .button-row {
+        flex-direction: column;
+    }
+
+    .btn-primary,
+    .btn-success,
+    .btn-danger {
+        width: 100%;
+    }
+
+    footer {
+        padding: 25px 5%;
+    }
+
+    .footer-content {
+        flex-direction: column;
+        text-align: center;
+        gap: 1rem;
+    }
+
+    .footer-links {
+        gap: 1.5rem;
+    }
+
+    th, td {
+        padding: 0.75rem 0.5rem;
+    }
+
+    table {
+        font-size: 0.85rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .address-input {
+        font-size: 1rem;
+        padding: 1rem 1.25rem;
+    }
+
+    .btn-primary {
+        font-size: 1rem;
+        padding: 1rem 2rem;
     }
 }

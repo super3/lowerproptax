@@ -16,116 +16,10 @@
         type="text/javascript"
     ></script>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Inter', Arial, sans-serif;
-            line-height: 1.6;
-            color: #1a1a1a;
-            background: #f8f9fa;
-        }
-
-        /* Navigation */
-        nav {
-            background: white;
-            padding: 0 7%;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid #e5e5e5;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
-            height: 72px;
-        }
-
-        .logo-link {
-            text-decoration: none;
-            color: inherit;
-            display: block;
-        }
-
-        .logo {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: #1a1a1a;
-        }
-
-        .nav-right {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-        }
-
-        .user-info {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-        }
-
-        .user-name {
-            font-weight: 500;
-            color: #1a1a1a;
-            font-size: 0.95rem;
-        }
-
-        #user-button {
-            display: flex;
-            align-items: center;
-        }
-
-        /* Main Container */
-        .container {
-            max-width: 1000px;
-            margin: 3rem auto;
-            padding: 0 2rem;
-        }
-
-        /* Back Link */
-        .back-link {
-            display: inline-block;
-            background: #f0f4ff;
-            color: #3171ef;
-            padding: 0.5rem 1rem;
-            border-radius: 6px;
-            text-decoration: none;
-            font-weight: 600;
-            font-size: 0.9rem;
-            transition: all 0.2s;
-            margin-bottom: 1.5rem;
-        }
-
-        .back-link:hover {
-            background: #e0e7ff;
-        }
-
-        .property-detail {
-            background: white;
-            border-radius: 12px;
-            padding: 2.5rem;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-        }
-
-        .property-header {
-            margin-bottom: 2rem;
-            padding-bottom: 1.5rem;
-            border-bottom: 2px solid #f0f0f0;
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-        }
+        /* Property detail page styles */
 
         .property-info {
             flex: 1;
-        }
-
-        .property-address {
-            font-size: 1.75rem;
-            font-weight: 700;
-            color: #1a1a1a;
-            margin-bottom: 0.5rem;
         }
 
         /* Three-dot menu */
@@ -182,127 +76,9 @@
             background: #f8f9fa;
             color: #ef3131;
         }
-
-        .property-location {
-            font-size: 1.1rem;
-            color: #666;
-            margin-bottom: 1rem;
-        }
-
-        .property-status {
-            display: inline-block;
-            padding: 0.5rem 1rem;
-            border-radius: 6px;
-            font-size: 0.9rem;
-            font-weight: 600;
-        }
-
-        .status-preparing {
-            background: #fff4e6;
-            color: #e67e22;
-        }
-
-        .status-ready {
-            background: #e8f5e9;
-            color: #27ae60;
-        }
-
-        .status-invalid {
-            background: #fee;
-            color: #c41e3a;
-        }
-
-        .status-message {
-            background: #f0f4ff;
-            border-left: 4px solid #3171ef;
-            padding: 1.25rem;
-            margin: 1.5rem 0;
-            border-radius: 6px;
-            font-size: 0.95rem;
-            color: #444;
-        }
-
-        .property-data {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 1.5rem;
-            margin-top: 2rem;
-        }
-
-        .data-card {
-            background: #fafbfc;
-            padding: 1.5rem;
-            border-radius: 8px;
-            border: 1px solid #e5e5e5;
-        }
-
-        .data-card label {
-            font-size: 0.8rem;
-            color: #666;
-            display: block;
-            margin-bottom: 0.5rem;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .data-card .value {
-            font-size: 1.75rem;
-            font-weight: 700;
-            color: #1a1a1a;
-        }
-
-        .data-card .value.preparing {
-            color: #999;
-            font-style: italic;
-        }
-
-        .btn-download {
-            background: #3171ef;
-            color: white;
-            padding: 1rem 2rem;
-            border-radius: 6px;
-            border: none;
-            font-weight: 600;
-            font-size: 1rem;
-            cursor: pointer;
-            transition: all 0.2s;
-            display: inline-block;
-            margin-top: 2rem;
-            text-decoration: none;
-        }
-
-        .btn-download:hover {
-            background: #2560d9;
-            transform: translateY(-1px);
-        }
-
-        .btn-download:disabled {
-            background: #ccc;
-            cursor: not-allowed;
-            transform: none;
-        }
-
-        @media (max-width: 768px) {
-            .container {
-                padding: 0 1rem;
-                margin: 2rem auto;
-            }
-
-            .property-detail {
-                padding: 1.5rem;
-            }
-
-            .property-address {
-                font-size: 1.5rem;
-            }
-
-            .property-data {
-                grid-template-columns: 1fr;
-            }
-        }
     </style>
 </head>
-<body>
+<body class="bg-gray">
     <!-- Navigation -->
     <nav>
         <a href="index.html" class="logo-link"><div class="logo">🏡 LowerPropTax</div></a>
@@ -315,7 +91,7 @@
     </nav>
 
     <!-- Main Content -->
-    <div class="container">
+    <div class="container narrow">
         <a href="dashboard.html" class="back-link">← Back to Dashboard</a>
 
         <div class="property-detail" id="property-detail">

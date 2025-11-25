@@ -15,91 +15,7 @@
         type="text/javascript"
     ></script>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Inter', Arial, sans-serif;
-            line-height: 1.6;
-            color: #1a1a1a;
-            background: #f8f9fa;
-        }
-
-        /* Navigation */
-        nav {
-            background: white;
-            padding: 0 7%;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid #e5e5e5;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
-            height: 72px;
-        }
-
-        .logo {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: #1a1a1a;
-            text-decoration: none;
-        }
-
-        .nav-links {
-            display: flex;
-            gap: 2.5rem;
-            list-style: none;
-            align-items: center;
-        }
-
-        .nav-links a {
-            text-decoration: none;
-            color: #1a1a1a;
-            font-weight: 500;
-            font-size: 0.95rem;
-            transition: color 0.2s;
-        }
-
-        .nav-links a:hover {
-            color: #3171ef;
-        }
-
-        .nav-auth {
-            display: flex;
-            gap: 1.5rem;
-            align-items: center;
-        }
-
-        .nav-auth a {
-            text-decoration: none;
-            color: #1a1a1a;
-            font-weight: 500;
-            font-size: 0.95rem;
-        }
-
-        .btn-get-started {
-            background: #3171ef;
-            color: white !important;
-            padding: 0.65rem 1.5rem;
-            border-radius: 6px;
-            text-decoration: none;
-            font-weight: 600;
-            font-size: 0.95rem;
-            transition: background 0.2s;
-        }
-
-        .btn-get-started:hover {
-            background: #2560d9;
-            color: white !important;
-        }
-
-        .container {
-            max-width: 1000px;
-            margin: 2rem auto;
-            padding: 0 1rem;
-        }
+        /* Terms page styles */
 
         .terms-content {
             background: white;
@@ -157,51 +73,19 @@
             margin-bottom: 0.5rem;
         }
 
-        /* Footer */
+        /* Footer override for terms page */
         footer {
-            background: #1a1a1a;
-            color: white;
-            padding: 30px 7%;
             margin-top: 3rem;
         }
 
-        .footer-content {
-            max-width: 1200px;
-            margin: 0 auto;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 1.5rem;
-        }
-
-        .footer-text {
-            color: #999;
-            font-size: 0.85rem;
-        }
-
-        .footer-links {
-            display: flex;
-            gap: 2rem;
-            flex-wrap: wrap;
-        }
-
-        .footer-links a {
-            color: #999;
-            text-decoration: none;
-            transition: color 0.2s;
-            font-size: 0.85rem;
-        }
-
-        .footer-links a:hover {
-            color: #3171ef;
+        /* Terms container override */
+        .container {
+            max-width: 1000px;
+            margin: 2rem auto;
+            padding: 0 1rem;
         }
 
         @media (max-width: 768px) {
-            .nav-links {
-                display: none;
-            }
-
             h1 {
                 font-size: 2rem;
             }
@@ -210,13 +94,13 @@
                 padding: 0 0.5rem;
             }
 
-            .terms-header, .terms-content {
+            .terms-content {
                 padding: 1.5rem;
             }
         }
     </style>
 </head>
-<body>
+<body class="bg-gray">
     <nav>
         <a href="index.html" class="logo">🏡 LowerPropTax</a>
         <div class="nav-auth">
