@@ -18,8 +18,37 @@
     <style>
         /* Property detail page styles */
 
+        .property-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .property-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #e5e5e5;
+        }
+
         .property-info {
             flex: 1;
+        }
+
+        .property-address {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 0.25rem;
+        }
+
+        .property-details {
+            font-size: 0.9rem;
+            color: #666;
         }
 
         /* Three-dot menu */
@@ -76,6 +105,154 @@
             background: #f8f9fa;
             color: #ef3131;
         }
+
+        /* Status message */
+        .status-message {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+            font-size: 0.9rem;
+            color: #555;
+            line-height: 1.5;
+        }
+
+        .status-message.preparing {
+            background: #fff8e6;
+            border-left: 3px solid #e67e22;
+        }
+
+        .status-message.invalid {
+            background: #fef2f2;
+            border-left: 3px solid #dc2626;
+        }
+
+        /* Comparison cards */
+        .comparison-cards {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .comparison-card {
+            background: #f8f9fa;
+            border: 1px solid #e5e5e5;
+            border-radius: 10px;
+            padding: 1.25rem;
+            text-align: center;
+        }
+
+        .comparison-card label {
+            font-size: 0.75rem;
+            color: #666;
+            display: block;
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 600;
+        }
+
+        .comparison-card .amount {
+            font-size: 1.75rem;
+            font-weight: 700;
+        }
+
+        .comparison-card .amount.preparing {
+            color: #ccc;
+        }
+
+        .comparison-card.county .amount {
+            color: #dc2626;
+        }
+
+        .comparison-card.market .amount {
+            color: #3171ef;
+        }
+
+        .comparison-card .sub-label {
+            font-size: 0.8rem;
+            color: #666;
+            margin-top: 0.25rem;
+        }
+
+        /* Savings result */
+        .savings-result {
+            background: #f8f9fa;
+            border: 2px solid #16a34a;
+            border-radius: 10px;
+            padding: 1.25rem;
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .savings-result.preparing {
+            border-color: #e5e5e5;
+        }
+
+        .savings-result label {
+            font-size: 0.8rem;
+            color: #16a34a;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+
+        .savings-result.preparing label {
+            color: #666;
+        }
+
+        .savings-result .amount {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #16a34a;
+        }
+
+        .savings-result .amount.preparing {
+            color: #ccc;
+        }
+
+        .savings-result .per-year {
+            font-size: 0.9rem;
+            color: #555;
+            margin-top: 0.25rem;
+        }
+
+        /* Download button */
+        .btn-download {
+            display: block;
+            width: 100%;
+            background: #16a34a;
+            color: white;
+            padding: 1rem;
+            border-radius: 8px;
+            text-align: center;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: all 0.2s;
+        }
+
+        .btn-download:hover {
+            background: #15803d;
+        }
+
+        /* Responsive */
+        @media (max-width: 480px) {
+            .comparison-cards {
+                grid-template-columns: 1fr;
+            }
+
+            .comparison-card .amount {
+                font-size: 1.5rem;
+            }
+
+            .savings-result .amount {
+                font-size: 1.75rem;
+            }
+        }
     </style>
 </head>
 <body class="bg-gray">
@@ -94,12 +271,11 @@
     <div class="container narrow">
         <a href="dashboard.html" class="back-link">← Back to Dashboard</a>
 
-        <div class="property-detail" id="property-detail">
+        <div class="property-card" id="property-card">
             <div class="property-header">
                 <div class="property-info">
                     <div class="property-address" id="property-address">Loading...</div>
-                    <div class="property-location" id="property-location"></div>
-                    <span class="property-status" id="property-status"></span>
+                    <div class="property-details" id="property-details"></div>
                 </div>
                 <div class="menu-container">
                     <button class="menu-button" id="menu-button">⋮</button>
@@ -111,34 +287,26 @@
 
             <div class="status-message" id="status-message"></div>
 
-            <div class="property-data">
-                <div class="data-card">
-                    <label id="assessed-value-label">Assessed Value</label>
-                    <div class="value preparing" id="assessed-value">--</div>
+            <div class="comparison-cards">
+                <div class="comparison-card county">
+                    <label id="county-label">County Assessment</label>
+                    <div class="amount preparing" id="county-value">--</div>
+                    <div class="sub-label">Current value</div>
                 </div>
-                <div class="data-card">
-                    <label id="annual-tax-label">Annual Tax</label>
-                    <div class="value preparing" id="annual-tax">--</div>
-                </div>
-                <div class="data-card">
-                    <label>Bedrooms</label>
-                    <div class="value preparing" id="bedrooms">--</div>
-                </div>
-                <div class="data-card">
-                    <label>Bathrooms</label>
-                    <div class="value preparing" id="bathrooms">--</div>
-                </div>
-                <div class="data-card">
-                    <label>Square Feet</label>
-                    <div class="value preparing" id="square-feet">--</div>
-                </div>
-                <div class="data-card">
-                    <label>Potential Annual Savings</label>
-                    <div class="value preparing" id="potential-savings">--</div>
+                <div class="comparison-card market">
+                    <label>Market Value</label>
+                    <div class="amount preparing" id="market-value">--</div>
+                    <div class="sub-label">Based on comparables</div>
                 </div>
             </div>
 
-            <a class="btn-download" id="download-report" style="display: none;" target="_blank">Download Report (Free!)</a>
+            <div class="savings-result preparing" id="savings-result">
+                <label>Your Potential Annual Savings</label>
+                <div class="amount preparing" id="potential-savings">--</div>
+                <div class="per-year">per year in property taxes</div>
+            </div>
+
+            <a class="btn-download" id="download-report" style="display: none;" target="_blank">Download Report</a>
         </div>
     </div>
 
@@ -186,88 +354,70 @@
             // Address
             document.getElementById('property-address').textContent = property.address;
 
-            // Hide location since it's already in the full address
-            document.getElementById('property-location').style.display = 'none';
+            // Property details (bed/bath/sqft)
+            const details = [];
+            if (property.bedrooms) details.push(`${property.bedrooms} bed`);
+            if (property.bathrooms) details.push(`${property.bathrooms} bath`);
+            if (property.sqft) details.push(`${Number(property.sqft).toLocaleString()} sq ft`);
+            document.getElementById('property-details').textContent = details.join(' • ') || '';
 
             // Get most recent assessment
             const latestAssessment = property.assessments && property.assessments.length > 0 ? property.assessments[0] : null;
 
             // Status - check assessment status instead of property status
             const status = latestAssessment?.status || 'preparing';
-            const statusEl = document.getElementById('property-status');
-            statusEl.className = `property-status status-${status}`;
-
-            if (status === 'invalid') {
-                statusEl.textContent = 'Unable to Process';
-            } else if (status === 'preparing') {
-                statusEl.textContent = 'Preparing Assessment...';
-            } else {
-                statusEl.textContent = 'Assessment Ready';
-            }
 
             // Status message
             const messageEl = document.getElementById('status-message');
             if (status === 'invalid') {
                 messageEl.textContent = "This property is outside our service area. We currently only service properties in Georgia.";
+                messageEl.className = 'status-message invalid';
             } else if (status === 'preparing') {
                 messageEl.textContent = "We're gathering data on your property. This usually takes 24 hours. We'll send you an email when your assessment is ready!";
+                messageEl.className = 'status-message preparing';
             } else {
                 messageEl.textContent = "Your assessment is complete! Review the details below and download your full report.";
+                messageEl.className = 'status-message';
             }
 
-            // Property data - display actual values from database (if available)
-            // Appraised Value (from assessment)
+            // County Assessment (appraised value)
+            const countyValueEl = document.getElementById('county-value');
             if (latestAssessment && latestAssessment.appraisedValue) {
-                document.getElementById('assessed-value').textContent = '$' + Number(latestAssessment.appraisedValue).toLocaleString();
-                document.getElementById('assessed-value').classList.remove('preparing');
+                countyValueEl.textContent = '$' + Number(latestAssessment.appraisedValue).toLocaleString();
+                countyValueEl.classList.remove('preparing');
             }
 
-            // Annual Tax (from assessment)
-            if (latestAssessment && latestAssessment.annualTax) {
-                document.getElementById('annual-tax').textContent = '$' + Number(latestAssessment.annualTax).toLocaleString();
-                document.getElementById('annual-tax').classList.remove('preparing');
+            // Update county label with year if available
+            if (latestAssessment && latestAssessment.year) {
+                document.getElementById('county-label').textContent = `County Assessment (${latestAssessment.year})`;
             }
 
-            // Bedrooms
-            if (property.bedrooms) {
-                document.getElementById('bedrooms').textContent = property.bedrooms;
-                document.getElementById('bedrooms').classList.remove('preparing');
-            }
-
-            // Bathrooms
-            if (property.bathrooms) {
-                document.getElementById('bathrooms').textContent = property.bathrooms;
-                document.getElementById('bathrooms').classList.remove('preparing');
-            }
-
-            // Square Feet
-            if (property.sqft) {
-                document.getElementById('square-feet').textContent = Number(property.sqft).toLocaleString();
-                document.getElementById('square-feet').classList.remove('preparing');
+            // Market Value (estimated appraised value)
+            const marketValueEl = document.getElementById('market-value');
+            if (latestAssessment && latestAssessment.estimatedAppraisedValue) {
+                marketValueEl.textContent = '$' + Number(latestAssessment.estimatedAppraisedValue).toLocaleString();
+                marketValueEl.classList.remove('preparing');
             }
 
             // Potential Savings (calculate from annualTax - estimatedAnnualTax)
+            const savingsEl = document.getElementById('potential-savings');
+            const savingsResultEl = document.getElementById('savings-result');
             if (latestAssessment && latestAssessment.annualTax && latestAssessment.estimatedAnnualTax) {
                 const savings = latestAssessment.annualTax - latestAssessment.estimatedAnnualTax;
                 if (savings > 0) {
-                    document.getElementById('potential-savings').textContent = '$' + savings.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                    savingsEl.textContent = '$' + savings.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
                 } else {
-                    document.getElementById('potential-savings').textContent = '$0.00';
+                    savingsEl.textContent = '$0';
                 }
-                document.getElementById('potential-savings').classList.remove('preparing');
+                savingsEl.classList.remove('preparing');
+                savingsResultEl.classList.remove('preparing');
             }
 
             // Show download button and set URL when report is available
             if (status === 'ready' && latestAssessment && latestAssessment.reportUrl) {
                 const downloadBtn = document.getElementById('download-report');
                 downloadBtn.href = latestAssessment.reportUrl;
-                downloadBtn.style.display = 'inline-block';
-            }
-
-            // Update assessed value label to show year if available
-            if (latestAssessment && latestAssessment.year) {
-                document.getElementById('assessed-value-label').textContent = `Assessed Value (${latestAssessment.year})`;
-                document.getElementById('annual-tax-label').textContent = `Annual Tax (${latestAssessment.year})`;
+                downloadBtn.style.display = 'block';
             }
         }
 
