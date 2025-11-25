@@ -1,6 +1,7 @@
 /**
  * Initial database schema migration
  * Creates properties and assessments tables
+ * Uses ifNotExists for compatibility with existing databases
  */
 
 exports.up = (pgm) => {
@@ -20,9 +21,9 @@ exports.up = (pgm) => {
     sqft: { type: 'integer' },
     created_at: { type: 'timestamp', default: pgm.func('NOW()') },
     updated_at: { type: 'timestamp', default: pgm.func('NOW()') }
-  });
+  }, { ifNotExists: true });
 
-  pgm.createIndex('properties', 'user_id');
+  pgm.createIndex('properties', 'user_id', { ifNotExists: true });
 
   // Create assessments table
   pgm.createTable('assessments', {
@@ -42,16 +43,25 @@ exports.up = (pgm) => {
     status: { type: 'varchar(50)', default: 'preparing' },
     created_at: { type: 'timestamp', default: pgm.func('NOW()') },
     updated_at: { type: 'timestamp', default: pgm.func('NOW()') }
-  });
+  }, { ifNotExists: true });
 
-  pgm.createIndex('assessments', 'property_id');
-  pgm.createIndex('assessments', 'year');
-  pgm.addConstraint('assessments', 'unique_property_year', {
-    unique: ['property_id', 'year']
-  });
+  pgm.createIndex('assessments', 'property_id', { ifNotExists: true });
+  pgm.createIndex('assessments', 'year', { ifNotExists: true });
+
+  // Add unique constraint only if it doesn't exist
+  pgm.sql(`
+    DO $$
+    BEGIN
+      IF NOT EXISTS (
+        SELECT 1 FROM pg_constraint WHERE conname = 'unique_property_year'
+      ) THEN
+        ALTER TABLE assessments ADD CONSTRAINT unique_property_year UNIQUE (property_id, year);
+      END IF;
+    END $$;
+  `);
 };
 
 exports.down = (pgm) => {
-  pgm.dropTable('assessments');
-  pgm.dropTable('properties');
+  pgm.dropTable('assessments', { ifExists: true });
+  pgm.dropTable('properties', { ifExists: true });
 };
