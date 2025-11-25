@@ -199,13 +199,20 @@
             border-left: 4px solid #16a34a;
             border-radius: 8px;
             padding: 1.25rem;
-            text-align: left;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
             margin-bottom: 1.5rem;
         }
 
         .savings-result.preparing {
             background: #f8f9fa;
             border-left-color: #e5e5e5;
+        }
+
+        .savings-info {
+            flex: 1;
         }
 
         .savings-result label {
@@ -234,21 +241,20 @@
 
         /* Download button */
         .btn-download {
-            display: block;
-            width: 100%;
             background: #16a34a;
             color: white;
-            padding: 1rem;
-            border-radius: 8px;
-            text-align: center;
+            padding: 0.75rem 1.25rem;
+            border-radius: 6px;
             text-decoration: none;
             font-weight: 600;
-            font-size: 1rem;
+            font-size: 0.85rem;
+            white-space: nowrap;
             transition: all 0.2s;
         }
 
         .btn-download:hover {
             background: #15803d;
+            transform: translateY(-1px);
         }
 
         /* Responsive */
@@ -261,8 +267,19 @@
                 font-size: 1.5rem;
             }
 
+            .savings-result {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
             .savings-result .amount {
                 font-size: 1.5rem;
+            }
+
+            .btn-download {
+                width: 100%;
+                text-align: center;
+                margin-top: 0.5rem;
             }
         }
     </style>
@@ -316,11 +333,12 @@
             </div>
 
             <div class="savings-result preparing" id="savings-result">
-                <label>Potential Annual Savings</label>
-                <div class="amount preparing" id="potential-savings">--</div>
+                <div class="savings-info">
+                    <label>Potential Annual Savings</label>
+                    <div class="amount preparing" id="potential-savings">--</div>
+                </div>
+                <a class="btn-download" id="download-report" style="display: none;" target="_blank">Download Report</a>
             </div>
-
-            <a class="btn-download" id="download-report" style="display: none;" target="_blank">Download Report</a>
         </div>
     </div>
 
@@ -421,9 +439,9 @@
             if (latestAssessment && latestAssessment.annualTax && latestAssessment.estimatedAnnualTax) {
                 const savings = latestAssessment.annualTax - latestAssessment.estimatedAnnualTax;
                 if (savings > 0) {
-                    savingsEl.textContent = '$' + savings.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+                    savingsEl.textContent = '$' + savings.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
                 } else {
-                    savingsEl.textContent = '$0';
+                    savingsEl.textContent = '$0.00';
                 }
                 savingsEl.classList.remove('preparing');
                 savingsResultEl.classList.remove('preparing');

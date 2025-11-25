@@ -118,16 +118,6 @@
             color: #3171ef;
         }
 
-        .year-badge {
-            background: #f0f4ff;
-            color: #3171ef;
-            padding: 0.2rem 0.5rem;
-            border-radius: 4px;
-            font-size: 0.75rem;
-            font-weight: 600;
-            margin-right: 0.5rem;
-        }
-
         .empty-properties {
             background: linear-gradient(135deg, #f0f4ff 0%, #f8f9ff 100%);
             border-radius: 12px;
@@ -1018,10 +1008,7 @@
                         <div class="property-address">${streetAddress}</div>
                         ${location ? `<div class="property-details">${location}</div>` : ''}
                     </div>
-                    <div style="display: flex; align-items: center;">
-                        ${assessmentYear ? `<span class="year-badge">${assessmentYear}</span>` : ''}
-                        <div class="property-status ${statusClass}">${statusText}</div>
-                    </div>
+                    <div class="property-status ${statusClass}">${assessmentYear ? `${assessmentYear} ` : ''}${statusText}</div>
                 </div>
 
                 ${savingsInfo}
