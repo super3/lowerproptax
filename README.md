@@ -35,9 +35,8 @@ npm test                           # Run test suite
 - [ ] Email notifications for completed assessments
 - [ ] Change Clerk to production mode
 - [ ] Handle 2025, 2026 assessment years
-- [ ] Historical tax data tracking
 - [ ] Tax deadlines tracking
 - [ ] Property tax appeal guidance
-- [ ] Add Comparable Properties to App?
+- [x] Add Comparable Properties to App?
 - [ ] Payment processing (Stripe) - require payment before viewing assessment reports
 - [ ] Mobile app (iOS & Android)
