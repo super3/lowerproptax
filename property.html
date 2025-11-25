@@ -195,20 +195,21 @@
 
         /* Savings result */
         .savings-result {
-            background: #f8f9fa;
-            border: 2px solid #16a34a;
-            border-radius: 10px;
+            background: linear-gradient(135deg, #e8f5e9 0%, #f1f8f4 100%);
+            border-left: 4px solid #16a34a;
+            border-radius: 8px;
             padding: 1.25rem;
-            text-align: center;
+            text-align: left;
             margin-bottom: 1.5rem;
         }
 
         .savings-result.preparing {
-            border-color: #e5e5e5;
+            background: #f8f9fa;
+            border-left-color: #e5e5e5;
         }
 
         .savings-result label {
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             color: #16a34a;
             font-weight: 600;
             text-transform: uppercase;
@@ -222,19 +223,13 @@
         }
 
         .savings-result .amount {
-            font-size: 2rem;
+            font-size: 1.75rem;
             font-weight: 700;
             color: #16a34a;
         }
 
         .savings-result .amount.preparing {
             color: #ccc;
-        }
-
-        .savings-result .per-year {
-            font-size: 0.9rem;
-            color: #555;
-            margin-top: 0.25rem;
         }
 
         /* Download button */
@@ -267,7 +262,7 @@
             }
 
             .savings-result .amount {
-                font-size: 1.75rem;
+                font-size: 1.5rem;
             }
         }
     </style>
@@ -321,9 +316,8 @@
             </div>
 
             <div class="savings-result preparing" id="savings-result">
-                <label>Your Potential Annual Savings</label>
+                <label>Potential Annual Savings</label>
                 <div class="amount preparing" id="potential-savings">--</div>
-                <div class="per-year">per year in property taxes</div>
             </div>
 
             <a class="btn-download" id="download-report" style="display: none;" target="_blank">Download Report</a>

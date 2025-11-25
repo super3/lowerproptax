@@ -280,15 +280,22 @@
         }
 
         .savings-result {
-            background: #f8f9fa;
-            border: 2px solid #16a34a;
-            border-radius: 10px;
+            background: linear-gradient(135deg, #e8f5e9 0%, #f1f8f4 100%);
+            border-left: 4px solid #16a34a;
+            border-radius: 8px;
             padding: 1.25rem;
-            text-align: center;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .savings-info {
+            flex: 1;
         }
 
         .savings-result label {
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             color: #16a34a;
             font-weight: 600;
             text-transform: uppercase;
@@ -298,28 +305,20 @@
         }
 
         .savings-result .amount {
-            font-size: 2rem;
+            font-size: 1.75rem;
             font-weight: 700;
             color: #16a34a;
         }
 
-        .savings-result .per-year {
-            font-size: 0.9rem;
-            color: #555;
-            margin-top: 0.25rem;
-        }
-
-        .savings-result .view-report {
-            display: inline-block;
-            margin-top: 0.75rem;
-            font-size: 0.85rem;
-            color: #16a34a;
-            text-decoration: none;
+        .btn-download-report {
+            background: #16a34a;
+            color: white;
+            padding: 0.75rem 1.25rem;
+            border-radius: 6px;
             font-weight: 600;
-        }
-
-        .savings-result .view-report:hover {
-            text-decoration: underline;
+            font-size: 0.85rem;
+            white-space: nowrap;
+            cursor: default;
         }
 
         /* Guarantee Badge */
@@ -1044,8 +1043,19 @@
                 font-size: 1.25rem;
             }
 
+            .savings-result {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
             .savings-result .amount {
                 font-size: 1.5rem;
+            }
+
+            .btn-download-report {
+                width: 100%;
+                text-align: center;
+                margin-top: 0.5rem;
             }
 
             .feature-content h2 {
@@ -1277,9 +1287,11 @@
                     </div>
                 </div>
                 <div class="savings-result">
-                    <label>Your Potential Annual Savings</label>
-                    <div class="amount">$280</div>
-                    <div class="per-year">per year in property taxes</div>
+                    <div class="savings-info">
+                        <label>Potential Annual Savings</label>
+                        <div class="amount">$281.44</div>
+                    </div>
+                    <span class="btn-download-report">Download Report</span>
                 </div>
             </div>
         </div>
