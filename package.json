@@ -9,7 +9,11 @@
     "dev": "nodemon src/index.js",
     "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js",
     "test:watch": "node --experimental-vm-modules node_modules/jest/bin/jest.js --watch",
-    "test:coverage": "node --experimental-vm-modules node_modules/jest/bin/jest.js --coverage"
+    "test:coverage": "node --experimental-vm-modules node_modules/jest/bin/jest.js --coverage",
+    "migrate": "node-pg-migrate -m src/db/migrations",
+    "migrate:up": "node-pg-migrate up -m src/db/migrations",
+    "migrate:down": "node-pg-migrate down -m src/db/migrations",
+    "migrate:create": "node-pg-migrate create -m src/db/migrations --migration-file-language cjs"
   },
   "keywords": [
     "lowerproptax",
@@ -19,11 +23,12 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "@clerk/express": "^1.6.6",
     "@clerk/backend": "^1.19.4",
+    "@clerk/express": "^1.6.6",
     "cors": "^2.8.5",
     "dotenv": "^17.2.1",
     "express": "^5.1.0",
+    "node-pg-migrate": "^8.0.3",
     "pg": "^8.16.3"
   },
   "devDependencies": {
