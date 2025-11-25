@@ -1062,6 +1062,170 @@
                 text-align: center;
             }
         }
+
+        /* Abstract document preview */
+        .document-preview {
+            position: relative;
+            display: flex;
+            justify-content: center;
+            padding: 2.5rem;
+            background: #e8f0fe;
+            border-radius: 12px;
+        }
+
+        .document-stack {
+            position: relative;
+        }
+
+        .document-page {
+            background: white;
+            border-radius: 6px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15), 0 2px 10px rgba(0, 0, 0, 0.08);
+            padding: 1.75rem;
+            width: 300px;
+            position: relative;
+            z-index: 3;
+        }
+
+        .document-page::before {
+            content: '';
+            position: absolute;
+            top: 4px;
+            left: 4px;
+            right: -4px;
+            bottom: -4px;
+            background: #f0f0f0;
+            border-radius: 6px;
+            z-index: -1;
+        }
+
+        .document-page::after {
+            content: '';
+            position: absolute;
+            top: 8px;
+            left: 8px;
+            right: -8px;
+            bottom: -8px;
+            background: #e5e5e5;
+            border-radius: 6px;
+            z-index: -2;
+        }
+
+        .document-header {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+            margin-bottom: 1.25rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .document-logo {
+            width: 44px;
+            height: 44px;
+            background: linear-gradient(135deg, #3171ef 0%, #1a5ed9 100%);
+            border-radius: 8px;
+            flex-shrink: 0;
+            box-shadow: 0 2px 6px rgba(49, 113, 239, 0.3);
+        }
+
+        .document-title-lines {
+            flex: 1;
+            padding-top: 0.25rem;
+        }
+
+        .line-placeholder {
+            height: 10px;
+            background: linear-gradient(90deg, #e8e8e8 0%, #f2f2f2 50%, #e8e8e8 100%);
+            border-radius: 5px;
+            margin-bottom: 0.5rem;
+        }
+
+        .line-placeholder.wide {
+            width: 100%;
+        }
+
+        .line-placeholder.medium {
+            width: 70%;
+        }
+
+        .line-placeholder.short {
+            width: 50%;
+        }
+
+        .line-placeholder.narrow {
+            width: 35%;
+            height: 8px;
+            background: linear-gradient(90deg, #d8d8d8 0%, #e5e5e5 50%, #d8d8d8 100%);
+            margin-bottom: 0.75rem;
+            text-transform: uppercase;
+        }
+
+        .document-section {
+            margin-bottom: 1.25rem;
+        }
+
+        .document-property-row {
+            display: flex;
+            gap: 0.75rem;
+        }
+
+        .property-photo-placeholder {
+            width: 70px;
+            height: 52px;
+            background: linear-gradient(145deg, #e8f4e8 0%, #d4e8d4 100%);
+            border-radius: 6px;
+            flex-shrink: 0;
+            border: 1px solid #c8e0c8;
+        }
+
+        .property-lines {
+            flex: 1;
+        }
+
+        .document-comparables {
+            display: flex;
+            gap: 0.6rem;
+        }
+
+        .comparable-item {
+            flex: 1;
+            text-align: center;
+        }
+
+        .comparable-photo {
+            width: 100%;
+            height: 44px;
+            background: linear-gradient(145deg, #f5f5f5 0%, #e8e8e8 100%);
+            border-radius: 6px;
+            margin-bottom: 0.5rem;
+            border: 1px solid #e0e0e0;
+        }
+
+        .comparable-item .line-placeholder.short {
+            width: 80%;
+            margin: 0 auto;
+            height: 6px;
+        }
+
+        .document-footer {
+            padding-top: 1rem;
+            margin-top: 0.5rem;
+            border-top: 2px solid #e8f5e9;
+            background: linear-gradient(180deg, rgba(232, 245, 233, 0.3) 0%, transparent 100%);
+            margin: 0 -1.75rem -1.75rem -1.75rem;
+            padding: 1rem 1.75rem 1.25rem 1.75rem;
+            border-radius: 0 0 6px 6px;
+        }
+
+        .document-footer .line-placeholder {
+            height: 8px;
+            margin-bottom: 0.4rem;
+        }
+
+        .document-footer .line-placeholder.wide {
+            background: linear-gradient(90deg, #c8e6c9 0%, #a5d6a7 50%, #c8e6c9 100%);
+        }
     </style>
 </head>
 <body>
@@ -1192,46 +1356,46 @@
                 </ul>
             </div>
             <div class="feature-image">
-                <div class="maintenance-mockup">
-                    <div class="maintenance-header">
-                        <h3>Your Appeal Report</h3>
-                    </div>
-                    <div class="request-list">
-                        <div class="request-item">
-                            <div class="request-header">
-                                <div class="request-info">
-                                    <h4>Property Overview</h4>
-                                    <p>123 Oak Street, Atlanta GA 30318</p>
-                                </div>
-                                <span class="request-status completed">✓ Complete</span>
+                <div class="document-preview">
+                    <div class="document-page">
+                        <div class="document-header">
+                            <div class="document-logo"></div>
+                            <div class="document-title-lines">
+                                <div class="line-placeholder wide"></div>
+                                <div class="line-placeholder medium"></div>
                             </div>
                         </div>
-                        <div class="request-item">
-                            <div class="request-header">
-                                <div class="request-info">
-                                    <h4>Comparable Properties (3)</h4>
-                                    <p>Similar homes sold in last 12 months</p>
+                        <div class="document-section">
+                            <div class="line-placeholder narrow"></div>
+                            <div class="document-property-row">
+                                <div class="property-photo-placeholder"></div>
+                                <div class="property-lines">
+                                    <div class="line-placeholder wide"></div>
+                                    <div class="line-placeholder medium"></div>
+                                    <div class="line-placeholder short"></div>
                                 </div>
-                                <span class="request-status completed">✓ Complete</span>
                             </div>
                         </div>
-                        <div class="request-item">
-                            <div class="request-header">
-                                <div class="request-info">
-                                    <h4>Market Value Analysis</h4>
-                                    <p>Estimated savings: $280/year</p>
+                        <div class="document-section">
+                            <div class="line-placeholder narrow"></div>
+                            <div class="document-comparables">
+                                <div class="comparable-item">
+                                    <div class="comparable-photo"></div>
+                                    <div class="line-placeholder short"></div>
                                 </div>
-                                <span class="request-status completed">✓ Complete</span>
+                                <div class="comparable-item">
+                                    <div class="comparable-photo"></div>
+                                    <div class="line-placeholder short"></div>
+                                </div>
+                                <div class="comparable-item">
+                                    <div class="comparable-photo"></div>
+                                    <div class="line-placeholder short"></div>
+                                </div>
                             </div>
                         </div>
-                        <div class="request-item" style="background: #e8f5e9; border: 1px solid #2e7d32; border-left: 4px solid #2e7d32; padding: 0.875rem;">
-                            <div class="request-header">
-                                <div class="request-info">
-                                    <h4 style="color: #2e7d32;">Download PDF Report</h4>
-                                    <p style="color: #2e7d32;">Ready to attach to your appeal</p>
-                                </div>
-                                <span class="request-status" style="background: #2e7d32; color: white;">Download</span>
-                            </div>
+                        <div class="document-footer">
+                            <div class="line-placeholder wide"></div>
+                            <div class="line-placeholder medium"></div>
                         </div>
                     </div>
                 </div>
