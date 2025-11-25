@@ -82,7 +82,19 @@
 
         /* Features Section */
         .features {
-            padding: 60px 7% 100px;
+            padding: 0;
+            background: white;
+        }
+
+        .feature-section {
+            padding: 60px 7%;
+        }
+
+        .feature-section:nth-child(odd) {
+            background: #f8f9fa;
+        }
+
+        .feature-section:nth-child(even) {
             background: white;
         }
 
@@ -91,12 +103,8 @@
             grid-template-columns: 1fr 1fr;
             gap: 80px;
             max-width: 1200px;
-            margin: 0 auto 120px;
+            margin: 0 auto;
             align-items: center;
-        }
-
-        .feature-block:last-child {
-            margin-bottom: 0;
         }
 
         .feature-block.reverse {
@@ -165,8 +173,33 @@
             font-size: 3rem;
         }
 
-        /* Dashboard Mockup */
-        .dashboard-mockup {
+        /* Social Proof */
+        .social-proof {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-top: 1.5rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid #e5e5e5;
+        }
+
+        .social-proof-text {
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        .social-proof-text strong {
+            color: #1a1a1a;
+        }
+
+        .service-area-note {
+            font-size: 0.9rem;
+            color: #666;
+            margin-top: 1.5rem;
+        }
+
+        /* Hero Before/After Comparison */
+        .hero-comparison {
             width: 100%;
             background: white;
             border-radius: 12px;
@@ -175,245 +208,141 @@
             overflow: hidden;
         }
 
-        .dashboard-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+        .comparison-header {
+            text-align: center;
             margin-bottom: 1.5rem;
             padding-bottom: 1rem;
             border-bottom: 1px solid #e5e5e5;
         }
 
-        .dashboard-header h3 {
+        .comparison-header h3 {
             font-size: 1.1rem;
             font-weight: 600;
             color: #1a1a1a;
+            margin-bottom: 0.25rem;
         }
 
-        .dashboard-header span {
+        .comparison-header span {
             font-size: 0.85rem;
             color: #666;
         }
 
-        .stats-row {
+        .comparison-cards {
             display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 0.75rem;
-            margin-bottom: 1rem;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
         }
 
-        .stat-card {
+        .comparison-card {
+            padding: 1.25rem;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .comparison-card.before {
             background: #f8f9fa;
-            padding: 0.875rem;
-            border-radius: 8px;
             border: 1px solid #e5e5e5;
         }
 
-        .stat-card label {
-            font-size: 0.7rem;
-            color: #666;
-            display: block;
-            margin-bottom: 0.25rem;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
+        .comparison-card.after {
+            background: #f8f9fa;
+            border: 1px solid #e5e5e5;
         }
 
-        .stat-card .value {
-            font-size: 1.1rem;
+        .comparison-card label {
+            font-size: 0.75rem;
+            color: #666;
+            display: block;
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 600;
+        }
+
+        .comparison-card .amount {
+            font-size: 1.75rem;
             font-weight: 700;
+        }
+
+        .comparison-card.before .amount {
+            color: #dc2626;
+        }
+
+        .comparison-card.after .amount {
             color: #3171ef;
         }
 
-        .property-list {
-            display: flex;
-            flex-direction: column;
-            gap: 0.75rem;
-        }
-
-        /* Property Card Mockup */
-        .property-card-mockup {
-            background: white;
-            border: 1px solid #e5e5e5;
-            border-radius: 8px;
-            padding: 1rem;
-        }
-
-        .property-header-mockup {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1rem;
-        }
-
-        .property-address-mockup {
-            font-size: 0.9rem;
-            font-weight: 600;
-            color: #1a1a1a;
-            margin-bottom: 0.15rem;
-        }
-
-        .property-location-mockup {
-            font-size: 0.75rem;
+        .comparison-card .sub-label {
+            font-size: 0.8rem;
             color: #666;
+            margin-top: 0.25rem;
         }
 
-        .property-status-mockup {
-            font-size: 0.7rem;
-            padding: 0.3rem 0.65rem;
-            border-radius: 4px;
+        .savings-result {
+            background: #f8f9fa;
+            border: 2px solid #16a34a;
+            border-radius: 10px;
+            padding: 1.25rem;
+            text-align: center;
+        }
+
+        .savings-result label {
+            font-size: 0.8rem;
+            color: #16a34a;
             font-weight: 600;
-            white-space: nowrap;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            display: block;
+            margin-bottom: 0.5rem;
         }
 
-        .property-status-mockup.preparing {
-            background: #fff4e6;
-            color: #e67e22;
+        .savings-result .amount {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #16a34a;
         }
 
-        .property-status-mockup.complete {
-            background: #e8f5e9;
-            color: #27ae60;
+        .savings-result .per-year {
+            font-size: 0.9rem;
+            color: #555;
+            margin-top: 0.25rem;
         }
 
-        /* Progress Timeline Mockup */
-        .progress-timeline-mockup {
-            padding-top: 1rem;
-            border-top: 1px solid #f0f0f0;
+        .savings-result .view-report {
+            display: inline-block;
+            margin-top: 0.75rem;
+            font-size: 0.85rem;
+            color: #16a34a;
+            text-decoration: none;
+            font-weight: 600;
         }
 
-        .progress-steps-mockup {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            position: relative;
-            margin-bottom: 1rem;
+        .savings-result .view-report:hover {
+            text-decoration: underline;
         }
 
-        .progress-line-mockup {
-            position: absolute;
-            top: 10px;
-            left: 0;
-            right: 0;
-            height: 2px;
-            background: #e5e5e5;
-            z-index: 0;
-        }
-
-        .progress-fill-mockup {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 50%;
-            height: 100%;
-            background: #3171ef;
-        }
-
-        .progress-step-mockup {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            z-index: 1;
-            flex: 1;
-        }
-
-        .step-circle-mockup {
-            width: 22px;
-            height: 22px;
-            border-radius: 50%;
-            background: #e5e5e5;
-            border: 2px solid white;
+        /* Guarantee Badge */
+        .guarantee-badge {
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 0.6rem;
-            font-weight: 700;
-            color: #999;
-            margin-bottom: 0.4rem;
+            gap: 0.5rem;
+            margin-top: 1rem;
+            padding: 0.75rem;
+            background: #f8f9fa;
+            border: 1px solid #e5e5e5;
+            border-radius: 8px;
         }
 
-        .progress-step-mockup.completed .step-circle-mockup {
-            background: #3171ef;
-            color: white;
+        .guarantee-badge .badge-icon {
+            font-size: 1.25rem;
         }
 
-        .progress-step-mockup.active .step-circle-mockup {
-            background: #3171ef;
-            color: white;
-            box-shadow: 0 0 0 3px rgba(49, 113, 239, 0.15);
-        }
-
-        .step-label-mockup {
-            font-size: 0.65rem;
-            color: #999;
+        .guarantee-badge .badge-text {
+            font-size: 0.85rem;
+            color: #555;
             font-weight: 500;
-        }
-
-        .progress-step-mockup.completed .step-label-mockup,
-        .progress-step-mockup.active .step-label-mockup {
-            color: #1a1a1a;
-            font-weight: 600;
-        }
-
-        .progress-info-mockup {
-            display: flex;
-            justify-content: space-between;
-            align-items: baseline;
-            font-size: 0.7rem;
-            gap: 0.75rem;
-        }
-
-        .progress-status-mockup {
-            color: #3171ef;
-            font-weight: 600;
-        }
-
-        .progress-eta-mockup {
-            color: #999;
-            font-size: 0.65rem;
-            white-space: nowrap;
-        }
-
-        /* Savings Highlight Mockup */
-        .savings-highlight-mockup {
-            margin-top: 0.75rem;
-            padding: 1rem;
-            background: linear-gradient(135deg, #e8f5e9 0%, #f1f8f4 100%);
-            border-left: 3px solid #27ae60;
-            border-radius: 6px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 1rem;
-        }
-
-        .savings-info-mockup {
-            flex: 1;
-        }
-
-        .savings-label-mockup {
-            font-size: 0.65rem;
-            color: #27ae60;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.3px;
-            margin-bottom: 0.35rem;
-        }
-
-        .savings-amount-mockup {
-            font-size: 1.4rem;
-            font-weight: 700;
-            color: #27ae60;
-        }
-
-        .btn-view-report-mockup {
-            background: #27ae60;
-            color: white;
-            padding: 0.6rem 1.2rem;
-            border-radius: 5px;
-            font-weight: 600;
-            font-size: 0.75rem;
-            border: none;
-            white-space: nowrap;
         }
 
         /* Financial Tracking Mockup */
@@ -606,7 +535,7 @@
 
         /* Pricing Section */
         .pricing-section {
-            padding: 60px 7%;
+            padding: 40px 7% 80px;
             background: #f8f9fa;
         }
 
@@ -619,76 +548,194 @@
         }
 
         .pricing-content {
-            max-width: 1000px;
+            max-width: 900px;
             margin: 0 auto;
             background: white;
-            border-radius: 12px;
-            padding: 2.5rem;
-            display: grid;
-            grid-template-columns: 1fr 2fr;
-            gap: 2.5rem;
-            align-items: center;
+            border-radius: 16px;
+            padding: 0;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
         }
 
-        .pricing-left {
-            border-right: 1px solid #e5e5e5;
-            padding-right: 2.5rem;
-        }
-
-        .pricing-tier {
-            font-size: 0.9rem;
-            font-weight: 600;
-            color: #666;
-            margin-bottom: 0.75rem;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .pricing-amount {
-            font-size: 3rem;
-            font-weight: 700;
-            color: #3171ef;
-            margin-bottom: 0.25rem;
-        }
-
-        .pricing-period {
-            color: #666;
-            font-size: 0.95rem;
-            margin-bottom: 1.5rem;
-        }
-
-        .pricing-right {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .pricing-features {
-            list-style: none;
+        .pricing-steps {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 0.75rem 1.5rem;
-            margin-bottom: 0;
         }
 
-        .pricing-features li {
+        .pricing-step {
+            padding: 2.5rem;
+            text-align: center;
+        }
+
+        .pricing-step.free {
+            background: #f8f9fa;
+            border-right: 1px solid #e5e5e5;
+        }
+
+        .pricing-step.paid {
+            background: white;
+        }
+
+        .step-number {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            background: #3171ef;
+            border-radius: 50%;
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: white;
+            margin-bottom: 1rem;
+        }
+
+        .pricing-step h3 {
+            font-size: 1.1rem;
+            font-weight: 600;
             color: #1a1a1a;
-            font-size: 0.95rem;
-            position: relative;
-            padding-left: 1.5rem;
+            margin-bottom: 0.5rem;
         }
 
-        .pricing-features li::before {
+        .pricing-step .price {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 0.25rem;
+            color: #1a1a1a;
+        }
+
+        .pricing-step .price-desc {
+            font-size: 0.9rem;
+            color: #666;
+            margin-bottom: 1rem;
+        }
+
+        .pricing-step ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            text-align: left;
+        }
+
+        .pricing-step li {
+            font-size: 0.9rem;
+            color: #555;
+            padding: 0.4rem 0;
+            padding-left: 1.5rem;
+            position: relative;
+        }
+
+        .pricing-step li::before {
             content: '✓';
             position: absolute;
             left: 0;
-            color: #2e7d32;
+            color: #3171ef;
             font-weight: bold;
+        }
+
+        .pricing-footer {
+            padding: 1.5rem 2.5rem;
+            background: #f8f9fa;
+            border-top: 1px solid #e5e5e5;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .pricing-footer p {
+            font-size: 0.9rem;
+            color: #666;
+            margin: 0;
+            flex: 1;
+        }
+
+        .pricing-footer strong {
+            color: #1a1a1a;
+        }
+
+        /* FAQ Section */
+        .faq-section {
+            padding: 60px 7%;
+            background: white;
+        }
+
+        .faq-section h2 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #1a1a1a;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .faq-list {
+            max-width: 700px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .faq-item {
+            background: #f8f9fa;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .faq-question {
+            width: 100%;
+            padding: 1rem 1.25rem;
+            background: none;
+            border: none;
+            text-align: left;
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: #1a1a1a;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+            font-family: inherit;
+        }
+
+        .faq-question:hover {
+            background: #f0f0f0;
+        }
+
+        .faq-icon {
+            font-size: 1.25rem;
+            color: #666;
+            transition: transform 0.2s;
+            flex-shrink: 0;
+        }
+
+        .faq-item.open .faq-icon {
+            transform: rotate(45deg);
+        }
+
+        .faq-answer {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+
+        .faq-item.open .faq-answer {
+            max-height: 200px;
+        }
+
+        .faq-answer p {
+            padding: 0 1.25rem 1rem;
+            font-size: 0.9rem;
+            color: #555;
+            line-height: 1.6;
+            margin: 0;
         }
 
         /* CTA Section */
         .cta-section {
-            padding: 60px 7%;
-            background: #3171ef;
+            padding: 80px 7%;
+            background: linear-gradient(135deg, #3171ef 0%, #1e56c7 100%);
             text-align: center;
             color: white;
         }
@@ -699,13 +746,13 @@
         }
 
         .cta-section h2 {
-            font-size: 2rem;
+            font-size: 2.25rem;
             font-weight: 700;
             margin-bottom: 0.75rem;
         }
 
         .cta-section p {
-            font-size: 1.05rem;
+            font-size: 1.1rem;
             margin-bottom: 1.5rem;
             opacity: 0.95;
         }
@@ -713,6 +760,27 @@
         .btn-white {
             background: white;
             color: #3171ef;
+            padding: 1rem 2.5rem;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1.05rem;
+            display: inline-block;
+            transition: all 0.2s;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn-white:hover {
+            background: #f0f0f0;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+        }
+
+        /* Secondary CTA style */
+        .btn-secondary {
+            background: transparent;
+            color: #3171ef;
+            border: 2px solid #3171ef;
             padding: 0.9rem 2rem;
             border-radius: 6px;
             text-decoration: none;
@@ -722,9 +790,9 @@
             transition: all 0.2s;
         }
 
-        .btn-white:hover {
-            background: #f0f0f0;
-            transform: translateY(-2px);
+        .btn-secondary:hover {
+            background: #3171ef;
+            color: white;
         }
 
         .cta-preview {
@@ -820,14 +888,46 @@
                 font-size: 1.1rem;
             }
 
-            .features {
+            /* Hero comparison mobile */
+            .hero-comparison {
+                padding: 1.25rem;
+            }
+
+            .comparison-header h3 {
+                font-size: 1rem;
+            }
+
+            .comparison-cards {
+                grid-template-columns: 1fr;
+                gap: 0.75rem;
+            }
+
+            .comparison-card {
+                padding: 1rem;
+            }
+
+            .comparison-card .amount {
+                font-size: 1.5rem;
+            }
+
+            .savings-result .amount {
+                font-size: 1.75rem;
+            }
+
+            .guarantee-badge {
+                flex-direction: column;
+                text-align: center;
+                gap: 0.25rem;
+            }
+
+            /* Feature sections mobile */
+            .feature-section {
                 padding: 60px 5%;
             }
 
             .feature-block {
                 grid-template-columns: 1fr;
                 gap: 40px;
-                margin-bottom: 80px;
             }
 
             .feature-block.reverse {
@@ -835,13 +935,16 @@
             }
 
             .feature-content h2 {
-                font-size: 2rem;
+                font-size: 1.75rem;
             }
 
-            .pricing-section,
-            .testimonials,
-            .cta-section {
-                padding: 40px 5%;
+            .feature-content p {
+                font-size: 1rem;
+            }
+
+            /* Pricing mobile */
+            .pricing-section {
+                padding: 60px 5%;
             }
 
             .pricing-section h2 {
@@ -849,29 +952,45 @@
                 margin-bottom: 2rem;
             }
 
-            .pricing-content {
+            .pricing-steps {
                 grid-template-columns: 1fr;
-                gap: 2rem;
+            }
+
+            .pricing-step {
                 padding: 2rem;
             }
 
-            .pricing-left {
+            .pricing-step.free {
                 border-right: none;
                 border-bottom: 1px solid #e5e5e5;
-                padding-right: 0;
-                padding-bottom: 2rem;
             }
 
-            .pricing-amount {
+            .pricing-step .price {
                 font-size: 2.5rem;
             }
 
-            .pricing-features {
-                grid-template-columns: 1fr;
+            .pricing-footer {
+                flex-direction: column;
+                text-align: center;
+                padding: 1.5rem;
             }
 
-            .section-header h2 {
-                font-size: 2rem;
+            .pricing-footer p {
+                margin-bottom: 1rem;
+            }
+
+            /* FAQ mobile */
+            .faq-section {
+                padding: 40px 5%;
+            }
+
+            .faq-section h2 {
+                font-size: 1.75rem;
+            }
+
+            /* CTA mobile */
+            .cta-section {
+                padding: 60px 5%;
             }
 
             .cta-section h2 {
@@ -882,28 +1001,7 @@
                 font-size: 1rem;
             }
 
-            .dashboard-mockup {
-                padding: 1rem;
-            }
-
-            .dashboard-header h3 {
-                font-size: 1rem;
-            }
-
-            .stats-row {
-                grid-template-columns: 1fr;
-            }
-
-            .stat-card {
-                padding: 0.5rem;
-            }
-
-            .property-card {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 0.5rem;
-            }
-
+            /* Feature mockups mobile */
             .financial-mockup,
             .maintenance-mockup {
                 padding: 1rem;
@@ -927,6 +1025,41 @@
             .request-header {
                 flex-direction: column;
                 gap: 0.5rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .hero h1 {
+                font-size: 2rem;
+            }
+
+            .hero-cta {
+                padding: 1rem 2rem;
+                font-size: 1rem;
+                width: 100%;
+                text-align: center;
+            }
+
+            .comparison-card .amount {
+                font-size: 1.25rem;
+            }
+
+            .savings-result .amount {
+                font-size: 1.5rem;
+            }
+
+            .feature-content h2 {
+                font-size: 1.5rem;
+            }
+
+            .pricing-step .price {
+                font-size: 2rem;
+            }
+
+            .btn-white {
+                padding: 1rem 2rem;
+                width: 100%;
+                text-align: center;
             }
         }
     </style>
@@ -958,43 +1091,31 @@
     <section class="hero">
         <div class="hero-content">
             <h1>Save hundreds on property taxes</h1>
-            <p class="hero-subtitle">Get a free assessment to see if you're overpaying. Only pay if we find savings.</p>
+            <p class="hero-subtitle">Get a free assessment to see if you're overpaying. Only pay if we find savings. Currently serving Georgia.</p>
             <a href="#" class="hero-cta" onclick="handleSignUp(event)">Get My Free Assessment</a>
         </div>
         <div class="hero-image">
-            <div class="dashboard-mockup">
-                <div class="dashboard-header">
-                    <h3>Your Property Assessment</h3>
-                    <span>Atlanta, GA</span>
+            <div class="hero-comparison">
+                <div class="comparison-header">
+                    <h3>123 Oak Street</h3>
+                    <span>3 bed, 2 bath • 1,850 sq ft</span>
                 </div>
-                <div class="stats-row">
-                    <div class="stat-card">
-                        <label>Potentially Overvalued By</label>
-                        <div class="value" style="color: #d32f2f;">$43,127.00</div>
+                <div class="comparison-cards">
+                    <div class="comparison-card before">
+                        <label>County Assessment</label>
+                        <div class="amount">$425,000</div>
+                        <div class="sub-label">Current value</div>
                     </div>
-                    <div class="stat-card">
-                        <label>Current Annual Tax</label>
-                        <div class="value" style="color: #3171ef;">$3,847.26</div>
+                    <div class="comparison-card after">
+                        <label>Market Value</label>
+                        <div class="amount">$397,000</div>
+                        <div class="sub-label">Based on comparables</div>
                     </div>
                 </div>
-                <div class="property-list">
-                    <!-- Completed Property Card -->
-                    <div class="property-card-mockup">
-                        <div class="property-header-mockup">
-                            <div>
-                                <div class="property-address-mockup">123 Oak Street</div>
-                                <div class="property-location-mockup">3 bed, 2 bath • 1,850 sq ft</div>
-                            </div>
-                            <span class="property-status-mockup complete">Complete</span>
-                        </div>
-                        <div class="savings-highlight-mockup">
-                            <div class="savings-info-mockup">
-                                <div class="savings-label-mockup">Potential Annual Savings</div>
-                                <div class="savings-amount-mockup">$645.23</div>
-                            </div>
-                            <button class="btn-view-report-mockup">View Report</button>
-                        </div>
-                    </div>
+                <div class="savings-result">
+                    <label>Your Potential Annual Savings</label>
+                    <div class="amount">$280</div>
+                    <div class="per-year">per year in property taxes</div>
                 </div>
             </div>
         </div>
@@ -1002,6 +1123,7 @@
 
     <!-- Features Section -->
     <section id="how-it-works" class="features">
+        <div class="feature-section">
         <div class="feature-block reverse">
             <div class="feature-content">
                 <h2>We find comparable properties</h2>
@@ -1021,11 +1143,11 @@
                     <div class="financial-summary">
                         <div class="financial-stat">
                             <label>Assessed Value</label>
-                            <div class="amount" style="color: #d32f2f;">$385,000</div>
+                            <div class="amount" style="color: #1a1a1a;">$425,000</div>
                         </div>
                         <div class="financial-stat">
                             <label>Avg Comparable</label>
-                            <div class="amount positive">$342,000</div>
+                            <div class="amount" style="color: #1a1a1a;">$397,000</div>
                         </div>
                     </div>
                     <div class="transaction-list">
@@ -1034,27 +1156,29 @@
                                 <h4>118 Oak Street</h4>
                                 <p>3 bed, 2 bath • 1,900 sq ft • Sold Aug 2025</p>
                             </div>
-                            <div class="transaction-amount" style="color: #1976d2; font-weight: 700;">$338,500</div>
+                            <div class="transaction-amount" style="color: #1a1a1a; font-weight: 700;">$392,000</div>
                         </div>
                         <div class="transaction-item">
                             <div class="transaction-details">
                                 <h4>215 Elm Drive</h4>
                                 <p>3 bed, 2 bath • 1,820 sq ft • Sold Jul 2025</p>
                             </div>
-                            <div class="transaction-amount" style="color: #1976d2; font-weight: 700;">$345,900</div>
+                            <div class="transaction-amount" style="color: #1a1a1a; font-weight: 700;">$401,500</div>
                         </div>
                         <div class="transaction-item">
                             <div class="transaction-details">
                                 <h4>892 Maple Court</h4>
                                 <p>3 bed, 2 bath • 1,875 sq ft • Sold Sep 2025</p>
                             </div>
-                            <div class="transaction-amount" style="color: #1976d2; font-weight: 700;">$341,200</div>
+                            <div class="transaction-amount" style="color: #1a1a1a; font-weight: 700;">$398,200</div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
+        </div>
 
+        <div class="feature-section">
         <div class="feature-block">
             <div class="feature-content">
                 <h2>Report ready for your appeal</h2>
@@ -1095,7 +1219,7 @@
                             <div class="request-header">
                                 <div class="request-info">
                                     <h4>Market Value Analysis</h4>
-                                    <p>Estimated savings: $645/year</p>
+                                    <p>Estimated savings: $280/year</p>
                                 </div>
                                 <span class="request-status completed">✓ Complete</span>
                             </div>
@@ -1113,7 +1237,9 @@
                 </div>
             </div>
         </div>
+        </div>
 
+        <div class="feature-section">
         <div class="feature-block reverse">
             <div class="feature-content">
                 <h2>Simple 5-minute process</h2>
@@ -1136,33 +1262,94 @@
                 </div>
             </div>
         </div>
+        </div>
     </section>
 
     <!-- Pricing Section -->
     <section id="pricing" class="pricing-section">
-        <h2>Pay only if we find savings</h2>
+        <h2>Simple, transparent pricing</h2>
         <div class="pricing-content">
-            <div class="pricing-left">
-                <div class="pricing-tier" style="margin-bottom: 0.5rem;">Simple Pricing</div>
-                <div class="pricing-amount" style="margin-bottom: 0.25rem;">Free</div>
-                <p class="pricing-period" style="margin-bottom: 0.25rem;">to see your savings</p>
-                <p style="margin: 0 0 1.5rem 0; font-size: 0.9rem; color: #666; line-height: 1.4;">
-                    <strong style="color: #3171ef;">$49</strong> for the full PDF report.
-                </p>
-                <a href="#" class="hero-cta" onclick="handleSignUp(event)">Get Started</a>
+            <div class="pricing-steps">
+                <div class="pricing-step free">
+                    <div class="step-number">1</div>
+                    <h3>Free Assessment</h3>
+                    <div class="price">$0</div>
+                    <div class="price-desc">See your potential savings</div>
+                    <ul>
+                        <li>Enter your property address</li>
+                        <li>We analyze comparable sales</li>
+                        <li>See estimated savings</li>
+                        <li>No credit card required</li>
+                    </ul>
+                </div>
+                <div class="pricing-step paid">
+                    <div class="step-number">2</div>
+                    <h3>Full Report</h3>
+                    <div class="price">$49</div>
+                    <div class="price-desc">Only if we find savings</div>
+                    <ul>
+                        <li>Professional PDF report</li>
+                        <li>3-5 comparable properties</li>
+                        <li>Property photos & details</li>
+                        <li>Ready for your appeal</li>
+                    </ul>
+                </div>
             </div>
-            <div class="pricing-right">
-                <ul class="pricing-features">
-                    <li>Free property tax assessment</li>
-                    <li>See potential savings first</li>
-                    <li>3-5 comparable properties</li>
-                    <li>Professional PDF report</li>
-                    <li>Property photos & details</li>
-                    <li>Ready for property tax appeals</li>
-                </ul>
-                <p style="margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid #e5e5e5; color: #666; font-size: 0.95rem;">
-                    <strong style="color: #1a1a1a;">Risk-free guarantee:</strong> If we don't find any savings, you pay nothing. Most customers save $500+ per year in property taxes.
-                </p>
+            <div class="pricing-footer">
+                <p><strong>Risk-free guarantee:</strong> If we don't find any savings, you pay nothing.</p>
+                <a href="#" class="hero-cta" onclick="handleSignUp(event)">Get Started Free</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQ Section -->
+    <section class="faq-section">
+        <h2>Frequently asked questions</h2>
+        <div class="faq-list">
+            <div class="faq-item">
+                <button class="faq-question">
+                    <span>How does the appeal process work?</span>
+                    <span class="faq-icon">+</span>
+                </button>
+                <div class="faq-answer">
+                    <p>Once you receive your report, you submit it along with your appeal form to your county assessor's office. The report provides the comparable property evidence needed to support your case for a lower assessment.</p>
+                </div>
+            </div>
+            <div class="faq-item">
+                <button class="faq-question">
+                    <span>When should I file my appeal?</span>
+                    <span class="faq-icon">+</span>
+                </button>
+                <div class="faq-answer">
+                    <p>Appeal deadlines vary by county in Georgia, typically 45 days after you receive your assessment notice. We recommend starting your assessment with us as soon as you receive your notice.</p>
+                </div>
+            </div>
+            <div class="faq-item">
+                <button class="faq-question">
+                    <span>What if you don't find any savings?</span>
+                    <span class="faq-icon">+</span>
+                </button>
+                <div class="faq-answer">
+                    <p>If our analysis shows your property is fairly assessed or we can't find comparable properties that support a lower value, you pay nothing. The initial assessment is always free.</p>
+                </div>
+            </div>
+            <div class="faq-item">
+                <button class="faq-question">
+                    <span>What areas do you service?</span>
+                    <span class="faq-icon">+</span>
+                </button>
+                <div class="faq-answer">
+                    <p>We currently serve homeowners throughout Georgia. We're working on expanding to other states soon. Enter your address to see if we can help with your property.</p>
+                </div>
+            </div>
+            <div class="faq-item">
+                <button class="faq-question">
+                    <span>How long does it take to get my report?</span>
+                    <span class="faq-icon">+</span>
+                </button>
+                <div class="faq-answer">
+                    <p>Most reports are ready within 24 hours of entering your property. We'll email you as soon as your assessment is complete and ready to download.</p>
+                </div>
             </div>
         </div>
     </section>
@@ -1170,13 +1357,10 @@
     <!-- CTA Section -->
     <section id="contact" class="cta-section">
         <div class="cta-content">
-            <h2>Find out if you're overpaying</h2>
-            <p>Get a free assessment in 5 minutes. Pay only if we find savings. Most customers save $500+ per year.</p>
+            <h2>Ready to lower your property taxes?</h2>
+            <p>Get your free assessment in minutes. Only pay if we find savings.</p>
             <a href="#" class="btn-white" onclick="handleSignUp(event)">Get My Free Assessment</a>
-            <p style="margin-top: 1rem; font-size: 0.9rem; opacity: 0.85;">No credit card required • Pay only if we find savings</p>
-        </div>
-        <div class="cta-preview">
-            <div class="interface-placeholder">📊</div>
+            <p style="margin-top: 1rem; font-size: 0.9rem; opacity: 0.85;">No credit card required • Results in 24 hours</p>
         </div>
     </section>
 
@@ -1294,6 +1478,14 @@
                         });
                     }
                 }
+            });
+        });
+
+        // FAQ accordion
+        document.querySelectorAll('.faq-question').forEach(button => {
+            button.addEventListener('click', function() {
+                const item = this.parentElement;
+                item.classList.toggle('open');
             });
         });
     </script>
