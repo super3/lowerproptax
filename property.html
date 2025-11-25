@@ -250,9 +250,7 @@
             font-size: 0.85rem;
             white-space: nowrap;
             transition: all 0.2s;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
+            align-self: center;
         }
 
         .btn-download:hover {
@@ -454,7 +452,7 @@
             if (status === 'ready' && latestAssessment && latestAssessment.reportUrl) {
                 const downloadBtn = document.getElementById('download-report');
                 downloadBtn.href = latestAssessment.reportUrl;
-                downloadBtn.style.display = 'inline-flex';
+                downloadBtn.style.display = 'block';
             }
         }
 
