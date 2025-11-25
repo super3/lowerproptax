@@ -59,6 +59,16 @@
         }
 
         /* Three-dot menu */
+        .year-badge {
+            background: #f0f4ff;
+            color: #3171ef;
+            padding: 0.25rem 0.6rem;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-left: 0.75rem;
+        }
+
         .menu-container {
             position: relative;
             margin-left: 1rem;
@@ -281,7 +291,10 @@
         <div class="property-card" id="property-card">
             <div class="property-header">
                 <div class="property-info">
-                    <div class="property-address" id="property-address">Loading...</div>
+                    <div style="display: flex; align-items: center;">
+                        <div class="property-address" id="property-address">Loading...</div>
+                        <span class="year-badge" id="year-badge" style="display: none;"></span>
+                    </div>
                     <div class="property-details" id="property-details"></div>
                 </div>
                 <div class="menu-container">
@@ -394,9 +407,11 @@
                 countyValueEl.classList.remove('preparing');
             }
 
-            // Update county label with year if available
+            // Update year badge if available
             if (latestAssessment && latestAssessment.year) {
-                document.getElementById('county-label').textContent = `County Assessment (${latestAssessment.year})`;
+                const yearBadge = document.getElementById('year-badge');
+                yearBadge.textContent = latestAssessment.year;
+                yearBadge.style.display = 'inline-block';
             }
 
             // Market Value (estimated appraised value)
