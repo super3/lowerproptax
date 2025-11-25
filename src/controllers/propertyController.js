@@ -9,33 +9,61 @@ export async function resetProperties() {
 export async function getProperties(req, res) {
   try {
     const userId = req.user.id;
+
+    // Single query with LEFT JOIN to get properties and their latest assessments
     const result = await pool.query(
-      `SELECT id, user_id as "userId", address, city, state,
-              zip_code as "zipCode", country, lat, lng,
-              bedrooms, bathrooms, sqft,
-              created_at as "createdAt", updated_at as "updatedAt"
-       FROM properties WHERE user_id = $1 ORDER BY created_at DESC`,
+      `SELECT p.id, p.user_id as "userId", p.address, p.city, p.state,
+              p.zip_code as "zipCode", p.country, p.lat, p.lng,
+              p.bedrooms, p.bathrooms, p.sqft,
+              p.created_at as "createdAt", p.updated_at as "updatedAt",
+              a.id as "assessmentId", a.year as "assessmentYear",
+              a.appraised_value as "assessmentAppraisedValue",
+              a.annual_tax as "assessmentAnnualTax",
+              a.estimated_appraised_value as "assessmentEstimatedAppraisedValue",
+              a.estimated_annual_tax as "assessmentEstimatedAnnualTax",
+              a.report_url as "assessmentReportUrl",
+              a.status as "assessmentStatus",
+              a.created_at as "assessmentCreatedAt",
+              a.updated_at as "assessmentUpdatedAt"
+       FROM properties p
+       LEFT JOIN (
+         SELECT DISTINCT ON (property_id) *
+         FROM assessments
+         ORDER BY property_id, year DESC
+       ) a ON a.property_id = p.id
+       WHERE p.user_id = $1
+       ORDER BY p.created_at DESC`,
       [userId]
     );
 
-    // Get latest assessment for each property
-    const properties = await Promise.all(result.rows.map(async (property) => {
-      const assessmentResult = await pool.query(
-        `SELECT id, year, appraised_value as "appraisedValue",
-                annual_tax as "annualTax", estimated_appraised_value as "estimatedAppraisedValue",
-                estimated_annual_tax as "estimatedAnnualTax", report_url as "reportUrl",
-                status, created_at as "createdAt", updated_at as "updatedAt"
-         FROM assessments
-         WHERE property_id = $1
-         ORDER BY year DESC
-         LIMIT 1`,
-        [property.id]
-      );
-
-      return {
-        ...property,
-        latestAssessment: assessmentResult.rows[0] || null
-      };
+    // Transform flat rows into nested structure
+    const properties = result.rows.map(row => ({
+      id: row.id,
+      userId: row.userId,
+      address: row.address,
+      city: row.city,
+      state: row.state,
+      zipCode: row.zipCode,
+      country: row.country,
+      lat: row.lat,
+      lng: row.lng,
+      bedrooms: row.bedrooms,
+      bathrooms: row.bathrooms,
+      sqft: row.sqft,
+      createdAt: row.createdAt,
+      updatedAt: row.updatedAt,
+      latestAssessment: row.assessmentId ? {
+        id: row.assessmentId,
+        year: row.assessmentYear,
+        appraisedValue: row.assessmentAppraisedValue,
+        annualTax: row.assessmentAnnualTax,
+        estimatedAppraisedValue: row.assessmentEstimatedAppraisedValue,
+        estimatedAnnualTax: row.assessmentEstimatedAnnualTax,
+        reportUrl: row.assessmentReportUrl,
+        status: row.assessmentStatus,
+        createdAt: row.assessmentCreatedAt,
+        updatedAt: row.assessmentUpdatedAt
+      } : null
     }));
 
     res.json(properties);

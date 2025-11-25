@@ -1,5 +1,16 @@
 // Mock in-memory database for testing when PostgreSQL is not available
 const mockData = new Map();
+const mockAssessments = new Map();
+
+// Helper to add an assessment to a property for testing
+export function addMockAssessment(propertyId, assessment) {
+  mockAssessments.set(propertyId, assessment);
+}
+
+// Helper to clear assessments
+export function clearMockAssessments() {
+  mockAssessments.clear();
+}
 
 export function createMockPool() {
   return {
@@ -40,12 +51,28 @@ export function createMockPool() {
         return { rows: [property], rowCount: 1 };
       }
 
-      // SELECT all for user
-      if (sqlUpper.includes('ORDER BY CREATED_AT DESC')) {
+      // SELECT all for user (with LEFT JOIN for assessments)
+      if (sqlUpper.includes('ORDER BY P.CREATED_AT DESC') || sqlUpper.includes('ORDER BY CREATED_AT DESC')) {
         const userId = params[0];
-        const properties = Array.from(mockData.values()).filter(
-          p => p.userId === userId
-        );
+        const properties = Array.from(mockData.values())
+          .filter(p => p.userId === userId)
+          .map(p => {
+            const assessment = mockAssessments.get(p.id);
+            return {
+              ...p,
+              // Include assessment fields from mockAssessments or null
+              assessmentId: assessment?.id || null,
+              assessmentYear: assessment?.year || null,
+              assessmentAppraisedValue: assessment?.appraisedValue || null,
+              assessmentAnnualTax: assessment?.annualTax || null,
+              assessmentEstimatedAppraisedValue: assessment?.estimatedAppraisedValue || null,
+              assessmentEstimatedAnnualTax: assessment?.estimatedAnnualTax || null,
+              assessmentReportUrl: assessment?.reportUrl || null,
+              assessmentStatus: assessment?.status || null,
+              assessmentCreatedAt: assessment?.createdAt || null,
+              assessmentUpdatedAt: assessment?.updatedAt || null
+            };
+          });
         return { rows: properties, rowCount: properties.length };
       }
 

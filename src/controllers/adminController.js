@@ -22,12 +22,10 @@ export async function getPendingProperties(req, res) {
 
     const result = await pool.query(query);
 
-    // For now, we don't have user email in the database
-    // In production, you'd join with a users table or fetch from Clerk
+    // Ensure status defaults to 'preparing' if null
     const properties = result.rows.map(prop => ({
       ...prop,
-      status: prop.status || 'preparing',
-      user_email: null  // TODO: Fetch from Clerk API using user_id
+      status: prop.status || 'preparing'
     }));
 
     res.json(properties);
@@ -60,14 +58,7 @@ export async function getCompletedProperties(req, res) {
 
     const result = await pool.query(query);
 
-    // For now, we don't have user email in the database
-    // In production, you'd join with a users table or fetch from Clerk
-    const properties = result.rows.map(prop => ({
-      ...prop,
-      user_email: null  // TODO: Fetch from Clerk API using user_id
-    }));
-
-    res.json(properties);
+    res.json(result.rows);
   } catch (error) {
     console.error('Error fetching completed properties:', error);
     res.status(500).json({ error: 'Failed to fetch completed properties' });

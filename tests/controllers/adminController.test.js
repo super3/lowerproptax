@@ -61,11 +61,11 @@ describe('Admin Controller', () => {
         expect.arrayContaining([
           expect.objectContaining({
             id: 'prop1',
-            user_email: null
+            status: 'preparing'
           }),
           expect.objectContaining({
             id: 'prop2',
-            user_email: null
+            status: 'preparing'
           })
         ])
       );
@@ -101,8 +101,7 @@ describe('Admin Controller', () => {
         expect.arrayContaining([
           expect.objectContaining({
             id: 'prop1',
-            status: 'preparing',
-            user_email: null
+            status: 'preparing'
           })
         ])
       );
@@ -143,7 +142,7 @@ describe('Admin Controller', () => {
         expect.arrayContaining([
           expect.objectContaining({
             id: 'prop3',
-            user_email: null
+            status: 'ready'
           })
         ])
       );

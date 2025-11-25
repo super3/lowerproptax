@@ -4,6 +4,7 @@ import {
   createMockResponse,
   mockUser
 } from '../utils/mockClerk.js';
+import { addMockAssessment, clearMockAssessments } from '../utils/mockDatabase.js';
 
 // Import the controller
 const propertyController = await import('../../src/controllers/propertyController.js');
@@ -14,6 +15,7 @@ describe('Property Controller', () => {
   beforeEach(async () => {
     // Reset properties storage before each test
     await propertyController.resetProperties();
+    clearMockAssessments();
 
     req = createMockRequest({
       user: { id: mockUser.id }
@@ -67,6 +69,44 @@ describe('Property Controller', () => {
       expect(properties).toHaveLength(1);
       expect(properties[0].userId).toBe(mockUser.id);
       expect(properties[0].address).toBe(property1.address);
+    });
+
+    test('should return properties with their latest assessment', async () => {
+      // Create a property
+      req.body = {
+        address: '789 Pine St',
+        city: 'Denver',
+        state: 'CO',
+        zipCode: '80201'
+      };
+      await propertyController.createProperty(req, res);
+      const createdProperty = res.json.mock.calls[0][0];
+
+      // Add an assessment for this property
+      addMockAssessment(createdProperty.id, {
+        id: 'assess_123',
+        year: 2024,
+        appraisedValue: 350000,
+        annualTax: 7000,
+        estimatedAppraisedValue: 320000,
+        estimatedAnnualTax: 6400,
+        reportUrl: 'https://example.com/report.pdf',
+        status: 'ready',
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      });
+
+      // Reset mocks and get properties
+      res.json.mockClear();
+      await propertyController.getProperties(req, res);
+
+      const properties = res.json.mock.calls[0][0];
+      expect(properties).toHaveLength(1);
+      expect(properties[0].latestAssessment).not.toBeNull();
+      expect(properties[0].latestAssessment.id).toBe('assess_123');
+      expect(properties[0].latestAssessment.year).toBe(2024);
+      expect(properties[0].latestAssessment.appraisedValue).toBe(350000);
+      expect(properties[0].latestAssessment.status).toBe('ready');
     });
   });
 
