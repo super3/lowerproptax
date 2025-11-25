@@ -37,6 +37,6 @@ npm test                           # Run test suite
 - [ ] Handle 2025, 2026 assessment years
 - [ ] Tax deadlines tracking
 - [ ] Property tax appeal guidance
-- [x] Add Comparable Properties to App?
+- [x] ~~Add Comparable Properties to App?~~
 - [ ] Payment processing (Stripe) - require payment before viewing assessment reports
 - [ ] Mobile app (iOS & Android)
