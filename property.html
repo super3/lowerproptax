@@ -338,7 +338,7 @@
                     <label>Potential Annual Savings</label>
                     <div class="amount preparing" id="potential-savings">--</div>
                 </div>
-                <a class="btn-download" id="download-report" style="display: none;" target="_blank">Download Report</a>
+                <a class="btn-download" id="download-report" target="_blank">Download Report</a>
             </div>
         </div>
     </div>
@@ -448,11 +448,12 @@
                 savingsResultEl.classList.remove('preparing');
             }
 
-            // Show download button and set URL when report is available
+            // Set download button URL when report is available
+            const downloadBtn = document.getElementById('download-report');
             if (status === 'ready' && latestAssessment && latestAssessment.reportUrl) {
-                const downloadBtn = document.getElementById('download-report');
                 downloadBtn.href = latestAssessment.reportUrl;
-                downloadBtn.style.display = 'block';
+            } else {
+                downloadBtn.style.visibility = 'hidden';
             }
         }
 
