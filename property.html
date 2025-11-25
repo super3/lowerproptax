@@ -59,16 +59,6 @@
         }
 
         /* Three-dot menu */
-        .year-badge {
-            background: #f0f4ff;
-            color: #3171ef;
-            padding: 0.25rem 0.6rem;
-            border-radius: 4px;
-            font-size: 0.85rem;
-            font-weight: 600;
-            margin-left: 0.75rem;
-        }
-
         .menu-container {
             position: relative;
             margin-left: 1rem;
@@ -303,12 +293,10 @@
         <div class="property-card" id="property-card">
             <div class="property-header">
                 <div class="property-info">
-                    <div style="display: flex; align-items: center;">
-                        <div class="property-address" id="property-address">Loading...</div>
-                        <span class="year-badge" id="year-badge" style="display: none;"></span>
-                    </div>
+                    <div class="property-address" id="property-address">Loading...</div>
                     <div class="property-details" id="property-details"></div>
                 </div>
+                <span class="property-status" id="property-status"></span>
                 <div class="menu-container">
                     <button class="menu-button" id="menu-button">⋮</button>
                     <div class="menu-dropdown" id="menu-dropdown">
@@ -419,12 +407,24 @@
                 countyValueEl.classList.remove('preparing');
             }
 
-            // Update year badge if available
-            if (latestAssessment && latestAssessment.year) {
-                const yearBadge = document.getElementById('year-badge');
-                yearBadge.textContent = latestAssessment.year;
-                yearBadge.style.display = 'inline-block';
+            // Update status badge with year
+            const statusBadge = document.getElementById('property-status');
+            const year = latestAssessment?.year || '';
+            let statusText, statusClass;
+
+            if (status === 'invalid') {
+                statusText = 'Unable';
+                statusClass = 'status-invalid';
+            } else if (status === 'preparing') {
+                statusText = 'In Progress';
+                statusClass = 'status-preparing';
+            } else {
+                statusText = 'Complete';
+                statusClass = 'status-ready';
             }
+
+            statusBadge.textContent = year ? `${year} ${statusText}` : statusText;
+            statusBadge.classList.add(statusClass);
 
             // Market Value (estimated appraised value)
             const marketValueEl = document.getElementById('market-value');
