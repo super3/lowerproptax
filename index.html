@@ -759,81 +759,6 @@
             font-weight: bold;
         }
 
-        /* Testimonials */
-        .testimonials {
-            padding: 100px 7%;
-            background: white;
-        }
-
-        .section-header {
-            text-align: center;
-            margin-bottom: 60px;
-        }
-
-        .section-header h2 {
-            font-size: 2.5rem;
-            font-weight: 700;
-            color: #1a1a1a;
-            margin-bottom: 1rem;
-        }
-
-        .section-header p {
-            font-size: 1.15rem;
-            color: #666;
-        }
-
-        .testimonials-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-            gap: 2rem;
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
-        .testimonial-card {
-            background: #f8f9fa;
-            padding: 2.5rem;
-            border-radius: 12px;
-        }
-
-        .testimonial-text {
-            color: #1a1a1a;
-            font-size: 1.05rem;
-            line-height: 1.7;
-            margin-bottom: 2rem;
-        }
-
-        .testimonial-author {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-        }
-
-        .author-avatar {
-            width: 48px;
-            height: 48px;
-            border-radius: 50%;
-            background: #3171ef;
-            color: white;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 600;
-            font-size: 1rem;
-        }
-
-        .author-info h4 {
-            font-size: 1rem;
-            font-weight: 600;
-            color: #1a1a1a;
-            margin-bottom: 0.25rem;
-        }
-
-        .author-info p {
-            font-size: 0.9rem;
-            color: #666;
-        }
-
         /* CTA Section */
         .cta-section {
             padding: 60px 7%;
@@ -940,6 +865,48 @@
             font-size: 1.5rem;
             cursor: pointer;
             color: #1a1a1a;
+            z-index: 1001;
+        }
+
+        .mobile-menu {
+            display: none;
+            position: fixed;
+            top: 72px;
+            left: 0;
+            right: 0;
+            background: white;
+            border-bottom: 1px solid #e5e5e5;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            padding: 1rem 5%;
+            z-index: 1000;
+        }
+
+        .mobile-menu.active {
+            display: block;
+        }
+
+        .mobile-menu a {
+            display: block;
+            padding: 0.75rem 0;
+            text-decoration: none;
+            color: #1a1a1a;
+            font-weight: 500;
+            font-size: 1rem;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .mobile-menu a:last-child {
+            border-bottom: none;
+        }
+
+        .mobile-menu a:hover {
+            color: #3171ef;
+        }
+
+        .mobile-menu .btn-get-started {
+            display: inline-block;
+            margin-top: 0.75rem;
+            text-align: center;
         }
 
         /* Responsive */
@@ -1111,8 +1078,16 @@
             <a href="#" id="nav-signin" onclick="handleSignIn(event)">Log In</a>
             <a href="#" id="nav-signup" class="btn-get-started" onclick="handleSignUp(event)">Get Started</a>
         </div>
-        <button class="mobile-menu-btn">☰</button>
+        <button class="mobile-menu-btn" id="mobile-menu-btn" aria-label="Toggle menu">☰</button>
     </nav>
+
+    <!-- Mobile Menu -->
+    <div class="mobile-menu" id="mobile-menu">
+        <a href="#how-it-works">How It Works</a>
+        <a href="#pricing">Pricing</a>
+        <a href="#" onclick="handleSignIn(event)">Log In</a>
+        <a href="#" class="btn-get-started" onclick="handleSignUp(event)">Get Started</a>
+    </div>
 
     <!-- Hero Section -->
     <section class="hero">
@@ -1420,6 +1395,25 @@
                 console.error('Error opening sign up:', error);
             }
         }
+
+        // Mobile menu toggle
+        const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+        const mobileMenu = document.getElementById('mobile-menu');
+
+        mobileMenuBtn.addEventListener('click', function() {
+            const isActive = mobileMenu.classList.toggle('active');
+            mobileMenuBtn.textContent = isActive ? '✕' : '☰';
+            mobileMenuBtn.setAttribute('aria-expanded', isActive);
+        });
+
+        // Close mobile menu when clicking a link
+        mobileMenu.querySelectorAll('a').forEach(link => {
+            link.addEventListener('click', function() {
+                mobileMenu.classList.remove('active');
+                mobileMenuBtn.textContent = '☰';
+                mobileMenuBtn.setAttribute('aria-expanded', 'false');
+            });
+        });
 
         // Smooth scrolling for navigation links
         document.querySelectorAll('a[href^="#"]').forEach(anchor => {
