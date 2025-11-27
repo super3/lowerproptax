@@ -58,13 +58,14 @@ All admin routes require both authentication and admin role.
 - Sorted by creation date
 
 #### `GET /api/admin/completed-properties`
-- Get all properties with "ready" status
+- Get all properties with "ready" or "invalid" status
 - Returns list sorted by updated_at DESC (most recent first)
 
 #### `GET /api/admin/properties/:id`
 - Get full property details for admin editing
 - Returns property details including all assessments
-- Includes current year's assessment or default values
+- Includes `currentAssessment` with current year's assessment or default values
+- Includes `userEmail` fetched from Clerk API (null if unavailable)
 
 #### `PUT /api/admin/properties/:id`
 - Update property details and assessment information
@@ -95,31 +96,30 @@ curl -X GET http://localhost:3001/api/properties \
 ```json
 {
   "id": "123e4567-e89b-12d3-a456-426614174000",
-  "user_id": "user_2abc123def",
+  "userId": "user_2abc123def",
   "address": "123 Main St",
   "city": "Atlanta",
   "state": "GA",
-  "zip_code": "30301",
+  "zipCode": "30301",
   "country": "US",
   "lat": 33.7490,
   "lng": -84.3880,
   "bedrooms": 3,
   "bathrooms": 2,
   "sqft": 1500,
-  "created_at": "2025-01-13T12:00:00.000Z",
-  "updated_at": "2025-01-13T12:00:00.000Z",
+  "createdAt": "2025-01-13T12:00:00.000Z",
+  "updatedAt": "2025-01-13T12:00:00.000Z",
   "latestAssessment": {
     "id": "456e7890-e89b-12d3-a456-426614174000",
-    "property_id": "123e4567-e89b-12d3-a456-426614174000",
     "year": 2025,
-    "appraised_value": 250000,
-    "annual_tax": 3500,
-    "estimated_appraised_value": 230000,
-    "estimated_annual_tax": 3220,
-    "report_url": "https://example.com/report.pdf",
+    "appraisedValue": 250000,
+    "annualTax": 3500,
+    "estimatedAppraisedValue": 230000,
+    "estimatedAnnualTax": 3220,
+    "reportUrl": "https://example.com/report.pdf",
     "status": "ready",
-    "created_at": "2025-01-13T12:00:00.000Z",
-    "updated_at": "2025-01-13T13:00:00.000Z"
+    "createdAt": "2025-01-13T12:00:00.000Z",
+    "updatedAt": "2025-01-13T13:00:00.000Z"
   }
 }
 ```
@@ -161,7 +161,7 @@ curl -X GET http://localhost:3001/api/properties \
 | estimated_appraised_value | DECIMAL(15, 2) | | Estimated appraised value |
 | estimated_annual_tax | DECIMAL(15, 2) | | Estimated annual tax amount |
 | report_url | VARCHAR(500) | | URL to assessment report PDF |
-| status | VARCHAR(50) | DEFAULT 'preparing' | Status: 'preparing' or 'ready' |
+| status | VARCHAR(50) | DEFAULT 'preparing' | Status: 'preparing', 'ready', or 'invalid' |
 | created_at | TIMESTAMP | DEFAULT NOW() | Creation timestamp |
 | updated_at | TIMESTAMP | DEFAULT NOW() | Last update timestamp |
 
