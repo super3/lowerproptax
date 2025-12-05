@@ -1,4 +1,5 @@
 import pool from '../db/connection.js';
+import { sendNewPropertyNotification } from '../services/emailService.js';
 
 // Test helper to reset storage
 export async function resetProperties() {
@@ -148,7 +149,12 @@ export async function createProperty(req, res) {
       ]
     );
 
-    res.status(201).json(result.rows[0]);
+    const property = result.rows[0];
+
+    // Send email notification (fire-and-forget)
+    sendNewPropertyNotification(property, req.user.email).catch(() => {});
+
+    res.status(201).json(property);
   } catch (error) {
     console.error('Error creating property:', error);
     res.status(500).json({ error: 'Failed to create property' });
