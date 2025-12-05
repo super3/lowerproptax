@@ -30,7 +30,7 @@ npm test                           # Run test suite
 
 ## Roadmap
 
-- [ ] Create help@lowerproptax.com email account
+- [x] ~~Create help@lowerproptax.com email account~~
 - [ ] Email notifications for pending assessments (to admin)
 - [ ] Email notifications for completed assessments
 - [ ] Change Clerk to production mode
