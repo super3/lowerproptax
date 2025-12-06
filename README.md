@@ -31,7 +31,7 @@ npm test                           # Run test suite
 ## Roadmap
 
 - [x] Create help@lowerproptax.com email account
-- [ ] Email notifications for pending assessments (to admin)
+- [x] Email notifications for pending assessments (to admin)
 - [ ] Email notifications for completed assessments
 - [ ] Change Clerk to production mode
 - [ ] Handle 2025, 2026 assessment years
