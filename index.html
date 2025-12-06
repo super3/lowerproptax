@@ -1574,6 +1574,27 @@
             }
         });
 
+        // Get redirect URL from query params (for deep linking from emails)
+        function getRedirectUrl() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const redirect = urlParams.get('redirect');
+            // Validate redirect URL is on our domain to prevent open redirect attacks
+            if (redirect) {
+                try {
+                    const url = new URL(redirect);
+                    if (url.hostname === window.location.hostname || url.hostname === 'lowerproptax.com') {
+                        return redirect;
+                    }
+                } catch (e) {
+                    // If it's a relative URL, it's safe
+                    if (redirect.startsWith('/')) {
+                        return redirect;
+                    }
+                }
+            }
+            return '/dashboard.html';
+        }
+
         function updateNavForSignedInUser() {
             const navAuth = document.getElementById('nav-auth');
             navAuth.innerHTML = '<a href="dashboard.html" class="btn-get-started">Go to Dashboard</a>';
@@ -1586,15 +1607,17 @@
                 return;
             }
             try {
-                // If user is already signed in, redirect to dashboard
+                const redirectUrl = getRedirectUrl();
+
+                // If user is already signed in, redirect
                 if (window.Clerk.user) {
-                    window.location.href = '/dashboard.html';
+                    window.location.href = redirectUrl;
                     return;
                 }
 
                 // Otherwise, open sign in modal
                 await window.Clerk.openSignIn({
-                    redirectUrl: '/dashboard.html'
+                    redirectUrl: redirectUrl
                 });
             } catch (error) {
                 console.error('Error opening sign in:', error);
@@ -1608,15 +1631,17 @@
                 return;
             }
             try {
-                // If user is already signed in, redirect to dashboard
+                const redirectUrl = getRedirectUrl();
+
+                // If user is already signed in, redirect
                 if (window.Clerk.user) {
-                    window.location.href = '/dashboard.html';
+                    window.location.href = redirectUrl;
                     return;
                 }
 
                 // Otherwise, open sign up modal
                 await window.Clerk.openSignUp({
-                    redirectUrl: '/dashboard.html'
+                    redirectUrl: redirectUrl
                 });
             } catch (error) {
                 console.error('Error opening sign up:', error);

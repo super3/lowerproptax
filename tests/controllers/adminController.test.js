@@ -8,6 +8,12 @@ jest.unstable_mockModule('../../src/db/connection.js', () => ({
   }
 }));
 
+// Mock the email service
+const mockSendAssessmentReadyNotification = jest.fn();
+jest.unstable_mockModule('../../src/services/emailService.js', () => ({
+  sendAssessmentReadyNotification: mockSendAssessmentReadyNotification
+}));
+
 // Import the controller after mocking
 const adminController = await import('../../src/controllers/adminController.js');
 
@@ -25,6 +31,7 @@ describe('Admin Controller', () => {
       status: jest.fn().mockReturnThis()
     };
     mockQuery.mockClear();
+    mockSendAssessmentReadyNotification.mockClear();
   });
 
   describe('getPendingProperties', () => {
@@ -683,6 +690,258 @@ describe('Admin Controller', () => {
           currentAssessment: mockAssessment
         })
       );
+    });
+
+    it('should send email notification when status is set to ready', async () => {
+      const originalEnv = process.env.CLERK_SECRET_KEY;
+      process.env.CLERK_SECRET_KEY = 'test_clerk_key';
+
+      req.params.id = 'prop1';
+      req.body = {
+        status: 'ready',
+        annualTax: 5000,
+        estimatedAnnualTax: 4000
+      };
+
+      const mockUpdatedProperty = {
+        id: 'prop1',
+        address: '123 Main St',
+        city: 'Austin',
+        state: 'TX',
+        user_id: 'user123',
+        updated_at: new Date()
+      };
+
+      const mockAssessment = {
+        id: 'assess_prop1_2025',
+        property_id: 'prop1',
+        year: 2025,
+        annual_tax: 5000,
+        estimated_annual_tax: 4000,
+        status: 'ready',
+        created_at: new Date(),
+        updated_at: new Date()
+      };
+
+      mockQuery
+        .mockResolvedValueOnce({ rows: [mockUpdatedProperty] })
+        .mockResolvedValueOnce({ rows: [mockAssessment] });
+
+      // Mock Clerk API to return user email
+      global.fetch = jest.fn().mockResolvedValue({
+        ok: true,
+        json: async () => ({
+          email_addresses: [{ email_address: 'user@example.com' }]
+        })
+      });
+
+      mockSendAssessmentReadyNotification.mockResolvedValue();
+
+      await adminController.updatePropertyDetails(req, res);
+
+      // Wait for async email to be called
+      await new Promise(resolve => setTimeout(resolve, 10));
+
+      expect(mockSendAssessmentReadyNotification).toHaveBeenCalledWith(
+        mockUpdatedProperty,
+        { annualTax: 5000, estimatedAnnualTax: 4000 },
+        'user@example.com'
+      );
+
+      process.env.CLERK_SECRET_KEY = originalEnv;
+      delete global.fetch;
+    });
+
+    it('should not send email when status is not ready', async () => {
+      req.params.id = 'prop1';
+      req.body = {
+        status: 'preparing'
+      };
+
+      const mockUpdatedProperty = {
+        id: 'prop1',
+        updated_at: new Date()
+      };
+
+      const mockAssessment = {
+        id: 'assess_prop1_2025',
+        property_id: 'prop1',
+        year: 2025,
+        status: 'preparing',
+        created_at: new Date(),
+        updated_at: new Date()
+      };
+
+      mockQuery
+        .mockResolvedValueOnce({ rows: [mockUpdatedProperty] })
+        .mockResolvedValueOnce({ rows: [mockAssessment] });
+
+      await adminController.updatePropertyDetails(req, res);
+
+      expect(mockSendAssessmentReadyNotification).not.toHaveBeenCalled();
+    });
+
+    it('should not send email when Clerk API fails', async () => {
+      const originalEnv = process.env.CLERK_SECRET_KEY;
+      process.env.CLERK_SECRET_KEY = 'test_clerk_key';
+
+      req.params.id = 'prop1';
+      req.body = {
+        status: 'ready'
+      };
+
+      const mockUpdatedProperty = {
+        id: 'prop1',
+        user_id: 'user123',
+        updated_at: new Date()
+      };
+
+      const mockAssessment = {
+        id: 'assess_prop1_2025',
+        property_id: 'prop1',
+        year: 2025,
+        status: 'ready',
+        created_at: new Date(),
+        updated_at: new Date()
+      };
+
+      mockQuery
+        .mockResolvedValueOnce({ rows: [mockUpdatedProperty] })
+        .mockResolvedValueOnce({ rows: [mockAssessment] });
+
+      // Mock Clerk API to fail
+      global.fetch = jest.fn().mockResolvedValue({
+        ok: false
+      });
+
+      await adminController.updatePropertyDetails(req, res);
+
+      expect(mockSendAssessmentReadyNotification).not.toHaveBeenCalled();
+
+      process.env.CLERK_SECRET_KEY = originalEnv;
+      delete global.fetch;
+    });
+
+    it('should handle Clerk API errors when sending ready notification', async () => {
+      const originalEnv = process.env.CLERK_SECRET_KEY;
+      process.env.CLERK_SECRET_KEY = 'test_clerk_key';
+
+      req.params.id = 'prop1';
+      req.body = {
+        status: 'ready'
+      };
+
+      const mockUpdatedProperty = {
+        id: 'prop1',
+        user_id: 'user123',
+        updated_at: new Date()
+      };
+
+      const mockAssessment = {
+        id: 'assess_prop1_2025',
+        property_id: 'prop1',
+        year: 2025,
+        status: 'ready',
+        created_at: new Date(),
+        updated_at: new Date()
+      };
+
+      mockQuery
+        .mockResolvedValueOnce({ rows: [mockUpdatedProperty] })
+        .mockResolvedValueOnce({ rows: [mockAssessment] });
+
+      // Mock Clerk API to throw error
+      global.fetch = jest.fn().mockRejectedValue(new Error('Clerk API error'));
+
+      await adminController.updatePropertyDetails(req, res);
+
+      // Should still respond successfully even if email fails
+      expect(res.json).toHaveBeenCalled();
+      expect(mockSendAssessmentReadyNotification).not.toHaveBeenCalled();
+
+      process.env.CLERK_SECRET_KEY = originalEnv;
+      delete global.fetch;
+    });
+
+    it('should not send email when no user email is available', async () => {
+      const originalEnv = process.env.CLERK_SECRET_KEY;
+      process.env.CLERK_SECRET_KEY = 'test_clerk_key';
+
+      req.params.id = 'prop1';
+      req.body = {
+        status: 'ready'
+      };
+
+      const mockUpdatedProperty = {
+        id: 'prop1',
+        user_id: 'user123',
+        updated_at: new Date()
+      };
+
+      const mockAssessment = {
+        id: 'assess_prop1_2025',
+        property_id: 'prop1',
+        year: 2025,
+        status: 'ready',
+        created_at: new Date(),
+        updated_at: new Date()
+      };
+
+      mockQuery
+        .mockResolvedValueOnce({ rows: [mockUpdatedProperty] })
+        .mockResolvedValueOnce({ rows: [mockAssessment] });
+
+      // Mock Clerk API to return no email
+      global.fetch = jest.fn().mockResolvedValue({
+        ok: true,
+        json: async () => ({
+          email_addresses: []
+        })
+      });
+
+      await adminController.updatePropertyDetails(req, res);
+
+      expect(mockSendAssessmentReadyNotification).not.toHaveBeenCalled();
+
+      process.env.CLERK_SECRET_KEY = originalEnv;
+      delete global.fetch;
+    });
+
+    it('should not send email when CLERK_SECRET_KEY is not set', async () => {
+      const originalEnv = process.env.CLERK_SECRET_KEY;
+      delete process.env.CLERK_SECRET_KEY;
+
+      req.params.id = 'prop1';
+      req.body = {
+        status: 'ready'
+      };
+
+      const mockUpdatedProperty = {
+        id: 'prop1',
+        user_id: 'user123',
+        updated_at: new Date()
+      };
+
+      const mockAssessment = {
+        id: 'assess_prop1_2025',
+        property_id: 'prop1',
+        year: 2025,
+        status: 'ready',
+        created_at: new Date(),
+        updated_at: new Date()
+      };
+
+      mockQuery
+        .mockResolvedValueOnce({ rows: [mockUpdatedProperty] })
+        .mockResolvedValueOnce({ rows: [mockAssessment] });
+
+      await adminController.updatePropertyDetails(req, res);
+
+      expect(mockSendAssessmentReadyNotification).not.toHaveBeenCalled();
+
+      if (originalEnv) {
+        process.env.CLERK_SECRET_KEY = originalEnv;
+      }
     });
   });
 

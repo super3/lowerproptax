@@ -1,4 +1,5 @@
 import pool from '../db/connection.js';
+import { sendAssessmentReadyNotification } from '../services/emailService.js';
 
 // Get all pending properties (status = 'preparing')
 export async function getPendingProperties(req, res) {
@@ -235,6 +236,35 @@ export async function updatePropertyDetails(req, res) {
       ...propertyResult.rows[0],
       currentAssessment: assessmentResult.rows[0]
     };
+
+    // Send email notification if status was set to 'ready'
+    if (status === 'ready') {
+      const property = propertyResult.rows[0];
+      const assessment = {
+        annualTax: assessmentResult.rows[0].annual_tax,
+        estimatedAnnualTax: assessmentResult.rows[0].estimated_annual_tax
+      };
+
+      // Fetch user email from Clerk
+      try {
+        const clerkApiKey = process.env.CLERK_SECRET_KEY;
+        if (clerkApiKey && property.user_id) {
+          const clerkResponse = await fetch(`https://api.clerk.com/v1/users/${property.user_id}`, {
+            headers: { 'Authorization': `Bearer ${clerkApiKey}` }
+          });
+
+          if (clerkResponse.ok) {
+            const clerkUser = await clerkResponse.json();
+            const userEmail = clerkUser.email_addresses?.[0]?.email_address;
+            if (userEmail) {
+              sendAssessmentReadyNotification(property, assessment, userEmail).catch(() => {});
+            }
+          }
+        }
+      } catch (clerkError) {
+        console.error('Error fetching user for notification:', clerkError);
+      }
+    }
 
     res.json(response);
   } catch (error) {

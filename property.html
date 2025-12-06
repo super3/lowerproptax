@@ -471,7 +471,9 @@
 
                 // Check if user is signed in
                 if (!window.Clerk.user && !isDevelopment) {
-                    window.location.href = '/index.html';
+                    // Redirect to homepage with return URL so user comes back after login
+                    const returnUrl = encodeURIComponent(window.location.href);
+                    window.location.href = `/index.html?redirect=${returnUrl}`;
                     return;
                 }
 
