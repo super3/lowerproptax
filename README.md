@@ -13,6 +13,7 @@ Property tax assessment platform that helps homeowners discover if they're overp
 - Clerk account (https://clerk.com)
 - Google Maps API key (https://console.cloud.google.com)
 - PostgreSQL database (Railway, Supabase, etc.)
+- Resend account (https://resend.com)
 
 ### From Source
 ```bash
