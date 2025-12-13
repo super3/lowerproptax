@@ -30,13 +30,10 @@ npm test                           # Run test suite
 
 ## Roadmap
 
-- [x] Create help@lowerproptax.com email account
-- [x] Email notifications for pending assessments (to admin)
-- [x] Email notifications for completed assessments
-- [x] Change Clerk to production mode
+- [ ] Automate finding 3 comps
+- [ ] Allow user to generate report by themselves
 - [ ] Handle 2025, 2026 assessment years
 - [ ] Tax deadlines tracking
 - [ ] Property tax appeal guidance
-- [x] ~~Add Comparable Properties to App?~~
 - [ ] Payment processing (Stripe) - require payment before viewing assessment reports
 - [ ] Mobile app (iOS & Android)
