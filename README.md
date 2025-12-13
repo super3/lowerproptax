@@ -9,7 +9,7 @@ Property tax assessment platform that helps homeowners discover if they're overp
 ## Installation
 
 ### Prerequisites
-- Node.js v24 (LTS)
+- Node.js v22 (LTS)
 - Clerk account (https://clerk.com)
 - Google Maps API key (https://console.cloud.google.com)
 - PostgreSQL database (Railway, Supabase, etc.)
