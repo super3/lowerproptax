@@ -33,7 +33,7 @@ npm test                           # Run test suite
 - [x] Create help@lowerproptax.com email account
 - [x] Email notifications for pending assessments (to admin)
 - [x] Email notifications for completed assessments
-- [ ] Change Clerk to production mode
+- [x] Change Clerk to production mode
 - [ ] Handle 2025, 2026 assessment years
 - [ ] Tax deadlines tracking
 - [ ] Property tax appeal guidance
