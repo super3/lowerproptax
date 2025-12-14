@@ -141,3 +141,8 @@ vite.config.ts.timestamp-*
 
 # Local test files
 CompReport.pdf
+
+# Data files
+*.xlsx
+*.csv
+scripts/fulton/
