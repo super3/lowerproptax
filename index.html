@@ -16,698 +16,695 @@
         type="text/javascript"
     ></script>
     <style>
-        /* Homepage-specific styles */
+        /* Landing Page Styles */
         body {
             overflow-x: hidden;
+            background: #fdfcfc;
         }
 
-        /* Hero Section */
-        .hero {
-            padding: 80px 7% 60px;
-            background: white;
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 60px;
+        /* Header/Navigation */
+        .landing-nav {
+            background: rgba(244, 243, 250, 0.02);
+            padding: 20px 140px;
+            display: flex;
             align-items: center;
-            max-width: 1400px;
-            margin: 0 auto;
+            gap: 24px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1002;
+            border-bottom: none;
+            box-shadow: none;
         }
 
-        .hero-content {
-            text-align: left;
+        .landing-nav .logo-img {
+            height: 23px;
+            width: auto;
         }
 
-        .hero h1 {
-            font-size: 3.5rem;
-            font-weight: 700;
-            color: #1a1a1a;
-            margin-bottom: 1.25rem;
-            line-height: 1.15;
+        .landing-nav .nav-center {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            gap: 28px;
         }
 
-        .hero-subtitle {
-            font-size: 1.25rem;
-            color: #555;
-            margin-bottom: 2rem;
-            line-height: 1.6;
-        }
-
-        .hero-cta {
-            background: #3171ef;
-            color: white;
-            padding: 1.1rem 2.5rem;
-            border-radius: 6px;
+        .landing-nav .nav-center a {
+            color: black;
             text-decoration: none;
-            font-weight: 600;
-            font-size: 1.05rem;
-            display: inline-block;
+            font-weight: 500;
+            font-size: 14px;
+            letter-spacing: -0.14px;
+        }
+
+        .landing-nav .nav-center a:hover {
+            opacity: 0.7;
+        }
+
+        .landing-nav .nav-right {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            width: 162px;
+            justify-content: flex-end;
+        }
+
+        .btn-login {
+            background: white;
+            color: black;
+            padding: 11px 14px;
+            border-radius: 10px;
+            font-weight: 500;
+            font-size: 15px;
+            letter-spacing: -0.3px;
+            text-decoration: none;
+            box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.04), 0px 0px 0px 1px rgba(8, 7, 22, 0.1);
             transition: all 0.2s;
         }
 
-        .hero-cta:hover {
-            background: #2560d9;
-            transform: translateY(-2px);
-            box-shadow: 0 10px 25px rgba(49, 113, 239, 0.3);
+        .btn-login:hover {
+            background: #f5f5f5;
         }
 
-        .hero-image {
-            width: 100%;
-        }
-
-        .hero-image img {
-            width: 100%;
-            border-radius: 12px;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
-        }
-
-        /* Features Section */
-        .features {
-            padding: 0;
-            background: white;
-        }
-
-        .feature-section {
-            padding: 60px 7%;
-        }
-
-        .feature-section:nth-child(odd) {
-            background: #f8f9fa;
-        }
-
-        .feature-section:nth-child(even) {
-            background: white;
-        }
-
-        .feature-block {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 80px;
-            max-width: 1200px;
-            margin: 0 auto;
-            align-items: center;
-        }
-
-        .feature-block.reverse {
-            direction: rtl;
-        }
-
-        .feature-block.reverse > * {
-            direction: ltr;
-        }
-
-        .feature-content h2 {
-            font-size: 2.5rem;
-            font-weight: 700;
-            color: #1a1a1a;
-            margin-bottom: 1.5rem;
-            line-height: 1.2;
-        }
-
-        .feature-content p {
-            font-size: 1.15rem;
-            color: #555;
-            line-height: 1.7;
-            margin-bottom: 1.5rem;
-        }
-
-        .feature-content ul {
-            list-style: none;
-            padding: 0;
-        }
-
-        .feature-content li {
-            padding: 0.75rem 0;
-            padding-left: 2rem;
-            position: relative;
-            color: #555;
-            font-size: 1.05rem;
-        }
-
-        .feature-content li::before {
-            content: '✓';
-            position: absolute;
-            left: 0;
-            color: #2e7d32;
-            font-weight: bold;
-            font-size: 1.2rem;
-        }
-
-        .feature-image {
-            width: 100%;
-        }
-
-        .feature-image img {
-            width: 100%;
-            border-radius: 12px;
-            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1);
-        }
-
-        .feature-placeholder {
-            width: 100%;
-            aspect-ratio: 4/3;
-            background: linear-gradient(135deg, #e8f0ff 0%, #f5f8ff 100%);
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 3rem;
-        }
-
-        /* Social Proof */
-        .social-proof {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            margin-top: 1.5rem;
-            padding-top: 1.5rem;
-            border-top: 1px solid #e5e5e5;
-        }
-
-        .social-proof-text {
-            font-size: 0.9rem;
-            color: #666;
-        }
-
-        .social-proof-text strong {
-            color: #1a1a1a;
-        }
-
-        .service-area-note {
-            font-size: 0.9rem;
-            color: #666;
-            margin-top: 1.5rem;
-        }
-
-        /* Hero Before/After Comparison */
-        .hero-comparison {
-            width: 100%;
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
-            padding: 1.5rem;
-            overflow: hidden;
-        }
-
-        .comparison-header {
-            text-align: center;
-            margin-bottom: 1.5rem;
-            padding-bottom: 1rem;
-            border-bottom: 1px solid #e5e5e5;
-        }
-
-        .comparison-header h3 {
-            font-size: 1.1rem;
-            font-weight: 600;
-            color: #1a1a1a;
-            margin-bottom: 0.25rem;
-        }
-
-        .comparison-header span {
-            font-size: 0.85rem;
-            color: #666;
-        }
-
-        .comparison-cards {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 1rem;
-            margin-bottom: 1.5rem;
-        }
-
-        .comparison-card {
-            padding: 1.25rem;
-            border-radius: 10px;
-            text-align: center;
-        }
-
-        .comparison-card.before {
-            background: #f8f9fa;
-            border: 1px solid #e5e5e5;
-        }
-
-        .comparison-card.after {
-            background: #f8f9fa;
-            border: 1px solid #e5e5e5;
-        }
-
-        .comparison-card label {
-            font-size: 0.75rem;
-            color: #666;
-            display: block;
-            margin-bottom: 0.5rem;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            font-weight: 600;
-        }
-
-        .comparison-card .amount {
-            font-size: 1.75rem;
-            font-weight: 700;
-        }
-
-        .comparison-card.before .amount {
-            color: #dc2626;
-        }
-
-        .comparison-card.after .amount {
-            color: #3171ef;
-        }
-
-        .comparison-card .sub-label {
-            font-size: 0.8rem;
-            color: #666;
-            margin-top: 0.25rem;
-        }
-
-        .savings-result {
-            background: linear-gradient(135deg, #e8f5e9 0%, #f1f8f4 100%);
-            border-left: 4px solid #16a34a;
-            border-radius: 8px;
-            padding: 1.25rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 1rem;
-        }
-
-        .savings-info {
-            flex: 1;
-        }
-
-        .savings-result label {
-            font-size: 0.75rem;
-            color: #16a34a;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            display: block;
-            margin-bottom: 0.5rem;
-        }
-
-        .savings-result .amount {
-            font-size: 1.75rem;
-            font-weight: 700;
-            color: #16a34a;
-        }
-
-        .btn-download-report {
-            background: #16a34a;
+        .btn-get-started-dark {
+            background: black;
             color: white;
-            padding: 0.75rem 1.25rem;
-            border-radius: 6px;
-            font-weight: 600;
-            font-size: 0.85rem;
-            white-space: nowrap;
-            cursor: default;
+            padding: 11px 14px;
+            border-radius: 10px;
+            font-weight: 500;
+            font-size: 15px;
+            letter-spacing: -0.3px;
+            text-decoration: none;
+            box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.04);
+            transition: all 0.2s;
         }
 
-        /* Guarantee Badge */
-        .guarantee-badge {
+        .btn-get-started-dark:hover {
+            background: #333;
+        }
+
+        /* Hero Section */
+        .hero-section {
+            position: relative;
+            padding: 179px 189px 0;
+            min-height: 600px;
+        }
+
+        .hero-content-wrapper {
+            display: flex;
+            gap: 221px;
+            align-items: flex-start;
+        }
+
+        .hero-title {
+            font-size: 53px;
+            font-weight: 400;
+            line-height: 1;
+            letter-spacing: -1.59px;
+            color: black;
+            width: 440px;
+        }
+
+        .hero-right {
+            display: flex;
+            flex-direction: column;
+            gap: 19px;
+            width: 419px;
+        }
+
+        .hero-description {
+            font-size: 16px;
+            font-weight: 500;
+            line-height: 1.4;
+            letter-spacing: -0.16px;
+            color: black;
+        }
+
+        .btn-cta-primary {
+            background: #5d6cf6;
+            color: white;
+            padding: 11px 14px;
+            border-radius: 8px;
+            font-weight: 500;
+            font-size: 15px;
+            letter-spacing: -0.3px;
+            text-decoration: none;
+            display: inline-block;
+            width: fit-content;
+            box-shadow: 0px 2px 4px rgba(15, 20, 67, 0.26), 0px 0px 0px 1px #2d3cca;
+            transition: all 0.2s;
+        }
+
+        .btn-cta-primary:hover {
+            background: #4c5be5;
+            transform: translateY(-1px);
+        }
+
+        /* Map/Screenshot Area */
+        .hero-map-container {
+            position: relative;
+            margin-top: 60px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .hero-map-image {
+            width: 100%;
+            max-width: 1241px;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Search Bar */
+        .search-bar-container {
+            position: relative;
+            margin-top: -40px;
+            display: flex;
+            justify-content: center;
+            z-index: 10;
+        }
+
+        .search-bar {
+            background: #fdfcfc;
+            border: 2px solid #9ec6ff;
+            border-radius: 20px;
+            padding: 20px 24px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            width: 687px;
+            box-shadow: 0px 10px 19px -15px rgba(25, 37, 146, 0.4);
+        }
+
+        .search-bar svg {
+            width: 22px;
+            height: 22px;
+            color: #5f5e6a;
+            flex-shrink: 0;
+        }
+
+        .search-bar input {
+            flex: 1;
+            border: none;
+            outline: none;
+            font-size: 18px;
+            font-weight: 500;
+            letter-spacing: -0.18px;
+            color: black;
+            background: transparent;
+        }
+
+        .search-bar input::placeholder {
+            color: #5f5e6a;
+        }
+
+        .search-bar .btn-search {
+            background: #fdfcfc;
+            color: black;
+            padding: 11px 14px;
+            border-radius: 10px;
+            font-weight: 500;
+            font-size: 15px;
+            letter-spacing: -0.3px;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.04), 0px 0px 0px 1px rgba(8, 7, 22, 0.1);
+            transition: all 0.2s;
+        }
+
+        .search-bar .btn-search:hover {
+            background: #f5f5f5;
+        }
+
+        /* Feature Sections */
+        .feature-section {
+            padding: 20px 200px 0;
+            border-top: 1px solid #f0efef;
+            display: flex;
+            gap: 48px;
+        }
+
+        .feature-left {
+            flex: 1;
+            padding: 30px 0;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .feature-right {
+            flex: 1;
+            padding: 30px 0;
+            overflow: hidden;
+        }
+
+        .feature-title {
+            font-size: 38px;
+            font-weight: 400;
+            line-height: 1;
+            letter-spacing: -1.14px;
+            color: black;
+            max-width: 440px;
+        }
+
+        .feature-description {
+            font-size: 16px;
+            font-weight: 500;
+            line-height: 1.4;
+            letter-spacing: -0.16px;
+            color: black;
+        }
+
+        /* Feature Tags */
+        .feature-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .feature-tag {
+            background: rgba(48, 54, 114, 0.1);
+            padding: 10px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 16px;
+            font-weight: 500;
+            letter-spacing: -0.16px;
+            color: #303672;
+        }
+
+        .feature-tag svg {
+            width: 22px;
+            height: 22px;
+            flex-shrink: 0;
+        }
+
+        /* Comparable Properties Card */
+        .comparables-card {
+            background: linear-gradient(228.54deg, rgba(253, 252, 252, 1) 23.567%, rgba(253, 252, 252, 0) 70.858%);
+        }
+
+        .comparables-header {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            padding-bottom: 20px;
+            box-shadow: 0px 1px 0px 0px white;
+        }
+
+        .comparables-title {
+            font-size: 20px;
+            font-weight: 600;
+            letter-spacing: -0.2px;
+            color: black;
+        }
+
+        .comparables-stats {
+            display: flex;
+            gap: 16px;
+        }
+
+        .comp-stat {
+            flex: 1;
+            padding: 10px;
+            border-radius: 10px;
+        }
+
+        .comp-stat.assessed {
+            background: rgba(255, 54, 40, 0.1);
+        }
+
+        .comp-stat.avg {
+            background: rgba(69, 83, 222, 0.1);
+        }
+
+        .comp-stat-label {
+            font-size: 16px;
+            font-weight: 500;
+            letter-spacing: -0.16px;
+            margin-bottom: 16px;
+        }
+
+        .comp-stat.assessed .comp-stat-label {
+            color: #b10c00;
+        }
+
+        .comp-stat.avg .comp-stat-label {
+            color: #07159d;
+        }
+
+        .comp-stat-value {
+            font-size: 24px;
+            font-weight: 500;
+            letter-spacing: -0.24px;
+        }
+
+        .comp-stat.assessed .comp-stat-value {
+            color: #ff3628;
+        }
+
+        .comp-stat.avg .comp-stat-value {
+            color: #4553de;
+        }
+
+        /* Property List */
+        .property-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .property-item {
+            background: #f5f5f5;
+            border: 1px solid #eff0f4;
+            border-radius: 8px;
+            padding: 12px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+
+        .property-item-info {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .property-item-address {
+            font-size: 14px;
+            font-weight: 600;
+            letter-spacing: -0.14px;
+            color: black;
+        }
+
+        .property-item-details {
+            font-size: 14px;
+            font-weight: 500;
+            letter-spacing: -0.14px;
+            color: #5f5e6a;
+        }
+
+        .property-item-price {
+            font-size: 16px;
+            font-weight: 700;
+            letter-spacing: -0.16px;
+            color: black;
+        }
+
+        /* Download Section */
+        .download-section {
+            background: linear-gradient(225.06deg, rgba(253, 252, 252, 1) 23.567%, rgba(253, 252, 252, 0) 70.858%);
+            height: 320px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            border-radius: 8px;
+        }
+
+        .download-btn {
+            background: #5d6cf6;
+            padding: 11px;
+            border-radius: 38px;
+            box-shadow: 0px 2px 4px rgba(15, 20, 67, 0.26), 0px 0px 0px 1px #2d3cca;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 0.5rem;
-            margin-top: 1rem;
-            padding: 0.75rem;
-            background: #f8f9fa;
-            border: 1px solid #e5e5e5;
-            border-radius: 8px;
         }
 
-        .guarantee-badge .badge-icon {
-            font-size: 1.25rem;
+        .download-btn svg {
+            width: 22px;
+            height: 22px;
+            color: white;
         }
 
-        .guarantee-badge .badge-text {
-            font-size: 0.85rem;
-            color: #555;
+        .download-title {
+            font-size: 14px;
+            font-weight: 600;
+            letter-spacing: -0.14px;
+            color: black;
+        }
+
+        .download-subtitle {
+            font-size: 14px;
             font-weight: 500;
+            letter-spacing: -0.14px;
+            color: #5f5e6a;
         }
 
-        /* Financial Tracking Mockup */
-        .financial-mockup {
-            width: 100%;
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
-            padding: 1.5rem;
-            overflow: hidden;
-        }
-
-        .financial-header {
-            margin-bottom: 1.5rem;
-            padding-bottom: 1rem;
-            border-bottom: 1px solid #e5e5e5;
-        }
-
-        .financial-header h3 {
-            font-size: 1.1rem;
-            font-weight: 600;
-            color: #1a1a1a;
-            margin-bottom: 0.5rem;
-        }
-
-        .financial-summary {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 0.75rem;
-            margin-bottom: 1rem;
-        }
-
-        .financial-stat {
-            background: #f8f9fa;
-            padding: 0.875rem;
-            border-radius: 8px;
-            border: 1px solid #e5e5e5;
-        }
-
-        .financial-stat label {
-            font-size: 0.7rem;
-            color: #666;
-            display: block;
-            margin-bottom: 0.25rem;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .financial-stat .amount {
-            font-size: 1.2rem;
-            font-weight: 700;
-        }
-
-        .financial-stat .amount.positive {
-            color: #2e7d32;
-        }
-
-        .financial-stat .amount.negative {
-            color: #d32f2f;
-        }
-
-        .transaction-list {
+        /* Process Steps */
+        .process-visual {
+            padding: 60px 0;
             display: flex;
             flex-direction: column;
-            gap: 0.75rem;
+            gap: 8px;
         }
 
-        .transaction-item {
+        .process-step {
             display: flex;
-            justify-content: space-between;
             align-items: center;
-            padding: 0.875rem;
-            background: white;
-            border: 1px solid #e5e5e5;
-            border-radius: 8px;
+            gap: 14px;
         }
 
-        .transaction-details {
+        .process-number {
+            width: 30px;
+            height: 30px;
+            border-radius: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: 600;
+            letter-spacing: -0.14px;
+            flex-shrink: 0;
+        }
+
+        .process-number.active {
+            background: #2937bb;
+            color: white;
+        }
+
+        .process-number.inactive {
+            background: #fdfcfc;
+            border: 1px solid #f0efef;
+            color: black;
+        }
+
+        .process-line {
+            width: 2px;
+            height: 37px;
+            background: #d9d9d9;
+            margin-left: 14px;
+        }
+
+        .process-content {
             flex: 1;
-        }
-
-        .transaction-details h4 {
-            font-size: 0.875rem;
-            font-weight: 600;
-            color: #1a1a1a;
-            margin-bottom: 0.25rem;
-        }
-
-        .transaction-details p {
-            font-size: 0.75rem;
-            color: #666;
-        }
-
-        .transaction-amount {
-            font-size: 0.875rem;
-            font-weight: 700;
-        }
-
-        .transaction-amount.income {
-            color: #2e7d32;
-        }
-
-        .transaction-amount.expense {
-            color: #d32f2f;
-        }
-
-        /* Maintenance Mockup */
-        .maintenance-mockup {
-            width: 100%;
-            background: white;
+            background: #fdfcfc;
+            border: 2px solid #9ec6ff;
             border-radius: 12px;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
-            padding: 1.5rem;
-            overflow: hidden;
-        }
-
-        .maintenance-header {
-            margin-bottom: 1.5rem;
-            padding-bottom: 1rem;
-            border-bottom: 1px solid #e5e5e5;
-        }
-
-        .maintenance-header h3 {
-            font-size: 1.1rem;
-            font-weight: 600;
-            color: #1a1a1a;
-        }
-
-        .request-list {
+            padding: 12px 16px;
             display: flex;
-            flex-direction: column;
-            gap: 0.75rem;
-        }
-
-        .request-item {
-            background: white;
-            border: 1px solid #e5e5e5;
-            border-radius: 8px;
-            padding: 0.875rem;
-        }
-
-        .request-header {
-            display: flex;
-            justify-content: space-between;
             align-items: center;
+            gap: 10px;
+            box-shadow: 0px 10px 19px -15px rgba(25, 37, 146, 0.4);
         }
 
-        .request-info h4 {
-            font-size: 0.875rem;
+        .process-content.inactive {
+            background: #f5f5f5;
+            border: none;
+            box-shadow: none;
+        }
+
+        .process-text {
+            flex: 1;
+            font-size: 14px;
             font-weight: 600;
-            color: #1a1a1a;
-            margin-bottom: 0.25rem;
+            letter-spacing: -0.14px;
+            color: black;
         }
 
-        .request-info p {
-            font-size: 0.75rem;
-            color: #666;
+        .process-check {
+            color: #5ebe0a;
         }
 
-        .request-status {
-            font-size: 0.7rem;
-            padding: 0.25rem 0.5rem;
-            border-radius: 4px;
-            font-weight: 600;
-            width: 80px;
-            text-align: center;
-            display: inline-block;
-        }
-
-        .request-status.completed {
-            background: #e8f5e9;
-            color: #2e7d32;
-        }
-
-        .request-status.in-progress {
-            background: #e3f2fd;
-            color: #1976d2;
-        }
-
-        .request-status.pending {
-            background: #fff3e0;
-            color: #f57c00;
-        }
-
-        .request-meta {
-            font-size: 0.7rem;
-            color: #999;
-            margin-top: 0.5rem;
+        .placeholder-bar {
+            height: 11px;
+            border-radius: 20px;
+            background: #d9d9d9;
         }
 
         /* Pricing Section */
         .pricing-section {
-            padding: 40px 7% 80px;
-            background: #f8f9fa;
-        }
-
-        .pricing-section h2 {
-            font-size: 2.5rem;
-            font-weight: 700;
-            color: #1a1a1a;
-            margin-bottom: 2.5rem;
-            text-align: center;
-        }
-
-        .pricing-content {
-            max-width: 900px;
-            margin: 0 auto;
-            background: white;
-            border-radius: 16px;
-            padding: 0;
-            overflow: hidden;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-        }
-
-        .pricing-steps {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-        }
-
-        .pricing-step {
-            padding: 2.5rem;
-            text-align: center;
-        }
-
-        .pricing-step.free {
-            background: #f8f9fa;
-            border-right: 1px solid #e5e5e5;
-        }
-
-        .pricing-step.paid {
-            background: white;
-        }
-
-        .step-number {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            width: 32px;
-            height: 32px;
-            background: #3171ef;
-            border-radius: 50%;
-            font-size: 0.9rem;
-            font-weight: 700;
-            color: white;
-            margin-bottom: 1rem;
-        }
-
-        .pricing-step h3 {
-            font-size: 1.1rem;
-            font-weight: 600;
-            color: #1a1a1a;
-            margin-bottom: 0.5rem;
-        }
-
-        .pricing-step .price {
-            font-size: 3rem;
-            font-weight: 700;
-            margin-bottom: 0.25rem;
-            color: #3171ef;
-        }
-
-        .pricing-step .price-desc {
-            font-size: 0.9rem;
-            color: #666;
-            margin-bottom: 1rem;
-        }
-
-        .pricing-step ul {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-            text-align: left;
-        }
-
-        .pricing-step li {
-            font-size: 0.9rem;
-            color: #555;
-            padding: 0.4rem 0;
-            padding-left: 1.5rem;
-            position: relative;
-        }
-
-        .pricing-step li::before {
-            content: '✓';
-            position: absolute;
-            left: 0;
-            color: #3171ef;
-            font-weight: bold;
-        }
-
-        .pricing-footer {
-            padding: 1.5rem 2.5rem;
-            background: #f8f9fa;
-            border-top: 1px solid #e5e5e5;
+            padding: 60px 200px 30px;
+            border-top: 1px solid #f0efef;
             display: flex;
-            justify-content: space-between;
+            flex-direction: column;
             align-items: center;
-            gap: 1.5rem;
         }
 
-        .pricing-footer p {
-            font-size: 0.9rem;
-            color: #666;
-            margin: 0;
-            flex: 1;
+        .pricing-title {
+            font-size: 38px;
+            font-weight: 400;
+            letter-spacing: -1.14px;
+            color: black;
+            text-align: center;
+            margin-bottom: 20px;
         }
 
-        .pricing-footer strong {
-            color: #1a1a1a;
+        .pricing-subtitle {
+            font-size: 16px;
+            font-weight: 500;
+            letter-spacing: -0.16px;
+            color: black;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .pricing-cards {
+            background: #f5f5f5;
+            border-radius: 12px;
+            padding: 4px;
+            display: flex;
+        }
+
+        .pricing-card {
+            width: 389px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        .pricing-card.highlighted {
+            background: white;
+            border: 1px solid #f0efef;
+            border-radius: 12px;
+            box-shadow: 0px 7px 22px -9px rgba(0, 0, 0, 0.09);
+        }
+
+        .pricing-label {
+            font-size: 14px;
+            font-weight: 600;
+            letter-spacing: 0.28px;
+            text-transform: uppercase;
+            color: #040714;
+        }
+
+        .pricing-amount {
+            font-size: 26px;
+            font-weight: 700;
+            letter-spacing: -1.04px;
+            color: #040714;
+        }
+
+        .pricing-desc {
+            font-size: 15px;
+            font-weight: 500;
+            color: #000510;
+            margin-top: 10px;
+        }
+
+        .pricing-btn {
+            padding: 11px 14px;
+            border-radius: 8px;
+            font-weight: 500;
+            font-size: 14px;
+            letter-spacing: -0.28px;
+            text-align: center;
+            border: none;
+            cursor: pointer;
+            text-decoration: none;
+            display: block;
+        }
+
+        .pricing-btn.outline {
+            background: #fdfcfc;
+            color: black;
+            box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.04), 0px 0px 0px 1px rgba(8, 7, 22, 0.1);
+        }
+
+        .pricing-btn.primary {
+            background: #5d6cf6;
+            color: white;
+            box-shadow: 0px 2px 4px rgba(15, 20, 67, 0.26), 0px 0px 0px 1px #2d3cca;
+        }
+
+        .pricing-features {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .pricing-feature {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 15px;
+            font-weight: 500;
+            color: #000510;
+        }
+
+        .pricing-feature svg {
+            width: 20px;
+            height: 20px;
+            color: #898b98;
+            flex-shrink: 0;
         }
 
         /* FAQ Section */
         .faq-section {
-            padding: 60px 7%;
-            background: white;
+            padding: 60px 200px 30px;
+            border-top: 1px solid #f0efef;
         }
 
-        .faq-section h2 {
-            font-size: 2.5rem;
-            font-weight: 700;
-            color: #1a1a1a;
-            margin-bottom: 2rem;
-            text-align: center;
+        .faq-title {
+            font-size: 38px;
+            font-weight: 400;
+            letter-spacing: -1.14px;
+            color: black;
+            margin-bottom: 20px;
         }
 
         .faq-list {
-            max-width: 700px;
-            margin: 0 auto;
             display: flex;
             flex-direction: column;
-            gap: 0.5rem;
         }
 
         .faq-item {
-            background: #f8f9fa;
-            border-radius: 8px;
-            overflow: hidden;
+            border-top: 1.5px dashed #b0b0b0;
+            border-bottom: 1.5px dashed #b0b0b0;
+            margin-top: -1.5px;
         }
 
         .faq-question {
             width: 100%;
-            padding: 1rem 1.25rem;
+            padding: 17px 0;
             background: none;
             border: none;
-            text-align: left;
-            font-size: 0.95rem;
-            font-weight: 600;
-            color: #1a1a1a;
-            cursor: pointer;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            gap: 1rem;
-            font-family: inherit;
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
         }
 
-        .faq-question:hover,
-        .faq-item.open .faq-question {
-            background: #f0f0f0;
+        .faq-question-text {
+            font-size: 18px;
+            font-weight: 500;
+            letter-spacing: -0.18px;
+            color: black;
+            text-align: left;
         }
 
         .faq-icon {
-            font-size: 1.25rem;
-            color: #666;
-            transition: transform 0.2s;
+            width: 18px;
+            height: 18px;
             flex-shrink: 0;
+            transition: transform 0.2s;
         }
 
         .faq-item.open .faq-icon {
@@ -724,92 +721,102 @@
             max-height: 200px;
         }
 
-        .faq-answer p {
-            padding: 1rem 1.25rem;
-            font-size: 0.9rem;
-            color: #555;
-            line-height: 1.6;
-            margin: 0;
+        .faq-answer-text {
+            font-size: 14px;
+            font-weight: 400;
+            letter-spacing: -0.14px;
+            line-height: 1.4;
+            color: #5f5e6a;
+            padding-bottom: 17px;
         }
 
-        /* CTA Section */
-        .cta-section {
-            padding: 80px 7%;
-            background: linear-gradient(135deg, #3171ef 0%, #1e56c7 100%);
-            text-align: center;
-            color: white;
+        /* CTA Banner */
+        .cta-banner-section {
+            padding: 60px 200px;
+            border-top: 1px solid #f0efef;
         }
 
-        .cta-content {
-            max-width: 700px;
-            margin: 0 auto;
-        }
-
-        .cta-section h2 {
-            font-size: 2.25rem;
-            font-weight: 700;
-            margin-bottom: 0.75rem;
-        }
-
-        .cta-section p {
-            font-size: 1.1rem;
-            margin-bottom: 1.5rem;
-            opacity: 0.95;
-        }
-
-        .btn-white {
-            background: white;
-            color: #3171ef;
-            padding: 1rem 2.5rem;
-            border-radius: 6px;
-            text-decoration: none;
-            font-weight: 600;
-            font-size: 1.05rem;
-            display: inline-block;
-            transition: all 0.2s;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-        }
-
-        .btn-white:hover {
-            background: #f0f0f0;
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
-        }
-
-        /* Secondary CTA style */
-        .btn-secondary {
-            background: transparent;
-            color: #3171ef;
-            border: 2px solid #3171ef;
-            padding: 0.9rem 2rem;
-            border-radius: 6px;
-            text-decoration: none;
-            font-weight: 600;
-            font-size: 1rem;
-            display: inline-block;
-            transition: all 0.2s;
-        }
-
-        .btn-secondary:hover {
-            background: #3171ef;
-            color: white;
-        }
-
-        .cta-preview {
-            display: none;
-        }
-
-        .interface-placeholder {
-            width: 100%;
-            aspect-ratio: 16/10;
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        .cta-banner {
+            background: linear-gradient(155.36deg, rgba(215, 232, 255, 1) 3.71%, rgba(195, 195, 232, 1) 40.54%, rgba(134, 180, 247, 1) 66.28%, rgba(80, 155, 230, 1) 92.78%);
+            border-radius: 18px;
+            padding: 40px;
             display: flex;
+            justify-content: space-between;
             align-items: center;
-            justify-content: center;
-            font-size: 4rem;
-            color: #3171ef;
+        }
+
+        .cta-banner-content {
+            display: flex;
+            flex-direction: column;
+            gap: 9px;
+        }
+
+        .cta-banner-title {
+            font-size: 38px;
+            font-weight: 400;
+            letter-spacing: -1.14px;
+            color: white;
+            max-width: 638px;
+        }
+
+        .cta-banner-desc {
+            font-size: 16px;
+            font-weight: 500;
+            letter-spacing: -0.16px;
+            line-height: 1.4;
+            color: white;
+            max-width: 329px;
+        }
+
+        .cta-banner-btn {
+            background: white;
+            color: black;
+            padding: 11px 14px;
+            border-radius: 10px;
+            font-weight: 500;
+            font-size: 15px;
+            letter-spacing: -0.3px;
+            text-decoration: none;
+            box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.04);
+            transition: all 0.2s;
+        }
+
+        .cta-banner-btn:hover {
+            background: #f5f5f5;
+        }
+
+        /* Footer */
+        .landing-footer {
+            padding: 20px 140px 60px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #fdfcfc;
+        }
+
+        .footer-copyright {
+            font-size: 14px;
+            font-weight: 500;
+            letter-spacing: -0.14px;
+            color: #5f5e6a;
+        }
+
+        .footer-nav {
+            display: flex;
+            gap: 28px;
+        }
+
+        .footer-nav a {
+            font-size: 14px;
+            font-weight: 500;
+            letter-spacing: -0.14px;
+            color: #5f5e6a;
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .footer-nav a:hover {
+            color: black;
         }
 
         /* Mobile Menu */
@@ -854,404 +861,134 @@
             border-bottom: none;
         }
 
-        .mobile-menu a:hover {
-            color: #3171ef;
-        }
-
-        .mobile-menu .btn-get-started {
-            display: block;
-            width: 100%;
-            margin-top: 0.75rem;
-            text-align: center;
-            padding: 0.85rem 1.5rem;
-        }
-
         /* Responsive */
-        @media (max-width: 968px) {
+        @media (max-width: 1200px) {
+            .landing-nav {
+                padding: 20px 5%;
+            }
+
+            .hero-section {
+                padding: 120px 5% 0;
+            }
+
+            .hero-content-wrapper {
+                flex-direction: column;
+                gap: 30px;
+            }
+
+            .hero-title {
+                font-size: 40px;
+                width: 100%;
+            }
+
+            .hero-right {
+                width: 100%;
+            }
+
+            .search-bar {
+                width: 90%;
+                max-width: 600px;
+            }
+
+            .feature-section {
+                padding: 20px 5% 0;
+                flex-direction: column;
+            }
+
+            .pricing-section {
+                padding: 60px 5% 30px;
+            }
+
+            .pricing-cards {
+                flex-direction: column;
+            }
+
+            .pricing-card {
+                width: 100%;
+                max-width: 400px;
+            }
+
+            .faq-section {
+                padding: 60px 5% 30px;
+            }
+
+            .cta-banner-section {
+                padding: 60px 5%;
+            }
+
+            .cta-banner {
+                flex-direction: column;
+                gap: 30px;
+                text-align: center;
+            }
+
+            .cta-banner-content {
+                align-items: center;
+            }
+
+            .landing-footer {
+                padding: 20px 5% 60px;
+                flex-direction: column;
+                gap: 20px;
+            }
+        }
+
+        @media (max-width: 768px) {
             .mobile-menu-btn {
                 display: block;
             }
 
-            .hero {
-                padding: 60px 5%;
-                grid-template-columns: 1fr;
-                gap: 40px;
+            .landing-nav .nav-center,
+            .landing-nav .nav-right {
+                display: none;
             }
 
-            .hero-content {
-                text-align: center;
+            .hero-title {
+                font-size: 32px;
             }
 
-            .hero h1 {
-                font-size: 2.5rem;
+            .feature-title,
+            .pricing-title,
+            .faq-title,
+            .cta-banner-title {
+                font-size: 28px;
             }
 
-            .hero-subtitle {
-                font-size: 1.1rem;
-            }
-
-            /* Hero comparison mobile */
-            .hero-comparison {
-                padding: 1.25rem;
-            }
-
-            .comparison-header h3 {
-                font-size: 1rem;
-            }
-
-            .comparison-cards {
-                grid-template-columns: 1fr;
-                gap: 0.75rem;
-            }
-
-            .comparison-card {
-                padding: 1rem;
-            }
-
-            .comparison-card .amount {
-                font-size: 1.5rem;
-            }
-
-            .savings-result .amount {
-                font-size: 1.75rem;
-            }
-
-            .guarantee-badge {
+            .search-bar {
                 flex-direction: column;
-                text-align: center;
-                gap: 0.25rem;
+                padding: 16px;
+                gap: 12px;
             }
 
-            /* Feature sections mobile */
-            .feature-section {
-                padding: 60px 5%;
-            }
-
-            .feature-block {
-                grid-template-columns: 1fr;
-                gap: 40px;
-            }
-
-            .feature-block.reverse {
-                direction: ltr;
-            }
-
-            .feature-content h2 {
-                font-size: 1.75rem;
-            }
-
-            .feature-content p {
-                font-size: 1rem;
-            }
-
-            /* Pricing mobile */
-            .pricing-section {
-                padding: 60px 5%;
-            }
-
-            .pricing-section h2 {
-                font-size: 2rem;
-                margin-bottom: 2rem;
-            }
-
-            .pricing-steps {
-                grid-template-columns: 1fr;
-            }
-
-            .pricing-step {
-                padding: 2rem;
-            }
-
-            .pricing-step.free {
-                border-right: none;
-                border-bottom: 1px solid #e5e5e5;
-            }
-
-            .pricing-step .price {
-                font-size: 2.5rem;
-            }
-
-            .pricing-footer {
-                flex-direction: column;
-                text-align: center;
-                padding: 1.5rem;
-            }
-
-            .pricing-footer p {
-                margin-bottom: 1rem;
-            }
-
-            /* FAQ mobile */
-            .faq-section {
-                padding: 40px 5%;
-            }
-
-            .faq-section h2 {
-                font-size: 1.75rem;
-            }
-
-            /* CTA mobile */
-            .cta-section {
-                padding: 60px 5%;
-            }
-
-            .cta-section h2 {
-                font-size: 1.75rem;
-            }
-
-            .cta-section p {
-                font-size: 1rem;
-            }
-
-            /* Feature mockups mobile */
-            .financial-mockup,
-            .maintenance-mockup {
-                padding: 1rem;
-            }
-
-            .financial-header h3,
-            .maintenance-header h3 {
-                font-size: 1rem;
-            }
-
-            .financial-summary {
-                grid-template-columns: 1fr;
-            }
-
-            .transaction-item {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 0.5rem;
-            }
-
-            .request-header {
-                flex-direction: column;
-                gap: 0.5rem;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .hero h1 {
-                font-size: 2rem;
-            }
-
-            .hero-cta {
-                padding: 1rem 2rem;
-                font-size: 1rem;
+            .search-bar input {
                 width: 100%;
-                text-align: center;
             }
 
-            .comparison-card .amount {
-                font-size: 1.25rem;
-            }
-
-            .savings-result {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-
-            .savings-result .amount {
-                font-size: 1.5rem;
-            }
-
-            .btn-download-report {
+            .search-bar .btn-search {
                 width: 100%;
-                text-align: center;
-                margin-top: 0.5rem;
             }
 
-            .feature-content h2 {
-                font-size: 1.5rem;
+            .process-content {
+                padding: 10px 12px;
             }
 
-            .pricing-step .price {
-                font-size: 2rem;
+            .process-text {
+                font-size: 12px;
             }
-
-            .btn-white {
-                padding: 1rem 2rem;
-                width: 100%;
-                text-align: center;
-            }
-        }
-
-        /* Abstract document preview */
-        .document-preview {
-            position: relative;
-            display: flex;
-            justify-content: center;
-            padding: 2.5rem;
-            background: #e8f0fe;
-            border-radius: 12px;
-        }
-
-        .document-stack {
-            position: relative;
-        }
-
-        .document-page {
-            background: white;
-            border-radius: 6px;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15), 0 2px 10px rgba(0, 0, 0, 0.08);
-            padding: 1.75rem;
-            width: 300px;
-            position: relative;
-            z-index: 3;
-        }
-
-        .document-page::before {
-            content: '';
-            position: absolute;
-            top: 4px;
-            left: 4px;
-            right: -4px;
-            bottom: -4px;
-            background: #f0f0f0;
-            border-radius: 6px;
-            z-index: -1;
-        }
-
-        .document-page::after {
-            content: '';
-            position: absolute;
-            top: 8px;
-            left: 8px;
-            right: -8px;
-            bottom: -8px;
-            background: #e5e5e5;
-            border-radius: 6px;
-            z-index: -2;
-        }
-
-        .document-header {
-            display: flex;
-            align-items: flex-start;
-            gap: 0.75rem;
-            margin-bottom: 1.25rem;
-            padding-bottom: 1rem;
-            border-bottom: 2px solid #f0f0f0;
-        }
-
-        .document-logo {
-            width: 44px;
-            height: 44px;
-            background: linear-gradient(135deg, #3171ef 0%, #1a5ed9 100%);
-            border-radius: 8px;
-            flex-shrink: 0;
-            box-shadow: 0 2px 6px rgba(49, 113, 239, 0.3);
-        }
-
-        .document-title-lines {
-            flex: 1;
-            padding-top: 0.25rem;
-        }
-
-        .line-placeholder {
-            height: 10px;
-            background: linear-gradient(90deg, #e8e8e8 0%, #f2f2f2 50%, #e8e8e8 100%);
-            border-radius: 5px;
-            margin-bottom: 0.5rem;
-        }
-
-        .line-placeholder.wide {
-            width: 100%;
-        }
-
-        .line-placeholder.medium {
-            width: 70%;
-        }
-
-        .line-placeholder.short {
-            width: 50%;
-        }
-
-        .line-placeholder.narrow {
-            width: 35%;
-            height: 8px;
-            background: linear-gradient(90deg, #d8d8d8 0%, #e5e5e5 50%, #d8d8d8 100%);
-            margin-bottom: 0.75rem;
-            text-transform: uppercase;
-        }
-
-        .document-section {
-            margin-bottom: 1.25rem;
-        }
-
-        .document-property-row {
-            display: flex;
-            gap: 0.75rem;
-        }
-
-        .property-photo-placeholder {
-            width: 70px;
-            height: 52px;
-            background: linear-gradient(145deg, #e8f4e8 0%, #d4e8d4 100%);
-            border-radius: 6px;
-            flex-shrink: 0;
-            border: 1px solid #c8e0c8;
-        }
-
-        .property-lines {
-            flex: 1;
-        }
-
-        .document-comparables {
-            display: flex;
-            gap: 0.6rem;
-        }
-
-        .comparable-item {
-            flex: 1;
-            text-align: center;
-        }
-
-        .comparable-photo {
-            width: 100%;
-            height: 44px;
-            background: linear-gradient(145deg, #f5f5f5 0%, #e8e8e8 100%);
-            border-radius: 6px;
-            margin-bottom: 0.5rem;
-            border: 1px solid #e0e0e0;
-        }
-
-        .comparable-item .line-placeholder.short {
-            width: 80%;
-            margin: 0 auto;
-            height: 6px;
-        }
-
-        .document-footer {
-            padding-top: 1rem;
-            margin-top: 0.5rem;
-            border-top: 2px solid #e8f5e9;
-            background: linear-gradient(180deg, rgba(232, 245, 233, 0.3) 0%, transparent 100%);
-            margin: 0 -1.75rem -1.75rem -1.75rem;
-            padding: 1rem 1.75rem 1.25rem 1.75rem;
-            border-radius: 0 0 6px 6px;
-        }
-
-        .document-footer .line-placeholder {
-            height: 8px;
-            margin-bottom: 0.4rem;
-        }
-
-        .document-footer .line-placeholder.wide {
-            background: linear-gradient(90deg, #c8e6c9 0%, #a5d6a7 50%, #c8e6c9 100%);
         }
     </style>
 </head>
 <body>
     <!-- Navigation -->
-    <nav>
-        <div class="logo">🏡 LowerPropTax</div>
-        <ul class="nav-links">
-            <li><a href="#how-it-works">How It Works</a></li>
-            <li><a href="#pricing">Pricing</a></li>
-        </ul>
-        <div class="nav-auth" id="nav-auth">
-            <a href="#" id="nav-signin" onclick="handleSignIn(event)">Log In</a>
-            <a href="#" id="nav-signup" class="btn-get-started" onclick="handleSignUp(event)">Get Started</a>
+    <nav class="landing-nav">
+        <div class="logo">LowerPropTax</div>
+        <div class="nav-center">
+            <a href="#how-it-works">How It Works</a>
+            <a href="#pricing">Pricing</a>
+        </div>
+        <div class="nav-right" id="nav-auth">
+            <a href="#" class="btn-login" onclick="handleSignIn(event)">Login</a>
+            <a href="#" class="btn-get-started-dark" onclick="handleSignUp(event)">Get started</a>
         </div>
         <button class="mobile-menu-btn" id="mobile-menu-btn" aria-label="Toggle menu">☰</button>
     </nav>
@@ -1260,298 +997,422 @@
     <div class="mobile-menu" id="mobile-menu">
         <a href="#how-it-works">How It Works</a>
         <a href="#pricing">Pricing</a>
-        <a href="#" onclick="handleSignIn(event)">Log In</a>
-        <a href="#" class="btn-get-started" onclick="handleSignUp(event)">Get Started</a>
+        <a href="#" onclick="handleSignIn(event)">Login</a>
+        <a href="#" onclick="handleSignUp(event)">Get started</a>
     </div>
 
     <!-- Hero Section -->
-    <section class="hero">
-        <div class="hero-content">
-            <h1>Save hundreds on property taxes</h1>
-            <p class="hero-subtitle">Get a free assessment to see if you're overpaying. Only pay if we find savings. Currently serving Georgia.</p>
-            <a href="#" class="hero-cta" onclick="handleSignUp(event)">Get My Free Assessment</a>
+    <section class="hero-section">
+        <div class="hero-content-wrapper">
+            <h1 class="hero-title">Save hundreds on property taxes</h1>
+            <div class="hero-right">
+                <p class="hero-description">Get a free assessment to see if you're overpaying. Only pay if we find savings. Currently serving Georgia.</p>
+                <a href="#" class="btn-cta-primary" onclick="handleSignUp(event)">Get My Free Assessment</a>
+            </div>
         </div>
-        <div class="hero-image">
-            <div class="hero-comparison">
-                <div class="comparison-header">
-                    <h3>123 Oak Street</h3>
-                    <span>3 bed, 2 bath • 1,850 sq ft</span>
+
+        <!-- Map Container -->
+        <div class="hero-map-container">
+            <img src="https://www.figma.com/api/mcp/asset/504b11af-55f8-455d-b6ab-f91225c414a4" alt="Property map" class="hero-map-image">
+        </div>
+    </section>
+
+    <!-- Search Bar -->
+    <div class="search-bar-container">
+        <div class="search-bar">
+            <svg viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="10" cy="10" r="7"/>
+                <line x1="15" y1="15" x2="20" y2="20"/>
+            </svg>
+            <input type="text" placeholder="Enter address" id="address-input">
+            <button class="btn-search" onclick="handleSearch()">Search</button>
+        </div>
+    </div>
+
+    <!-- Feature Section 1: Comparable Properties -->
+    <section id="how-it-works" class="feature-section" style="margin-top: 100px;">
+        <div class="feature-left">
+            <h2 class="feature-title">We find comparable properties</h2>
+            <p class="feature-description">Our system analyzes recent sales and listings to find 3-5 properties similar to yours. We pull data from public records and multiple listing sources to build a comprehensive comparison.</p>
+            <div class="feature-tags">
+                <div class="feature-tag">
+                    <svg viewBox="0 0 22 22" fill="#303672">
+                        <rect x="2" y="2" width="18" height="18" rx="4" fill="#303672"/>
+                        <path d="M7 11L10 14L15 8" stroke="white" stroke-width="2" fill="none"/>
+                    </svg>
+                    Similar size, age, and condition
                 </div>
-                <div class="comparison-cards">
-                    <div class="comparison-card before">
-                        <label>County Assessment</label>
-                        <div class="amount">$425,000</div>
-                        <div class="sub-label">Current value</div>
+                <div class="feature-tag">
+                    <svg viewBox="0 0 22 22" fill="#303672">
+                        <rect x="2" y="2" width="18" height="18" rx="4" fill="#303672"/>
+                        <path d="M7 11L10 14L15 8" stroke="white" stroke-width="2" fill="none"/>
+                    </svg>
+                    Same neighborhood or nearby areas
+                </div>
+                <div class="feature-tag">
+                    <svg viewBox="0 0 22 22" fill="#303672">
+                        <rect x="2" y="2" width="18" height="18" rx="4" fill="#303672"/>
+                        <path d="M7 11L10 14L15 8" stroke="white" stroke-width="2" fill="none"/>
+                    </svg>
+                    Sales within last 12 months
+                </div>
+                <div class="feature-tag">
+                    <svg viewBox="0 0 22 22" fill="#303672">
+                        <rect x="2" y="2" width="18" height="18" rx="4" fill="#303672"/>
+                        <path d="M7 11L10 14L15 8" stroke="white" stroke-width="2" fill="none"/>
+                    </svg>
+                    Clear market value estimate
+                </div>
+            </div>
+        </div>
+        <div class="feature-right comparables-card">
+            <div class="comparables-header">
+                <div class="comparables-title">Comparable Properties</div>
+                <div class="comparables-stats">
+                    <div class="comp-stat assessed">
+                        <div class="comp-stat-label">Assessed Value</div>
+                        <div class="comp-stat-value">$425,000.00</div>
                     </div>
-                    <div class="comparison-card after">
-                        <label>Market Value</label>
-                        <div class="amount">$397,000</div>
-                        <div class="sub-label">Based on comparables</div>
+                    <div class="comp-stat avg">
+                        <div class="comp-stat-label">Avg Comparable</div>
+                        <div class="comp-stat-value">$397,000.00</div>
                     </div>
                 </div>
-                <div class="savings-result">
-                    <div class="savings-info">
-                        <label>Potential Annual Savings</label>
-                        <div class="amount">$281.44</div>
+            </div>
+            <div class="property-list">
+                <div class="property-item">
+                    <div class="property-item-info">
+                        <div class="property-item-address">112 Oak Street</div>
+                        <div class="property-item-details">3 bed, 2 bath • 1,900 sq ft • Sold Aug 2025</div>
                     </div>
-                    <span class="btn-download-report">Download Report</span>
+                    <div class="property-item-price">$392,000</div>
+                </div>
+                <div class="property-item">
+                    <div class="property-item-info">
+                        <div class="property-item-address">112 Oak Street</div>
+                        <div class="property-item-details">3 bed, 2 bath • 1,900 sq ft • Sold Aug 2025</div>
+                    </div>
+                    <div class="property-item-price">$392,000</div>
+                </div>
+                <div class="property-item">
+                    <div class="property-item-info">
+                        <div class="property-item-address">112 Oak Street</div>
+                        <div class="property-item-details">3 bed, 2 bath • 1,900 sq ft • Sold Aug 2025</div>
+                    </div>
+                    <div class="property-item-price">$392,000</div>
+                </div>
+                <div class="property-item">
+                    <div class="property-item-info">
+                        <div class="property-item-address">112 Oak Street</div>
+                        <div class="property-item-details">3 bed, 2 bath • 1,900 sq ft • Sold Aug 2025</div>
+                    </div>
+                    <div class="property-item-price">$392,000</div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Features Section -->
-    <section id="how-it-works" class="features">
-        <div class="feature-section">
-        <div class="feature-block reverse">
-            <div class="feature-content">
-                <h2>We find comparable properties</h2>
-                <p>Our system analyzes recent sales and listings to find 3-5 properties similar to yours. We pull data from public records and multiple listing sources to build a comprehensive comparison.</p>
-                <ul>
-                    <li>Similar size, age, and condition</li>
-                    <li>Same neighborhood or nearby areas</li>
-                    <li>Recent sales within last 12 months</li>
-                    <li>Clear market value estimate</li>
-                </ul>
-            </div>
-            <div class="feature-image">
-                <div class="financial-mockup">
-                    <div class="financial-header">
-                        <h3>Comparable Properties</h3>
-                    </div>
-                    <div class="financial-summary">
-                        <div class="financial-stat">
-                            <label>Assessed Value</label>
-                            <div class="amount" style="color: #dc2626;">$425,000</div>
-                        </div>
-                        <div class="financial-stat">
-                            <label>Avg Comparable</label>
-                            <div class="amount" style="color: #3171ef;">$397,000</div>
-                        </div>
-                    </div>
-                    <div class="transaction-list">
-                        <div class="transaction-item">
-                            <div class="transaction-details">
-                                <h4>118 Oak Street</h4>
-                                <p>3 bed, 2 bath • 1,900 sq ft • Sold Aug 2025</p>
-                            </div>
-                            <div class="transaction-amount" style="color: #1a1a1a; font-weight: 700;">$392,000</div>
-                        </div>
-                        <div class="transaction-item">
-                            <div class="transaction-details">
-                                <h4>215 Elm Drive</h4>
-                                <p>3 bed, 2 bath • 1,820 sq ft • Sold Jul 2025</p>
-                            </div>
-                            <div class="transaction-amount" style="color: #1a1a1a; font-weight: 700;">$401,500</div>
-                        </div>
-                        <div class="transaction-item">
-                            <div class="transaction-details">
-                                <h4>892 Maple Court</h4>
-                                <p>3 bed, 2 bath • 1,875 sq ft • Sold Sep 2025</p>
-                            </div>
-                            <div class="transaction-amount" style="color: #1a1a1a; font-weight: 700;">$398,200</div>
-                        </div>
-                    </div>
+    <!-- Feature Section 2: Report Ready -->
+    <section class="feature-section">
+        <div class="feature-left" style="padding-top: 60px; padding-bottom: 30px;">
+            <h2 class="feature-title">Report ready for your appeal</h2>
+            <p class="feature-description">Get a professionally formatted PDF report that includes all comparable properties with photos, sale prices, and property details. Just download and attach it to your property tax appeal.</p>
+            <div class="feature-tags">
+                <div class="feature-tag">
+                    <svg viewBox="0 0 22 22" fill="#303672">
+                        <rect x="2" y="2" width="18" height="18" rx="4" fill="#303672"/>
+                        <path d="M7 11L10 14L15 8" stroke="white" stroke-width="2" fill="none"/>
+                    </svg>
+                    Professional PDF format
+                </div>
+                <div class="feature-tag">
+                    <svg viewBox="0 0 22 22" fill="#303672">
+                        <rect x="2" y="2" width="18" height="18" rx="4" fill="#303672"/>
+                        <path d="M7 11L10 14L15 8" stroke="white" stroke-width="2" fill="none"/>
+                    </svg>
+                    Sale dates and prices
+                </div>
+                <div class="feature-tag">
+                    <svg viewBox="0 0 22 22" fill="#303672">
+                        <rect x="2" y="2" width="18" height="18" rx="4" fill="#303672"/>
+                        <path d="M7 11L10 14L15 8" stroke="white" stroke-width="2" fill="none"/>
+                    </svg>
+                    Property photos and details
+                </div>
+                <div class="feature-tag">
+                    <svg viewBox="0 0 22 22" fill="#303672">
+                        <rect x="2" y="2" width="18" height="18" rx="4" fill="#303672"/>
+                        <path d="M7 11L10 14L15 8" stroke="white" stroke-width="2" fill="none"/>
+                    </svg>
+                    Market value analysis
+                </div>
+                <div class="feature-tag">
+                    <svg viewBox="0 0 22 22" fill="#303672">
+                        <rect x="2" y="2" width="18" height="18" rx="4" fill="#303672"/>
+                        <path d="M7 11L10 14L15 8" stroke="white" stroke-width="2" fill="none"/>
+                    </svg>
+                    Square footage comparisons
                 </div>
             </div>
         </div>
+        <div class="feature-right" style="padding-top: 60px;">
+            <div class="download-section">
+                <div class="download-btn">
+                    <svg viewBox="0 0 22 22" fill="currentColor">
+                        <path d="M11 3v12M11 15l-4-4M11 15l4-4M5 19h12"/>
+                    </svg>
+                </div>
+                <div class="download-title">Download Report</div>
+                <div class="download-subtitle">PDF</div>
+            </div>
         </div>
+    </section>
 
-        <div class="feature-section">
-        <div class="feature-block">
-            <div class="feature-content">
-                <h2>Report ready for your appeal</h2>
-                <p>Get a professionally formatted PDF report that includes all comparable properties with photos, sale prices, and property details. Just download and attach it to your property tax appeal.</p>
-                <ul>
-                    <li>Professional PDF format</li>
-                    <li>Property photos and details</li>
-                    <li>Sale dates and prices</li>
-                    <li>Square footage comparisons</li>
-                    <li>Market value analysis</li>
-                </ul>
-            </div>
-            <div class="feature-image">
-                <div class="document-preview">
-                    <div class="document-page">
-                        <div class="document-header">
-                            <div class="document-logo"></div>
-                            <div class="document-title-lines">
-                                <div class="line-placeholder wide"></div>
-                                <div class="line-placeholder medium"></div>
-                            </div>
-                        </div>
-                        <div class="document-section">
-                            <div class="line-placeholder narrow"></div>
-                            <div class="document-property-row">
-                                <div class="property-photo-placeholder"></div>
-                                <div class="property-lines">
-                                    <div class="line-placeholder wide"></div>
-                                    <div class="line-placeholder medium"></div>
-                                    <div class="line-placeholder short"></div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="document-section">
-                            <div class="line-placeholder narrow"></div>
-                            <div class="document-comparables">
-                                <div class="comparable-item">
-                                    <div class="comparable-photo"></div>
-                                    <div class="line-placeholder short"></div>
-                                </div>
-                                <div class="comparable-item">
-                                    <div class="comparable-photo"></div>
-                                    <div class="line-placeholder short"></div>
-                                </div>
-                                <div class="comparable-item">
-                                    <div class="comparable-photo"></div>
-                                    <div class="line-placeholder short"></div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="document-footer">
-                            <div class="line-placeholder wide"></div>
-                            <div class="line-placeholder medium"></div>
-                        </div>
-                    </div>
+    <!-- Feature Section 3: Simple Process -->
+    <section class="feature-section">
+        <div class="feature-left" style="padding-top: 60px; padding-bottom: 30px;">
+            <h2 class="feature-title">Simple 5-minute process</h2>
+            <p class="feature-description">No complicated forms or phone calls. Enter your property address, see your potential savings for free, then decide if you want the full PDF report.</p>
+            <div class="feature-tags">
+                <div class="feature-tag">
+                    <svg viewBox="0 0 22 22" fill="#303672">
+                        <rect x="2" y="2" width="18" height="18" rx="4" fill="#303672"/>
+                        <path d="M7 11L10 14L15 8" stroke="white" stroke-width="2" fill="none"/>
+                    </svg>
+                    Enter your address
+                </div>
+                <div class="feature-tag">
+                    <svg viewBox="0 0 22 22" fill="#303672">
+                        <rect x="2" y="2" width="18" height="18" rx="4" fill="#303672"/>
+                        <path d="M7 11L10 14L15 8" stroke="white" stroke-width="2" fill="none"/>
+                    </svg>
+                    Analyze comparable properties
+                </div>
+                <div class="feature-tag">
+                    <svg viewBox="0 0 22 22" fill="#303672">
+                        <rect x="2" y="2" width="18" height="18" rx="4" fill="#303672"/>
+                        <path d="M7 11L10 14L15 8" stroke="white" stroke-width="2" fill="none"/>
+                    </svg>
+                    See estimated savings
+                </div>
+                <div class="feature-tag">
+                    <svg viewBox="0 0 22 22" fill="#303672">
+                        <rect x="2" y="2" width="18" height="18" rx="4" fill="#303672"/>
+                        <path d="M7 11L10 14L15 8" stroke="white" stroke-width="2" fill="none"/>
+                    </svg>
+                    Pay $49 for full PDF report
+                </div>
+                <div class="feature-tag">
+                    <svg viewBox="0 0 22 22" fill="#303672">
+                        <rect x="2" y="2" width="18" height="18" rx="4" fill="#303672"/>
+                        <path d="M7 11L10 14L15 8" stroke="white" stroke-width="2" fill="none"/>
+                    </svg>
+                    Download and attach to your appeal
                 </div>
             </div>
         </div>
-        </div>
-
-        <div class="feature-section">
-        <div class="feature-block reverse">
-            <div class="feature-content">
-                <h2>Simple 5-minute process</h2>
-                <p>No complicated forms or phone calls. Enter your property address, see your potential savings for free, then decide if you want the full PDF report.</p>
-                <ul>
-                    <li>Enter your property address (free)</li>
-                    <li>We analyze comparable properties</li>
-                    <li>See your estimated savings</li>
-                    <li>Pay $49 only if you want the full PDF report</li>
-                    <li>Download and attach to your appeal</li>
-                </ul>
-            </div>
-            <div class="feature-image">
-                <div class="feature-placeholder">
-                    <div style="text-align: center; padding: 2rem;">
-                        <div style="font-size: 4rem; margin-bottom: 1rem;">✓</div>
-                        <div style="font-size: 1.5rem; font-weight: 700; color: #1a1a1a; margin-bottom: 0.5rem;">Risk-Free</div>
-                        <div style="font-size: 1.1rem; color: #666;">Pay only if we find savings</div>
+        <div class="feature-right">
+            <div class="process-visual">
+                <div class="process-step">
+                    <div class="process-number active">1</div>
+                    <div class="process-content">
+                        <span class="process-text">124 Oak St, Byhalia MS 38611</span>
+                        <svg class="process-check" width="22" height="22" viewBox="0 0 22 22" fill="#5ebe0a">
+                            <rect x="2" y="2" width="18" height="18" rx="4" fill="#5ebe0a"/>
+                            <path d="M7 11L10 14L15 8" stroke="white" stroke-width="2" fill="none"/>
+                        </svg>
+                    </div>
+                </div>
+                <div class="process-line"></div>
+                <div class="process-step">
+                    <div class="process-number inactive">2</div>
+                    <div class="process-content inactive">
+                        <div class="placeholder-bar" style="width: 36px;"></div>
+                        <div class="placeholder-bar" style="width: 96px;"></div>
+                    </div>
+                </div>
+                <div class="process-line"></div>
+                <div class="process-step">
+                    <div class="process-number inactive">3</div>
+                    <div class="process-content inactive">
+                        <div class="placeholder-bar" style="width: 75px;"></div>
+                        <div class="placeholder-bar" style="width: 137px;"></div>
+                    </div>
+                </div>
+                <div class="process-line"></div>
+                <div class="process-step">
+                    <div class="process-number inactive">3</div>
+                    <div class="process-content inactive">
+                        <div class="placeholder-bar" style="width: 131px;"></div>
+                        <div class="placeholder-bar" style="width: 27px;"></div>
                     </div>
                 </div>
             </div>
-        </div>
         </div>
     </section>
 
     <!-- Pricing Section -->
     <section id="pricing" class="pricing-section">
-        <h2>Simple, transparent pricing</h2>
-        <div class="pricing-content">
-            <div class="pricing-steps">
-                <div class="pricing-step free">
-                    <div class="step-number">1</div>
-                    <h3>Free Assessment</h3>
-                    <div class="price">$0</div>
-                    <div class="price-desc">See your potential savings</div>
-                    <ul>
-                        <li>Enter your property address</li>
-                        <li>We analyze comparable sales</li>
-                        <li>See estimated savings</li>
-                        <li>No credit card required</li>
-                    </ul>
+        <h2 class="pricing-title">Simple, transparent pricing</h2>
+        <p class="pricing-subtitle">Experience straightforward pricing with no hidden fees</p>
+
+        <div class="pricing-cards">
+            <div class="pricing-card">
+                <div class="pricing-label">FREE</div>
+                <div>
+                    <div class="pricing-amount">$0</div>
+                    <div class="pricing-desc">See your potential savings</div>
                 </div>
-                <div class="pricing-step paid">
-                    <div class="step-number">2</div>
-                    <h3>Full Report</h3>
-                    <div class="price">$49</div>
-                    <div class="price-desc">Only if we find savings</div>
-                    <ul>
-                        <li>Professional PDF report</li>
-                        <li>3-5 comparable properties</li>
-                        <li>Property photos & details</li>
-                        <li>Ready for your appeal</li>
-                    </ul>
+                <a href="#" class="pricing-btn outline">Free Plan</a>
+                <div class="pricing-features">
+                    <div class="pricing-feature">
+                        <svg viewBox="0 0 20 20" fill="currentColor">
+                            <path d="M6 10l3 3 5-5" stroke="currentColor" stroke-width="2" fill="none"/>
+                        </svg>
+                        Enter your property address
+                    </div>
+                    <div class="pricing-feature">
+                        <svg viewBox="0 0 20 20" fill="currentColor">
+                            <path d="M6 10l3 3 5-5" stroke="currentColor" stroke-width="2" fill="none"/>
+                        </svg>
+                        We analyze comparable sales
+                    </div>
+                    <div class="pricing-feature">
+                        <svg viewBox="0 0 20 20" fill="currentColor">
+                            <path d="M6 10l3 3 5-5" stroke="currentColor" stroke-width="2" fill="none"/>
+                        </svg>
+                        See estimated savings
+                    </div>
+                    <div class="pricing-feature">
+                        <svg viewBox="0 0 20 20" fill="currentColor">
+                            <path d="M6 10l3 3 5-5" stroke="currentColor" stroke-width="2" fill="none"/>
+                        </svg>
+                        No credit card required
+                    </div>
                 </div>
             </div>
-            <div class="pricing-footer">
-                <p><strong>Risk-free guarantee:</strong> If we don't find any savings, you pay nothing.</p>
-                <a href="#" class="hero-cta" onclick="handleSignUp(event)">Get Started Free</a>
+            <div class="pricing-card highlighted">
+                <div class="pricing-label">FULL REPORT</div>
+                <div>
+                    <div class="pricing-amount">$49</div>
+                    <div class="pricing-desc">Only if we find savings</div>
+                </div>
+                <a href="#" class="pricing-btn primary" onclick="handleSignUp(event)">Get Started</a>
+                <div class="pricing-features">
+                    <div class="pricing-feature">
+                        <svg viewBox="0 0 20 20" fill="currentColor">
+                            <path d="M6 10l3 3 5-5" stroke="currentColor" stroke-width="2" fill="none"/>
+                        </svg>
+                        Professional PDF report
+                    </div>
+                    <div class="pricing-feature">
+                        <svg viewBox="0 0 20 20" fill="currentColor">
+                            <path d="M6 10l3 3 5-5" stroke="currentColor" stroke-width="2" fill="none"/>
+                        </svg>
+                        3-5 comparable properties
+                    </div>
+                    <div class="pricing-feature">
+                        <svg viewBox="0 0 20 20" fill="currentColor">
+                            <path d="M6 10l3 3 5-5" stroke="currentColor" stroke-width="2" fill="none"/>
+                        </svg>
+                        Property photos & details
+                    </div>
+                    <div class="pricing-feature">
+                        <svg viewBox="0 0 20 20" fill="currentColor">
+                            <path d="M6 10l3 3 5-5" stroke="currentColor" stroke-width="2" fill="none"/>
+                        </svg>
+                        Ready for your appeal
+                    </div>
+                </div>
             </div>
         </div>
     </section>
 
     <!-- FAQ Section -->
     <section class="faq-section">
-        <h2>Frequently asked questions</h2>
+        <h2 class="faq-title">Frequently asked questions</h2>
         <div class="faq-list">
-            <div class="faq-item">
+            <div class="faq-item open">
                 <button class="faq-question">
-                    <span>How does the appeal process work?</span>
-                    <span class="faq-icon">+</span>
+                    <span class="faq-question-text">How does the appeal process work?</span>
+                    <svg class="faq-icon" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="9" y1="4" x2="9" y2="14"/>
+                        <line x1="4" y1="9" x2="14" y2="9"/>
+                    </svg>
                 </button>
                 <div class="faq-answer">
-                    <p>Once you receive your report, you submit it along with your appeal form to your county assessor's office. The report provides the comparable property evidence needed to support your case for a lower assessment.</p>
+                    <p class="faq-answer-text">Once you receive your report, you submit it along with your appeal form to your county assessor's office. The report provides the comparable property evidence needed to support your case for a lower assessment.</p>
                 </div>
             </div>
             <div class="faq-item">
                 <button class="faq-question">
-                    <span>When should I file my appeal?</span>
-                    <span class="faq-icon">+</span>
+                    <span class="faq-question-text">When should I file my appeal?</span>
+                    <svg class="faq-icon" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="9" y1="4" x2="9" y2="14"/>
+                        <line x1="4" y1="9" x2="14" y2="9"/>
+                    </svg>
                 </button>
                 <div class="faq-answer">
-                    <p>Appeal deadlines vary by county in Georgia, typically 45 days after you receive your assessment notice. We recommend starting your assessment with us as soon as you receive your notice.</p>
+                    <p class="faq-answer-text">Appeal deadlines vary by county in Georgia, typically 45 days after you receive your assessment notice. We recommend starting your assessment with us as soon as you receive your notice.</p>
                 </div>
             </div>
             <div class="faq-item">
                 <button class="faq-question">
-                    <span>What if you don't find any savings?</span>
-                    <span class="faq-icon">+</span>
+                    <span class="faq-question-text">What if you don't find any savings?</span>
+                    <svg class="faq-icon" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="9" y1="4" x2="9" y2="14"/>
+                        <line x1="4" y1="9" x2="14" y2="9"/>
+                    </svg>
                 </button>
                 <div class="faq-answer">
-                    <p>If our analysis shows your property is fairly assessed or we can't find comparable properties that support a lower value, you pay nothing. The initial assessment is always free.</p>
+                    <p class="faq-answer-text">If our analysis shows your property is fairly assessed or we can't find comparable properties that support a lower value, you pay nothing. The initial assessment is always free.</p>
                 </div>
             </div>
             <div class="faq-item">
                 <button class="faq-question">
-                    <span>What areas do you service?</span>
-                    <span class="faq-icon">+</span>
+                    <span class="faq-question-text">What areas do you service?</span>
+                    <svg class="faq-icon" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="9" y1="4" x2="9" y2="14"/>
+                        <line x1="4" y1="9" x2="14" y2="9"/>
+                    </svg>
                 </button>
                 <div class="faq-answer">
-                    <p>We currently serve homeowners throughout Georgia. We're working on expanding to other states soon. Enter your address to see if we can help with your property.</p>
+                    <p class="faq-answer-text">We currently serve homeowners throughout Georgia. We're working on expanding to other states soon. Enter your address to see if we can help with your property.</p>
                 </div>
             </div>
             <div class="faq-item">
                 <button class="faq-question">
-                    <span>How long does it take to get my report?</span>
-                    <span class="faq-icon">+</span>
+                    <span class="faq-question-text">How long does it take to get my report?</span>
+                    <svg class="faq-icon" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="9" y1="4" x2="9" y2="14"/>
+                        <line x1="4" y1="9" x2="14" y2="9"/>
+                    </svg>
                 </button>
                 <div class="faq-answer">
-                    <p>Most reports are ready within 24 hours of entering your property. We'll email you as soon as your assessment is complete and ready to download.</p>
+                    <p class="faq-answer-text">Most reports are ready within 24 hours of entering your property. We'll email you as soon as your assessment is complete and ready to download.</p>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- CTA Section -->
-    <section id="contact" class="cta-section">
-        <div class="cta-content">
-            <h2>Ready to lower your property taxes?</h2>
-            <p>Get your free assessment in minutes. Only pay if we find savings.</p>
-            <a href="#" class="btn-white" onclick="handleSignUp(event)">Get My Free Assessment</a>
-            <p style="margin-top: 1rem; font-size: 0.9rem; opacity: 0.85;">No credit card required • Results in 24 hours</p>
+    <!-- CTA Banner -->
+    <section class="cta-banner-section">
+        <div class="cta-banner">
+            <div class="cta-banner-content">
+                <h2 class="cta-banner-title">Ready to lower your property taxes?</h2>
+                <p class="cta-banner-desc">Get your free assessment in minutes. Only pay if we find savings.</p>
+            </div>
+            <a href="#" class="cta-banner-btn" onclick="handleSignUp(event)">Get My Free Assessment</a>
         </div>
     </section>
 
     <!-- Footer -->
-    <footer>
-        <div class="footer-content">
-            <div class="footer-text">&copy; 2025 LowerPropTax. All rights reserved.</div>
-            <div class="footer-links">
-                <a href="mailto:help@lowerproptax.com">Help</a>
-                <a href="terms.html#privacy-policy">Privacy</a>
-                <a href="terms.html">Terms</a>
-            </div>
+    <footer class="landing-footer">
+        <div class="footer-copyright">© 2025 LowerPropTax. All rights reserved.</div>
+        <div class="footer-nav">
+            <a href="mailto:help@lowerproptax.com">Help</a>
+            <a href="terms.html#privacy-policy">Privacy</a>
+            <a href="terms.html">Terms</a>
         </div>
     </footer>
 
@@ -1598,7 +1459,7 @@
 
         function updateNavForSignedInUser() {
             const navAuth = document.getElementById('nav-auth');
-            navAuth.innerHTML = '<a href="dashboard.html" class="btn-get-started">Go to Dashboard</a>';
+            navAuth.innerHTML = '<a href="dashboard.html" class="btn-get-started-dark">Go to Dashboard</a>';
         }
 
         async function handleSignIn(event) {
@@ -1649,6 +1510,14 @@
             }
         }
 
+        function handleSearch() {
+            const address = document.getElementById('address-input').value;
+            if (address.trim()) {
+                // Redirect to sign up with the address
+                handleSignUp(new Event('click'));
+            }
+        }
+
         // Mobile menu toggle
         const mobileMenuBtn = document.getElementById('mobile-menu-btn');
         const mobileMenu = document.getElementById('mobile-menu');
@@ -1689,8 +1558,21 @@
         document.querySelectorAll('.faq-question').forEach(button => {
             button.addEventListener('click', function() {
                 const item = this.parentElement;
+                // Close other items
+                document.querySelectorAll('.faq-item').forEach(otherItem => {
+                    if (otherItem !== item) {
+                        otherItem.classList.remove('open');
+                    }
+                });
                 item.classList.toggle('open');
             });
+        });
+
+        // Handle enter key on search input
+        document.getElementById('address-input').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                handleSearch();
+            }
         });
     </script>
 </body>
