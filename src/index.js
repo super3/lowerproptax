@@ -5,12 +5,16 @@ import { clerkMiddleware } from '@clerk/express';
 import propertyRoutes from './routes/propertyRoutes.js';
 import adminRoutes from './routes/adminRoutes.js';
 import { initDatabase } from './db/init.js';
+import { validateEnv } from './config/env.js';
 
 // Load environment variables
 dotenv.config();
 
+// Validate required environment variables at startup
+const env = validateEnv();
+
 const app = express();
-const PORT = process.env.PORT || 3001;
+const PORT = env.PORT;
 
 // Middleware
 app.use(cors({
@@ -45,7 +49,7 @@ async function startServer() {
     await initDatabase();
     app.listen(PORT, '0.0.0.0', () => {
       console.log(`LowerPropTax server running on http://localhost:${PORT}`);
-      console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
+      console.log(`Environment: ${env.NODE_ENV}`);
     });
   } catch (error) {
     console.error('Failed to start server:', error);
