@@ -1,8 +1,86 @@
+import type { Response } from 'express';
 import pool from '../db/connection.js';
 import { sendAssessmentReadyNotification } from '../services/emailService.js';
+import type { AuthenticatedRequest, Property, Assessment, UpdatePropertyDetailsBody, CurrentAssessmentPlaceholder } from '../types/index.js';
+
+// Row types from database
+interface PendingPropertyRow {
+  id: string;
+  address: string;
+  city: string;
+  state: string;
+  zip_code: string;
+  status: string | null;
+  created_at: Date;
+  user_id: string;
+}
+
+interface CompletedPropertyRow {
+  id: string;
+  address: string;
+  city: string;
+  state: string;
+  zip_code: string;
+  status: string;
+  created_at: Date;
+  updated_at: Date;
+  user_id: string;
+}
+
+interface PropertyDetailsRow {
+  id: string;
+  address: string;
+  city: string;
+  state: string;
+  zipCode: string;
+  country: string;
+  lat: number | null;
+  lng: number | null;
+  bedrooms: number | null;
+  bathrooms: number | null;
+  sqft: number | null;
+  createdAt: Date;
+  updatedAt: Date;
+  userId: string;
+  assessments?: Assessment[];
+  currentAssessment?: Assessment | CurrentAssessmentPlaceholder;
+  userEmail?: string | null;
+}
+
+interface AssessmentRow {
+  id: string;
+  year: number;
+  appraisedValue: number | null;
+  annualTax: number | null;
+  estimatedAppraisedValue: number | null;
+  estimatedAnnualTax: number | null;
+  reportUrl: string | null;
+  status: string;
+  createdAt: Date;
+  updatedAt: Date;
+  annual_tax?: number | null;
+  estimated_annual_tax?: number | null;
+}
+
+interface UpdatedPropertyRow {
+  id: string;
+  address?: string;
+  city?: string;
+  state?: string;
+  zip_code?: string;
+  user_id: string;
+  bedrooms?: number;
+  bathrooms?: number;
+  sqft?: number;
+  updated_at: Date;
+}
+
+interface ClerkUserResponse {
+  email_addresses?: Array<{ email_address: string }>;
+}
 
 // Get all pending properties (status = 'preparing')
-export async function getPendingProperties(req, res) {
+export async function getPendingProperties(req: AuthenticatedRequest, res: Response): Promise<void> {
   try {
     const query = `
       SELECT
@@ -21,10 +99,10 @@ export async function getPendingProperties(req, res) {
       ORDER BY p.created_at ASC
     `;
 
-    const result = await pool.query(query);
+    const result = await pool.query<PendingPropertyRow>(query);
 
     // Ensure status defaults to 'preparing' if null
-    const properties = result.rows.map(prop => ({
+    const properties = result.rows.map((prop: PendingPropertyRow) => ({
       ...prop,
       status: prop.status || 'preparing'
     }));
@@ -37,7 +115,7 @@ export async function getPendingProperties(req, res) {
 }
 
 // Get all completed properties (status = 'ready' or 'invalid')
-export async function getCompletedProperties(req, res) {
+export async function getCompletedProperties(req: AuthenticatedRequest, res: Response): Promise<void> {
   try {
     const query = `
       SELECT
@@ -57,7 +135,7 @@ export async function getCompletedProperties(req, res) {
       ORDER BY p.updated_at DESC
     `;
 
-    const result = await pool.query(query);
+    const result = await pool.query<CompletedPropertyRow>(query);
 
     res.json(result.rows);
   } catch (error) {
@@ -67,7 +145,7 @@ export async function getCompletedProperties(req, res) {
 }
 
 // Get a single property details for admin editing
-export async function getPropertyDetails(req, res) {
+export async function getPropertyDetails(req: AuthenticatedRequest, res: Response): Promise<void> {
   try {
     const { id } = req.params;
 
@@ -91,16 +169,17 @@ export async function getPropertyDetails(req, res) {
       WHERE id = $1
     `;
 
-    const result = await pool.query(query, [id]);
+    const result = await pool.query<PropertyDetailsRow>(query, [id]);
 
     if (result.rows.length === 0) {
-      return res.status(404).json({ error: 'Property not found' });
+      res.status(404).json({ error: 'Property not found' });
+      return;
     }
 
     const property = result.rows[0];
 
     // Get assessments for this property
-    const assessmentsResult = await pool.query(
+    const assessmentsResult = await pool.query<AssessmentRow>(
       `SELECT id, year, appraised_value as "appraisedValue", annual_tax as "annualTax",
               estimated_appraised_value as "estimatedAppraisedValue",
               estimated_annual_tax as "estimatedAnnualTax", report_url as "reportUrl",
@@ -115,7 +194,7 @@ export async function getPropertyDetails(req, res) {
 
     // Get current year's assessment or create default
     const currentYear = new Date().getFullYear();
-    const currentAssessment = assessmentsResult.rows.find(a => a.year === currentYear);
+    const currentAssessment = assessmentsResult.rows.find((a: AssessmentRow) => a.year === currentYear);
 
     property.currentAssessment = currentAssessment || {
       year: currentYear,
@@ -138,7 +217,7 @@ export async function getPropertyDetails(req, res) {
         });
 
         if (clerkResponse.ok) {
-          const clerkUser = await clerkResponse.json();
+          const clerkUser = await clerkResponse.json() as ClerkUserResponse;
           property.userEmail = clerkUser.email_addresses?.[0]?.email_address || null;
         } else {
           property.userEmail = null;
@@ -159,7 +238,7 @@ export async function getPropertyDetails(req, res) {
 }
 
 // Update property details
-export async function updatePropertyDetails(req, res) {
+export async function updatePropertyDetails(req: AuthenticatedRequest, res: Response): Promise<void> {
   try {
     const { id } = req.params;
     const {
@@ -173,7 +252,7 @@ export async function updatePropertyDetails(req, res) {
       estimatedAnnualTax,
       reportUrl,
       status
-    } = req.body;
+    } = req.body as UpdatePropertyDetailsBody;
 
     // Update property (bedrooms, bathrooms, sqft)
     const propertyQuery = `
@@ -187,7 +266,7 @@ export async function updatePropertyDetails(req, res) {
       RETURNING *
     `;
 
-    const propertyResult = await pool.query(propertyQuery, [
+    const propertyResult = await pool.query<UpdatedPropertyRow>(propertyQuery, [
       bedrooms !== undefined ? bedrooms : null,
       bathrooms !== undefined ? bathrooms : null,
       sqft !== undefined ? sqft : null,
@@ -195,7 +274,8 @@ export async function updatePropertyDetails(req, res) {
     ]);
 
     if (propertyResult.rows.length === 0) {
-      return res.status(404).json({ error: 'Property not found' });
+      res.status(404).json({ error: 'Property not found' });
+      return;
     }
 
     // Update or create assessment for the specified year (or current year if not specified)
@@ -219,7 +299,7 @@ export async function updatePropertyDetails(req, res) {
     `;
 
     const assessmentId = `assess_${id}_${assessmentYear}`;
-    const assessmentResult = await pool.query(assessmentQuery, [
+    const assessmentResult = await pool.query<AssessmentRow>(assessmentQuery, [
       assessmentId,
       id,
       assessmentYear,
@@ -254,10 +334,10 @@ export async function updatePropertyDetails(req, res) {
           });
 
           if (clerkResponse.ok) {
-            const clerkUser = await clerkResponse.json();
+            const clerkUser = await clerkResponse.json() as ClerkUserResponse;
             const userEmail = clerkUser.email_addresses?.[0]?.email_address;
             if (userEmail) {
-              sendAssessmentReadyNotification(property, assessment, userEmail).catch(() => {});
+              sendAssessmentReadyNotification(property as unknown as Property, assessment, userEmail).catch(() => {});
             }
           }
         }
@@ -274,7 +354,7 @@ export async function updatePropertyDetails(req, res) {
 }
 
 // Mark property as ready (legacy function, kept for backward compatibility)
-export async function markPropertyAsReady(req, res) {
+export async function markPropertyAsReady(req: AuthenticatedRequest, res: Response): Promise<void> {
   try {
     const { id } = req.params;
 
@@ -285,10 +365,11 @@ export async function markPropertyAsReady(req, res) {
       RETURNING *
     `;
 
-    const result = await pool.query(query, [id]);
+    const result = await pool.query<UpdatedPropertyRow>(query, [id]);
 
     if (result.rows.length === 0) {
-      return res.status(404).json({ error: 'Property not found' });
+      res.status(404).json({ error: 'Property not found' });
+      return;
     }
 
     res.json(result.rows[0]);

@@ -1,8 +1,9 @@
 import { Resend } from 'resend';
+import type { EmailProperty, EmailAssessment } from '../types/index.js';
 
 const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
 
-export async function sendNewPropertyNotification(property, userEmail) {
+export async function sendNewPropertyNotification(property: EmailProperty, userEmail: string | null | undefined): Promise<void> {
   if (!resend) {
     console.log('Email service not configured (RESEND_API_KEY missing)');
     return;
@@ -27,11 +28,11 @@ Created: ${new Date().toISOString()}
     });
     console.log(`Email notification sent for property ${id}`);
   } catch (error) {
-    console.error('Failed to send email notification:', error.message);
+    console.error('Failed to send email notification:', (error as Error).message);
   }
 }
 
-export async function sendAssessmentReadyNotification(property, assessment, userEmail) {
+export async function sendAssessmentReadyNotification(property: EmailProperty, assessment: EmailAssessment, userEmail: string): Promise<void> {
   if (!resend) {
     console.log('Email service not configured (RESEND_API_KEY missing)');
     return;
@@ -42,8 +43,8 @@ export async function sendAssessmentReadyNotification(property, assessment, user
   const fullAddress = location ? `${address}, ${location}` : address;
 
   // Calculate savings
-  const annualTax = parseFloat(assessment.annualTax) || 0;
-  const estimatedAnnualTax = parseFloat(assessment.estimatedAnnualTax) || 0;
+  const annualTax = parseFloat(String(assessment.annualTax)) || 0;
+  const estimatedAnnualTax = parseFloat(String(assessment.estimatedAnnualTax)) || 0;
   const savings = annualTax - estimatedAnnualTax;
   const savingsFormatted = savings > 0
     ? `$${savings.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
@@ -73,6 +74,6 @@ Questions? Reply to this email and we'll be happy to help.
     });
     console.log(`Assessment ready notification sent for property ${id} to ${userEmail}`);
   } catch (error) {
-    console.error('Failed to send assessment ready notification:', error.message);
+    console.error('Failed to send assessment ready notification:', (error as Error).message);
   }
 }

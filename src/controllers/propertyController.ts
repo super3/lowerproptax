@@ -1,18 +1,53 @@
+import type { Response } from 'express';
 import pool from '../db/connection.js';
 import { sendNewPropertyNotification } from '../services/emailService.js';
+import type { AuthenticatedRequest, Property, Assessment, CreatePropertyBody, UpdatePropertyBody } from '../types/index.js';
+
+// Row types from database
+interface PropertyRow {
+  id: string;
+  userId: string;
+  address: string;
+  city: string;
+  state: string;
+  zipCode: string;
+  country: string;
+  lat: number | null;
+  lng: number | null;
+  bedrooms: number | null;
+  bathrooms: number | null;
+  sqft: number | null;
+  createdAt: Date;
+  updatedAt: Date;
+  assessmentId?: string | null;
+  assessmentYear?: number | null;
+  assessmentAppraisedValue?: number | null;
+  assessmentAnnualTax?: number | null;
+  assessmentEstimatedAppraisedValue?: number | null;
+  assessmentEstimatedAnnualTax?: number | null;
+  assessmentReportUrl?: string | null;
+  assessmentStatus?: string | null;
+  assessmentCreatedAt?: Date | null;
+  assessmentUpdatedAt?: Date | null;
+  assessments?: Assessment[];
+}
+
+interface OwnershipRow {
+  user_id: string;
+}
 
 // Test helper to reset storage
-export async function resetProperties() {
+export async function resetProperties(): Promise<void> {
   await pool.query('DELETE FROM properties');
 }
 
 // Get all properties for the authenticated user
-export async function getProperties(req, res) {
+export async function getProperties(req: AuthenticatedRequest, res: Response): Promise<void> {
   try {
     const userId = req.user.id;
 
     // Single query with LEFT JOIN to get properties and their latest assessments
-    const result = await pool.query(
+    const result = await pool.query<PropertyRow>(
       `SELECT p.id, p.user_id as "userId", p.address, p.city, p.state,
               p.zip_code as "zipCode", p.country, p.lat, p.lng,
               p.bedrooms, p.bathrooms, p.sqft,
@@ -38,7 +73,7 @@ export async function getProperties(req, res) {
     );
 
     // Transform flat rows into nested structure
-    const properties = result.rows.map(row => ({
+    const properties: Property[] = result.rows.map((row: PropertyRow) => ({
       id: row.id,
       userId: row.userId,
       address: row.address,
@@ -55,15 +90,15 @@ export async function getProperties(req, res) {
       updatedAt: row.updatedAt,
       latestAssessment: row.assessmentId ? {
         id: row.assessmentId,
-        year: row.assessmentYear,
+        year: row.assessmentYear as number,
         appraisedValue: row.assessmentAppraisedValue,
         annualTax: row.assessmentAnnualTax,
         estimatedAppraisedValue: row.assessmentEstimatedAppraisedValue,
         estimatedAnnualTax: row.assessmentEstimatedAnnualTax,
         reportUrl: row.assessmentReportUrl,
-        status: row.assessmentStatus,
-        createdAt: row.assessmentCreatedAt,
-        updatedAt: row.assessmentUpdatedAt
+        status: row.assessmentStatus || undefined,
+        createdAt: row.assessmentCreatedAt || undefined,
+        updatedAt: row.assessmentUpdatedAt || undefined
       } : null
     }));
 
@@ -75,10 +110,10 @@ export async function getProperties(req, res) {
 }
 
 // Get a single property by ID
-export async function getProperty(req, res) {
+export async function getProperty(req: AuthenticatedRequest, res: Response): Promise<void> {
   try {
     const { id } = req.params;
-    const result = await pool.query(
+    const result = await pool.query<PropertyRow>(
       `SELECT id, user_id as "userId", address, city, state,
               zip_code as "zipCode", country, lat, lng,
               bedrooms, bathrooms, sqft,
@@ -88,18 +123,20 @@ export async function getProperty(req, res) {
     );
 
     if (result.rows.length === 0) {
-      return res.status(404).json({ error: 'Property not found' });
+      res.status(404).json({ error: 'Property not found' });
+      return;
     }
 
-    const property = result.rows[0];
+    const property = result.rows[0] as PropertyRow & { assessments?: Assessment[] };
 
     // Ensure user owns this property
     if (property.userId !== req.user.id) {
-      return res.status(403).json({ error: 'Access denied' });
+      res.status(403).json({ error: 'Access denied' });
+      return;
     }
 
     // Get all assessments for this property
-    const assessmentsResult = await pool.query(
+    const assessmentsResult = await pool.query<Assessment>(
       `SELECT id, year, appraised_value as "appraisedValue",
               annual_tax as "annualTax", estimated_appraised_value as "estimatedAppraisedValue",
               estimated_annual_tax as "estimatedAnnualTax", report_url as "reportUrl",
@@ -120,17 +157,18 @@ export async function getProperty(req, res) {
 }
 
 // Create a new property
-export async function createProperty(req, res) {
+export async function createProperty(req: AuthenticatedRequest, res: Response): Promise<void> {
   try {
-    const { address, city, state, zipCode, country, lat, lng } = req.body;
+    const { address, city, state, zipCode, country, lat, lng } = req.body as CreatePropertyBody;
 
     if (!address) {
-      return res.status(400).json({ error: 'Address is required' });
+      res.status(400).json({ error: 'Address is required' });
+      return;
     }
 
     const propertyId = `prop_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
 
-    const result = await pool.query(
+    const result = await pool.query<PropertyRow>(
       `INSERT INTO properties (id, user_id, address, city, state, zip_code, country, lat, lng, created_at, updated_at)
        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, NOW(), NOW())
        RETURNING id, user_id as "userId", address, city, state,
@@ -162,30 +200,32 @@ export async function createProperty(req, res) {
 }
 
 // Update a property
-export async function updateProperty(req, res) {
+export async function updateProperty(req: AuthenticatedRequest, res: Response): Promise<void> {
   try {
     const { id } = req.params;
 
     // First check if property exists and user owns it
-    const checkResult = await pool.query(
+    const checkResult = await pool.query<OwnershipRow>(
       'SELECT user_id FROM properties WHERE id = $1',
       [id]
     );
 
     if (checkResult.rows.length === 0) {
-      return res.status(404).json({ error: 'Property not found' });
+      res.status(404).json({ error: 'Property not found' });
+      return;
     }
 
     const property = checkResult.rows[0];
 
     // Ensure user owns this property
     if (property.user_id !== req.user.id) {
-      return res.status(403).json({ error: 'Access denied' });
+      res.status(403).json({ error: 'Access denied' });
+      return;
     }
 
-    const { address, city, state, zipCode, country, lat, lng } = req.body;
+    const { address, city, state, zipCode, country, lat, lng } = req.body as UpdatePropertyBody;
 
-    const result = await pool.query(
+    const result = await pool.query<PropertyRow>(
       `UPDATE properties
        SET address = COALESCE($1, address),
            city = COALESCE($2, city),
@@ -219,25 +259,27 @@ export async function updateProperty(req, res) {
 }
 
 // Delete a property
-export async function deleteProperty(req, res) {
+export async function deleteProperty(req: AuthenticatedRequest, res: Response): Promise<void> {
   try {
     const { id } = req.params;
 
     // First check if property exists and user owns it
-    const checkResult = await pool.query(
+    const checkResult = await pool.query<OwnershipRow>(
       'SELECT user_id FROM properties WHERE id = $1',
       [id]
     );
 
     if (checkResult.rows.length === 0) {
-      return res.status(404).json({ error: 'Property not found' });
+      res.status(404).json({ error: 'Property not found' });
+      return;
     }
 
     const property = checkResult.rows[0];
 
     // Ensure user owns this property
     if (property.user_id !== req.user.id) {
-      return res.status(403).json({ error: 'Access denied' });
+      res.status(403).json({ error: 'Access denied' });
+      return;
     }
 
     await pool.query('DELETE FROM properties WHERE id = $1', [id]);

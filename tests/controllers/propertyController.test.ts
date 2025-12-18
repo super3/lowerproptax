@@ -2,7 +2,9 @@ import { jest } from '@jest/globals';
 import {
   createMockRequest,
   createMockResponse,
-  mockUser
+  mockUser,
+  MockRequest,
+  MockResponse
 } from '../utils/mockClerk.js';
 import { addMockAssessment, clearMockAssessments } from '../utils/mockDatabase.js';
 
@@ -10,7 +12,8 @@ import { addMockAssessment, clearMockAssessments } from '../utils/mockDatabase.j
 const propertyController = await import('../../src/controllers/propertyController.js');
 
 describe('Property Controller', () => {
-  let req, res;
+  let req: MockRequest;
+  let res: MockResponse;
 
   beforeEach(async () => {
     // Reset properties storage before each test
@@ -25,7 +28,7 @@ describe('Property Controller', () => {
 
   describe('getProperties', () => {
     test('should return empty array when user has no properties', async () => {
-      await propertyController.getProperties(req, res);
+      await propertyController.getProperties(req as any, res as any);
 
       expect(res.json).toHaveBeenCalledWith([]);
     });
@@ -48,8 +51,8 @@ describe('Property Controller', () => {
 
       // Add property for our user
       req.body = property1;
-      await propertyController.createProperty(req, res);
-      const userProperty = res.json.mock.calls[0][0];
+      await propertyController.createProperty(req as any, res as any);
+      const userProperty = (res.json as jest.Mock).mock.calls[0][0];
 
       // Add property for another user
       const otherUserReq = createMockRequest({
@@ -57,15 +60,15 @@ describe('Property Controller', () => {
         body: property2
       });
       const otherUserRes = createMockResponse();
-      await propertyController.createProperty(otherUserReq, otherUserRes);
+      await propertyController.createProperty(otherUserReq as any, otherUserRes as any);
 
       // Reset mocks
-      res.json.mockClear();
+      (res.json as jest.Mock).mockClear();
 
       // Get properties for our user
-      await propertyController.getProperties(req, res);
+      await propertyController.getProperties(req as any, res as any);
 
-      const properties = res.json.mock.calls[0][0];
+      const properties = (res.json as jest.Mock).mock.calls[0][0];
       expect(properties).toHaveLength(1);
       expect(properties[0].userId).toBe(mockUser.id);
       expect(properties[0].address).toBe(property1.address);
@@ -79,8 +82,8 @@ describe('Property Controller', () => {
         state: 'CO',
         zipCode: '80201'
       };
-      await propertyController.createProperty(req, res);
-      const createdProperty = res.json.mock.calls[0][0];
+      await propertyController.createProperty(req as any, res as any);
+      const createdProperty = (res.json as jest.Mock).mock.calls[0][0];
 
       // Add an assessment for this property
       addMockAssessment(createdProperty.id, {
@@ -97,10 +100,10 @@ describe('Property Controller', () => {
       });
 
       // Reset mocks and get properties
-      res.json.mockClear();
-      await propertyController.getProperties(req, res);
+      (res.json as jest.Mock).mockClear();
+      await propertyController.getProperties(req as any, res as any);
 
-      const properties = res.json.mock.calls[0][0];
+      const properties = (res.json as jest.Mock).mock.calls[0][0];
       expect(properties).toHaveLength(1);
       expect(properties[0].latestAssessment).not.toBeNull();
       expect(properties[0].latestAssessment.id).toBe('assess_123');
@@ -114,7 +117,7 @@ describe('Property Controller', () => {
     test('should return 404 if property does not exist', async () => {
       req.params = { id: 'nonexistent_id' };
 
-      await propertyController.getProperty(req, res);
+      await propertyController.getProperty(req as any, res as any);
 
       expect(res.status).toHaveBeenCalledWith(404);
       expect(res.json).toHaveBeenCalledWith({
@@ -133,13 +136,13 @@ describe('Property Controller', () => {
         }
       });
       const otherUserRes = createMockResponse();
-      await propertyController.createProperty(otherUserReq, otherUserRes);
-      const otherProperty = otherUserRes.json.mock.calls[0][0];
+      await propertyController.createProperty(otherUserReq as any, otherUserRes as any);
+      const otherProperty = (otherUserRes.json as jest.Mock).mock.calls[0][0];
 
       // Try to get it with our user
       req.params = { id: otherProperty.id };
 
-      await propertyController.getProperty(req, res);
+      await propertyController.getProperty(req as any, res as any);
 
       expect(res.status).toHaveBeenCalledWith(403);
       expect(res.json).toHaveBeenCalledWith({
@@ -154,16 +157,16 @@ describe('Property Controller', () => {
         city: 'Atlanta',
         state: 'GA'
       };
-      await propertyController.createProperty(req, res);
-      const property = res.json.mock.calls[0][0];
+      await propertyController.createProperty(req as any, res as any);
+      const property = (res.json as jest.Mock).mock.calls[0][0];
 
       // Reset mocks
-      res.json.mockClear();
+      (res.json as jest.Mock).mockClear();
 
       // Get the property
       req.params = { id: property.id };
 
-      await propertyController.getProperty(req, res);
+      await propertyController.getProperty(req as any, res as any);
 
       expect(res.json).toHaveBeenCalledWith(property);
     });
@@ -173,7 +176,7 @@ describe('Property Controller', () => {
     test('should return 400 if address is missing', async () => {
       req.body = { city: 'Atlanta', state: 'GA' };
 
-      await propertyController.createProperty(req, res);
+      await propertyController.createProperty(req as any, res as any);
 
       expect(res.status).toHaveBeenCalledWith(400);
       expect(res.json).toHaveBeenCalledWith({
@@ -184,10 +187,10 @@ describe('Property Controller', () => {
     test('should create property with minimal data', async () => {
       req.body = { address: '123 Main St' };
 
-      await propertyController.createProperty(req, res);
+      await propertyController.createProperty(req as any, res as any);
 
       expect(res.status).toHaveBeenCalledWith(201);
-      const property = res.json.mock.calls[0][0];
+      const property = (res.json as jest.Mock).mock.calls[0][0];
       expect(property.id).toBeDefined();
       expect(property.userId).toBe(mockUser.id);
       expect(property.address).toBe('123 Main St');
@@ -209,10 +212,10 @@ describe('Property Controller', () => {
         lng: -84.3880
       };
 
-      await propertyController.createProperty(req, res);
+      await propertyController.createProperty(req as any, res as any);
 
       expect(res.status).toHaveBeenCalledWith(201);
-      const property = res.json.mock.calls[0][0];
+      const property = (res.json as jest.Mock).mock.calls[0][0];
       expect(property.address).toBe('123 Main St');
       expect(property.city).toBe('Atlanta');
       expect(property.state).toBe('GA');
@@ -228,7 +231,7 @@ describe('Property Controller', () => {
       req.params = { id: 'nonexistent_id' };
       req.body = { address: 'Updated Address' };
 
-      await propertyController.updateProperty(req, res);
+      await propertyController.updateProperty(req as any, res as any);
 
       expect(res.status).toHaveBeenCalledWith(404);
       expect(res.json).toHaveBeenCalledWith({
@@ -243,14 +246,14 @@ describe('Property Controller', () => {
         body: { address: '789 Pine St' }
       });
       const otherUserRes = createMockResponse();
-      await propertyController.createProperty(otherUserReq, otherUserRes);
-      const otherProperty = otherUserRes.json.mock.calls[0][0];
+      await propertyController.createProperty(otherUserReq as any, otherUserRes as any);
+      const otherProperty = (otherUserRes.json as jest.Mock).mock.calls[0][0];
 
       // Try to update it with our user
       req.params = { id: otherProperty.id };
       req.body = { address: 'Hacked Address' };
 
-      await propertyController.updateProperty(req, res);
+      await propertyController.updateProperty(req as any, res as any);
 
       expect(res.status).toHaveBeenCalledWith(403);
       expect(res.json).toHaveBeenCalledWith({
@@ -265,12 +268,12 @@ describe('Property Controller', () => {
         city: 'Atlanta',
         state: 'GA'
       };
-      await propertyController.createProperty(req, res);
-      const property = res.json.mock.calls[0][0];
+      await propertyController.createProperty(req as any, res as any);
+      const property = (res.json as jest.Mock).mock.calls[0][0];
 
       // Reset mocks
-      res.json.mockClear();
-      res.status.mockClear();
+      (res.json as jest.Mock).mockClear();
+      (res.status as jest.Mock).mockClear();
 
       // Update the property
       req.params = { id: property.id };
@@ -280,9 +283,9 @@ describe('Property Controller', () => {
         state: 'TX'
       };
 
-      await propertyController.updateProperty(req, res);
+      await propertyController.updateProperty(req as any, res as any);
 
-      const updatedProperty = res.json.mock.calls[0][0];
+      const updatedProperty = (res.json as jest.Mock).mock.calls[0][0];
       expect(updatedProperty.id).toBe(property.id);
       expect(updatedProperty.address).toBe('456 Oak Ave');
       expect(updatedProperty.city).toBe('Austin');
@@ -297,19 +300,19 @@ describe('Property Controller', () => {
         city: 'Atlanta',
         state: 'GA'
       };
-      await propertyController.createProperty(req, res);
-      const property = res.json.mock.calls[0][0];
+      await propertyController.createProperty(req as any, res as any);
+      const property = (res.json as jest.Mock).mock.calls[0][0];
 
       // Reset mocks
-      res.json.mockClear();
+      (res.json as jest.Mock).mockClear();
 
       // Update only the city
       req.params = { id: property.id };
       req.body = { city: 'Marietta' };
 
-      await propertyController.updateProperty(req, res);
+      await propertyController.updateProperty(req as any, res as any);
 
-      const updatedProperty = res.json.mock.calls[0][0];
+      const updatedProperty = (res.json as jest.Mock).mock.calls[0][0];
       expect(updatedProperty.address).toBe('123 Main St'); // unchanged
       expect(updatedProperty.city).toBe('Marietta'); // changed
       expect(updatedProperty.state).toBe('GA'); // unchanged
@@ -318,11 +321,11 @@ describe('Property Controller', () => {
     test('should update all property fields including country and coordinates', async () => {
       // Create property with minimal data
       req.body = { address: '123 Main St' };
-      await propertyController.createProperty(req, res);
-      const property = res.json.mock.calls[0][0];
+      await propertyController.createProperty(req as any, res as any);
+      const property = (res.json as jest.Mock).mock.calls[0][0];
 
       // Reset mocks
-      res.json.mockClear();
+      (res.json as jest.Mock).mockClear();
 
       // Update with all fields including country, lat, lng, zipCode
       req.params = { id: property.id };
@@ -336,9 +339,9 @@ describe('Property Controller', () => {
         lng: 2.3522
       };
 
-      await propertyController.updateProperty(req, res);
+      await propertyController.updateProperty(req as any, res as any);
 
-      const updatedProperty = res.json.mock.calls[0][0];
+      const updatedProperty = (res.json as jest.Mock).mock.calls[0][0];
       expect(updatedProperty.address).toBe('456 Oak Ave');
       expect(updatedProperty.city).toBe('Paris');
       expect(updatedProperty.state).toBe('Île-de-France');
@@ -359,11 +362,11 @@ describe('Property Controller', () => {
         lat: 33.7490,
         lng: -84.3880
       };
-      await propertyController.createProperty(req, res);
-      const property = res.json.mock.calls[0][0];
+      await propertyController.createProperty(req as any, res as any);
+      const property = (res.json as jest.Mock).mock.calls[0][0];
 
       // Reset mocks
-      res.json.mockClear();
+      (res.json as jest.Mock).mockClear();
 
       // Update with explicit null
       req.params = { id: property.id };
@@ -371,9 +374,9 @@ describe('Property Controller', () => {
         city: null
       };
 
-      await propertyController.updateProperty(req, res);
+      await propertyController.updateProperty(req as any, res as any);
 
-      const updatedProperty = res.json.mock.calls[0][0];
+      const updatedProperty = (res.json as jest.Mock).mock.calls[0][0];
       // When we pass null, COALESCE will fall back to existing value (null is not considered a value)
       // So the city should remain 'Atlanta' (unchanged)
       expect(updatedProperty.city).toBe('Atlanta');
@@ -383,11 +386,11 @@ describe('Property Controller', () => {
     test('should handle empty string values in update', async () => {
       // Create property
       req.body = { address: '123 Main St', city: 'Atlanta' };
-      await propertyController.createProperty(req, res);
-      const property = res.json.mock.calls[0][0];
+      await propertyController.createProperty(req as any, res as any);
+      const property = (res.json as jest.Mock).mock.calls[0][0];
 
       // Reset mocks
-      res.json.mockClear();
+      (res.json as jest.Mock).mockClear();
 
       // Update with empty string (which !== undefined, so it should be used)
       req.params = { id: property.id };
@@ -395,9 +398,9 @@ describe('Property Controller', () => {
         city: ''
       };
 
-      await propertyController.updateProperty(req, res);
+      await propertyController.updateProperty(req as any, res as any);
 
-      const updatedProperty = res.json.mock.calls[0][0];
+      const updatedProperty = (res.json as jest.Mock).mock.calls[0][0];
       expect(updatedProperty.city).toBe('');
     });
   });
@@ -406,7 +409,7 @@ describe('Property Controller', () => {
     test('should return 404 if property does not exist', async () => {
       req.params = { id: 'nonexistent_id' };
 
-      await propertyController.deleteProperty(req, res);
+      await propertyController.deleteProperty(req as any, res as any);
 
       expect(res.status).toHaveBeenCalledWith(404);
       expect(res.json).toHaveBeenCalledWith({
@@ -421,13 +424,13 @@ describe('Property Controller', () => {
         body: { address: '789 Pine St' }
       });
       const otherUserRes = createMockResponse();
-      await propertyController.createProperty(otherUserReq, otherUserRes);
-      const otherProperty = otherUserRes.json.mock.calls[0][0];
+      await propertyController.createProperty(otherUserReq as any, otherUserRes as any);
+      const otherProperty = (otherUserRes.json as jest.Mock).mock.calls[0][0];
 
       // Try to delete it with our user
       req.params = { id: otherProperty.id };
 
-      await propertyController.deleteProperty(req, res);
+      await propertyController.deleteProperty(req as any, res as any);
 
       expect(res.status).toHaveBeenCalledWith(403);
       expect(res.json).toHaveBeenCalledWith({
@@ -438,26 +441,26 @@ describe('Property Controller', () => {
     test('should delete property if user owns it', async () => {
       // Create property
       req.body = { address: '123 Main St' };
-      await propertyController.createProperty(req, res);
-      const property = res.json.mock.calls[0][0];
+      await propertyController.createProperty(req as any, res as any);
+      const property = (res.json as jest.Mock).mock.calls[0][0];
 
       // Reset mocks
-      res.json.mockClear();
+      (res.json as jest.Mock).mockClear();
 
       // Delete the property
       req.params = { id: property.id };
 
-      await propertyController.deleteProperty(req, res);
+      await propertyController.deleteProperty(req as any, res as any);
 
       expect(res.json).toHaveBeenCalledWith({
         message: 'Property deleted successfully'
       });
 
       // Verify property is deleted
-      res.json.mockClear();
-      res.status.mockClear();
+      (res.json as jest.Mock).mockClear();
+      (res.status as jest.Mock).mockClear();
 
-      await propertyController.getProperty(req, res);
+      await propertyController.getProperty(req as any, res as any);
 
       expect(res.status).toHaveBeenCalledWith(404);
     });

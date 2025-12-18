@@ -1,14 +1,16 @@
 import { describe, test, expect, beforeAll, afterAll } from '@jest/globals';
 
 describe('Database Connection', () => {
-  let originalEnv;
+  let originalEnv: string | undefined;
 
   beforeAll(() => {
     originalEnv = process.env.DATABASE_URL;
   });
 
   afterAll(() => {
-    process.env.DATABASE_URL = originalEnv;
+    if (originalEnv) {
+      process.env.DATABASE_URL = originalEnv;
+    }
   });
 
   test('should create connection pool when DATABASE_URL is not set', async () => {
