@@ -6,7 +6,9 @@ import {
   createMockToken,
   createMockClerkClient,
   mockUser,
-  mockSession
+  mockSession,
+  MockRequest,
+  MockResponse
 } from '../utils/mockClerk.js';
 
 // Mock the Clerk SDK
@@ -19,7 +21,9 @@ jest.unstable_mockModule('@clerk/express', () => ({
 const { requireAuth } = await import('../../src/middleware/auth.js');
 
 describe('Authentication Middleware', () => {
-  let req, res, next;
+  let req: MockRequest;
+  let res: MockResponse;
+  let next: jest.Mock;
 
   beforeEach(() => {
     req = createMockRequest();
@@ -30,7 +34,7 @@ describe('Authentication Middleware', () => {
 
   describe('requireAuth', () => {
     test('should return 401 if no authorization header is provided', async () => {
-      await requireAuth(req, res, next);
+      await requireAuth(req as any, res as any, next);
 
       expect(res.status).toHaveBeenCalledWith(401);
       expect(res.json).toHaveBeenCalledWith({
@@ -42,7 +46,7 @@ describe('Authentication Middleware', () => {
     test('should return 401 if authorization header does not start with Bearer', async () => {
       req.headers.authorization = 'Basic token123';
 
-      await requireAuth(req, res, next);
+      await requireAuth(req as any, res as any, next);
 
       expect(res.status).toHaveBeenCalledWith(401);
       expect(res.json).toHaveBeenCalledWith({
@@ -54,7 +58,7 @@ describe('Authentication Middleware', () => {
     test('should return 401 if token format is invalid', async () => {
       req.headers.authorization = 'Bearer invalid.token';
 
-      await requireAuth(req, res, next);
+      await requireAuth(req as any, res as any, next);
 
       expect(res.status).toHaveBeenCalledWith(401);
       expect(res.json).toHaveBeenCalledWith({
@@ -67,11 +71,11 @@ describe('Authentication Middleware', () => {
       const token = createMockToken({ sid: mockSession.id });
       req.headers.authorization = `Bearer ${token}`;
 
-      await requireAuth(req, res, next);
+      await requireAuth(req as any, res as any, next);
 
       expect(mockClerkClient.sessions.getSession).toHaveBeenCalledWith(mockSession.id);
       expect(mockClerkClient.users.getUser).toHaveBeenCalledWith(mockUser.id);
-      expect(req.user).toEqual({
+      expect((req as any).user).toEqual({
         id: mockUser.id,
         email: mockUser.emailAddresses[0].emailAddress,
         username: mockUser.username
@@ -84,10 +88,10 @@ describe('Authentication Middleware', () => {
       const token = createMockToken({ sub: mockUser.id, sid: undefined, sess: undefined }); // No session ID
       req.headers.authorization = `Bearer ${token}`;
 
-      await requireAuth(req, res, next);
+      await requireAuth(req as any, res as any, next);
 
       expect(mockClerkClient.users.getUser).toHaveBeenCalledWith(mockUser.id);
-      expect(req.user).toEqual({
+      expect((req as any).user).toEqual({
         id: mockUser.id,
         email: mockUser.emailAddresses[0].emailAddress,
         username: mockUser.username
@@ -104,7 +108,7 @@ describe('Authentication Middleware', () => {
       const token = createMockToken({ sid: mockSession.id });
       req.headers.authorization = `Bearer ${token}`;
 
-      await requireAuth(req, res, next);
+      await requireAuth(req as any, res as any, next);
 
       expect(res.status).toHaveBeenCalledWith(401);
       expect(res.json).toHaveBeenCalledWith({
@@ -121,7 +125,7 @@ describe('Authentication Middleware', () => {
       const token = createMockToken({ sub: mockUser.id });
       req.headers.authorization = `Bearer ${token}`;
 
-      await requireAuth(req, res, next);
+      await requireAuth(req as any, res as any, next);
 
       expect(res.status).toHaveBeenCalledWith(401);
       expect(res.json).toHaveBeenCalledWith({
@@ -133,7 +137,7 @@ describe('Authentication Middleware', () => {
     test('should handle unexpected errors gracefully', async () => {
       req.headers.authorization = 'Bearer malformed';
 
-      await requireAuth(req, res, next);
+      await requireAuth(req as any, res as any, next);
 
       expect(res.status).toHaveBeenCalledWith(401);
       expect(res.json).toHaveBeenCalled();
@@ -143,12 +147,12 @@ describe('Authentication Middleware', () => {
     test('should handle outer try-catch errors with 500', async () => {
       // Create a request object that throws an error when accessing headers
       const errorReq = {
-        get headers() {
+        get headers(): Record<string, string> {
           throw new Error('Unexpected error accessing headers');
         }
       };
 
-      await requireAuth(errorReq, res, next);
+      await requireAuth(errorReq as any, res as any, next);
 
       expect(res.status).toHaveBeenCalledWith(500);
       expect(res.json).toHaveBeenCalledWith({
@@ -169,7 +173,7 @@ describe('Authentication Middleware', () => {
       const token = createMockToken({ sub: mockUser.id, sid: undefined, sess: undefined }); // No sid, will use sub
       req.headers.authorization = `Bearer ${token}`;
 
-      await requireAuth(req, res, next);
+      await requireAuth(req as any, res as any, next);
 
       expect(mockClerkClient.users.getUser).toHaveBeenCalledWith(mockUser.id);
       expect(res.status).toHaveBeenCalledWith(401);

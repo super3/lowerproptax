@@ -8,7 +8,7 @@ jest.unstable_mockModule('node-pg-migrate', () => ({
 
 describe('Database Initialization', () => {
   const originalEnv = process.env.DATABASE_URL;
-  let initDatabase;
+  let initDatabase: () => Promise<void>;
 
   beforeEach(async () => {
     delete process.env.DATABASE_URL;
@@ -34,7 +34,7 @@ describe('Database Initialization', () => {
 
   test('should run migrations successfully when DATABASE_URL is set', async () => {
     process.env.DATABASE_URL = 'postgres://test:test@localhost:5432/test';
-    mockRunner.mockResolvedValueOnce();
+    mockRunner.mockResolvedValueOnce(undefined);
 
     await initDatabase();
 

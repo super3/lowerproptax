@@ -17,8 +17,20 @@ jest.unstable_mockModule('../../src/services/emailService.js', () => ({
 // Import the controller after mocking
 const adminController = await import('../../src/controllers/adminController.js');
 
+interface MockRequest {
+  user: { id: string };
+  params: Record<string, string>;
+  body: Record<string, unknown>;
+}
+
+interface MockResponse {
+  json: jest.Mock;
+  status: jest.Mock;
+}
+
 describe('Admin Controller', () => {
-  let req, res;
+  let req: MockRequest;
+  let res: MockResponse;
 
   beforeEach(() => {
     req = {
@@ -61,7 +73,7 @@ describe('Admin Controller', () => {
 
       mockQuery.mockResolvedValue({ rows: mockProperties });
 
-      await adminController.getPendingProperties(req, res);
+      await adminController.getPendingProperties(req as any, res as any);
 
       expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining("WHERE a.status = 'preparing' OR a.status IS NULL"));
       expect(res.json).toHaveBeenCalledWith(
@@ -81,7 +93,7 @@ describe('Admin Controller', () => {
     it('should return empty array when no pending properties exist', async () => {
       mockQuery.mockResolvedValue({ rows: [] });
 
-      await adminController.getPendingProperties(req, res);
+      await adminController.getPendingProperties(req as any, res as any);
 
       expect(res.json).toHaveBeenCalledWith([]);
     });
@@ -102,7 +114,7 @@ describe('Admin Controller', () => {
 
       mockQuery.mockResolvedValue({ rows: mockProperties });
 
-      await adminController.getPendingProperties(req, res);
+      await adminController.getPendingProperties(req as any, res as any);
 
       expect(res.json).toHaveBeenCalledWith(
         expect.arrayContaining([
@@ -117,7 +129,7 @@ describe('Admin Controller', () => {
     it('should handle database errors', async () => {
       mockQuery.mockRejectedValue(new Error('Database error'));
 
-      await adminController.getPendingProperties(req, res);
+      await adminController.getPendingProperties(req as any, res as any);
 
       expect(res.status).toHaveBeenCalledWith(500);
       expect(res.json).toHaveBeenCalledWith({ error: 'Failed to fetch pending properties' });
@@ -142,7 +154,7 @@ describe('Admin Controller', () => {
 
       mockQuery.mockResolvedValue({ rows: mockProperties });
 
-      await adminController.getCompletedProperties(req, res);
+      await adminController.getCompletedProperties(req as any, res as any);
 
       expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining("WHERE a.status IN ('ready', 'invalid')"));
       expect(res.json).toHaveBeenCalledWith(
@@ -158,7 +170,7 @@ describe('Admin Controller', () => {
     it('should return empty array when no completed properties exist', async () => {
       mockQuery.mockResolvedValue({ rows: [] });
 
-      await adminController.getCompletedProperties(req, res);
+      await adminController.getCompletedProperties(req as any, res as any);
 
       expect(res.json).toHaveBeenCalledWith([]);
     });
@@ -166,7 +178,7 @@ describe('Admin Controller', () => {
     it('should handle database errors', async () => {
       mockQuery.mockRejectedValue(new Error('Database error'));
 
-      await adminController.getCompletedProperties(req, res);
+      await adminController.getCompletedProperties(req as any, res as any);
 
       expect(res.status).toHaveBeenCalledWith(500);
       expect(res.json).toHaveBeenCalledWith({ error: 'Failed to fetch completed properties' });
@@ -205,7 +217,7 @@ describe('Admin Controller', () => {
         .mockResolvedValueOnce({ rows: [mockProperty] })
         .mockResolvedValueOnce({ rows: mockAssessments });
 
-      await adminController.getPropertyDetails(req, res);
+      await adminController.getPropertyDetails(req as any, res as any);
 
       expect(mockQuery).toHaveBeenCalledWith(
         expect.stringContaining('SELECT'),
@@ -242,7 +254,7 @@ describe('Admin Controller', () => {
         .mockResolvedValueOnce({ rows: [mockProperty] })
         .mockResolvedValueOnce({ rows: [] }); // No assessments
 
-      await adminController.getPropertyDetails(req, res);
+      await adminController.getPropertyDetails(req as any, res as any);
 
       expect(res.json).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -262,7 +274,7 @@ describe('Admin Controller', () => {
       req.params.id = 'nonexistent';
       mockQuery.mockResolvedValue({ rows: [] });
 
-      await adminController.getPropertyDetails(req, res);
+      await adminController.getPropertyDetails(req as any, res as any);
 
       expect(res.status).toHaveBeenCalledWith(404);
       expect(res.json).toHaveBeenCalledWith({ error: 'Property not found' });
@@ -272,7 +284,7 @@ describe('Admin Controller', () => {
       req.params.id = 'prop1';
       mockQuery.mockRejectedValue(new Error('Database error'));
 
-      await adminController.getPropertyDetails(req, res);
+      await adminController.getPropertyDetails(req as any, res as any);
 
       expect(res.status).toHaveBeenCalledWith(500);
       expect(res.json).toHaveBeenCalledWith({ error: 'Failed to fetch property details' });
@@ -291,7 +303,7 @@ describe('Admin Controller', () => {
         state: 'GA'
       };
 
-      const mockAssessments = [];
+      const mockAssessments: unknown[] = [];
 
       mockQuery
         .mockResolvedValueOnce({ rows: [mockProperty] })
@@ -303,9 +315,9 @@ describe('Admin Controller', () => {
         json: async () => ({
           email_addresses: [{ email_address: 'user@example.com' }]
         })
-      });
+      }) as jest.Mock;
 
-      await adminController.getPropertyDetails(req, res);
+      await adminController.getPropertyDetails(req as any, res as any);
 
       expect(global.fetch).toHaveBeenCalledWith(
         'https://api.clerk.com/v1/users/user123',
@@ -323,7 +335,7 @@ describe('Admin Controller', () => {
       );
 
       process.env.CLERK_SECRET_KEY = originalEnv;
-      delete global.fetch;
+      delete (global as any).fetch;
     });
 
     it('should handle Clerk API failure gracefully', async () => {
@@ -344,9 +356,9 @@ describe('Admin Controller', () => {
       // Mock fetch to return non-ok response
       global.fetch = jest.fn().mockResolvedValue({
         ok: false
-      });
+      }) as jest.Mock;
 
-      await adminController.getPropertyDetails(req, res);
+      await adminController.getPropertyDetails(req as any, res as any);
 
       expect(res.json).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -355,7 +367,7 @@ describe('Admin Controller', () => {
       );
 
       process.env.CLERK_SECRET_KEY = originalEnv;
-      delete global.fetch;
+      delete (global as any).fetch;
     });
 
     it('should handle Clerk API errors gracefully', async () => {
@@ -374,9 +386,9 @@ describe('Admin Controller', () => {
         .mockResolvedValueOnce({ rows: [] });
 
       // Mock fetch to throw error
-      global.fetch = jest.fn().mockRejectedValue(new Error('Clerk API error'));
+      global.fetch = jest.fn().mockRejectedValue(new Error('Clerk API error')) as jest.Mock;
 
-      await adminController.getPropertyDetails(req, res);
+      await adminController.getPropertyDetails(req as any, res as any);
 
       expect(res.json).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -385,7 +397,7 @@ describe('Admin Controller', () => {
       );
 
       process.env.CLERK_SECRET_KEY = originalEnv;
-      delete global.fetch;
+      delete (global as any).fetch;
     });
 
     it('should handle missing email_addresses in Clerk response', async () => {
@@ -407,9 +419,9 @@ describe('Admin Controller', () => {
       global.fetch = jest.fn().mockResolvedValue({
         ok: true,
         json: async () => ({})
-      });
+      }) as jest.Mock;
 
-      await adminController.getPropertyDetails(req, res);
+      await adminController.getPropertyDetails(req as any, res as any);
 
       expect(res.json).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -418,7 +430,7 @@ describe('Admin Controller', () => {
       );
 
       process.env.CLERK_SECRET_KEY = originalEnv;
-      delete global.fetch;
+      delete (global as any).fetch;
     });
   });
 
@@ -456,7 +468,7 @@ describe('Admin Controller', () => {
         .mockResolvedValueOnce({ rows: [mockUpdatedProperty] })
         .mockResolvedValueOnce({ rows: [mockAssessment] });
 
-      await adminController.updatePropertyDetails(req, res);
+      await adminController.updatePropertyDetails(req as any, res as any);
 
       expect(mockQuery).toHaveBeenCalledWith(
         expect.stringContaining('UPDATE properties'),
@@ -497,7 +509,7 @@ describe('Admin Controller', () => {
         .mockResolvedValueOnce({ rows: [mockUpdatedProperty] })
         .mockResolvedValueOnce({ rows: [mockAssessment] });
 
-      await adminController.updatePropertyDetails(req, res);
+      await adminController.updatePropertyDetails(req as any, res as any);
 
       expect(res.json).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -512,7 +524,7 @@ describe('Admin Controller', () => {
       req.body = { bedrooms: 3 };
       mockQuery.mockResolvedValue({ rows: [] });
 
-      await adminController.updatePropertyDetails(req, res);
+      await adminController.updatePropertyDetails(req as any, res as any);
 
       expect(res.status).toHaveBeenCalledWith(404);
       expect(res.json).toHaveBeenCalledWith({ error: 'Property not found' });
@@ -523,7 +535,7 @@ describe('Admin Controller', () => {
       req.body = { bedrooms: 3 };
       mockQuery.mockRejectedValue(new Error('Database error'));
 
-      await adminController.updatePropertyDetails(req, res);
+      await adminController.updatePropertyDetails(req as any, res as any);
 
       expect(res.status).toHaveBeenCalledWith(500);
       expect(res.json).toHaveBeenCalledWith({ error: 'Failed to update property details' });
@@ -560,7 +572,7 @@ describe('Admin Controller', () => {
         .mockResolvedValueOnce({ rows: [mockUpdatedProperty] })
         .mockResolvedValueOnce({ rows: [mockAssessment] });
 
-      await adminController.updatePropertyDetails(req, res);
+      await adminController.updatePropertyDetails(req as any, res as any);
 
       expect(res.json).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -604,7 +616,7 @@ describe('Admin Controller', () => {
         .mockResolvedValueOnce({ rows: [mockUpdatedProperty] })
         .mockResolvedValueOnce({ rows: [mockAssessment] });
 
-      await adminController.updatePropertyDetails(req, res);
+      await adminController.updatePropertyDetails(req as any, res as any);
 
       expect(res.json).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -638,7 +650,7 @@ describe('Admin Controller', () => {
         .mockResolvedValueOnce({ rows: [mockUpdatedProperty] })
         .mockResolvedValueOnce({ rows: [mockAssessment] });
 
-      await adminController.updatePropertyDetails(req, res);
+      await adminController.updatePropertyDetails(req as any, res as any);
 
       expect(res.json).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -682,7 +694,7 @@ describe('Admin Controller', () => {
         .mockResolvedValueOnce({ rows: [mockUpdatedProperty] })
         .mockResolvedValueOnce({ rows: [mockAssessment] });
 
-      await adminController.updatePropertyDetails(req, res);
+      await adminController.updatePropertyDetails(req as any, res as any);
 
       expect(res.json).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -733,11 +745,11 @@ describe('Admin Controller', () => {
         json: async () => ({
           email_addresses: [{ email_address: 'user@example.com' }]
         })
-      });
+      }) as jest.Mock;
 
-      mockSendAssessmentReadyNotification.mockResolvedValue();
+      mockSendAssessmentReadyNotification.mockResolvedValue(undefined);
 
-      await adminController.updatePropertyDetails(req, res);
+      await adminController.updatePropertyDetails(req as any, res as any);
 
       // Wait for async email to be called
       await new Promise(resolve => setTimeout(resolve, 10));
@@ -749,7 +761,7 @@ describe('Admin Controller', () => {
       );
 
       process.env.CLERK_SECRET_KEY = originalEnv;
-      delete global.fetch;
+      delete (global as any).fetch;
     });
 
     it('should not send email when status is not ready', async () => {
@@ -776,7 +788,7 @@ describe('Admin Controller', () => {
         .mockResolvedValueOnce({ rows: [mockUpdatedProperty] })
         .mockResolvedValueOnce({ rows: [mockAssessment] });
 
-      await adminController.updatePropertyDetails(req, res);
+      await adminController.updatePropertyDetails(req as any, res as any);
 
       expect(mockSendAssessmentReadyNotification).not.toHaveBeenCalled();
     });
@@ -812,14 +824,14 @@ describe('Admin Controller', () => {
       // Mock Clerk API to fail
       global.fetch = jest.fn().mockResolvedValue({
         ok: false
-      });
+      }) as jest.Mock;
 
-      await adminController.updatePropertyDetails(req, res);
+      await adminController.updatePropertyDetails(req as any, res as any);
 
       expect(mockSendAssessmentReadyNotification).not.toHaveBeenCalled();
 
       process.env.CLERK_SECRET_KEY = originalEnv;
-      delete global.fetch;
+      delete (global as any).fetch;
     });
 
     it('should handle Clerk API errors when sending ready notification', async () => {
@@ -851,16 +863,16 @@ describe('Admin Controller', () => {
         .mockResolvedValueOnce({ rows: [mockAssessment] });
 
       // Mock Clerk API to throw error
-      global.fetch = jest.fn().mockRejectedValue(new Error('Clerk API error'));
+      global.fetch = jest.fn().mockRejectedValue(new Error('Clerk API error')) as jest.Mock;
 
-      await adminController.updatePropertyDetails(req, res);
+      await adminController.updatePropertyDetails(req as any, res as any);
 
       // Should still respond successfully even if email fails
       expect(res.json).toHaveBeenCalled();
       expect(mockSendAssessmentReadyNotification).not.toHaveBeenCalled();
 
       process.env.CLERK_SECRET_KEY = originalEnv;
-      delete global.fetch;
+      delete (global as any).fetch;
     });
 
     it('should not send email when no user email is available', async () => {
@@ -897,14 +909,14 @@ describe('Admin Controller', () => {
         json: async () => ({
           email_addresses: []
         })
-      });
+      }) as jest.Mock;
 
-      await adminController.updatePropertyDetails(req, res);
+      await adminController.updatePropertyDetails(req as any, res as any);
 
       expect(mockSendAssessmentReadyNotification).not.toHaveBeenCalled();
 
       process.env.CLERK_SECRET_KEY = originalEnv;
-      delete global.fetch;
+      delete (global as any).fetch;
     });
 
     it('should not send email when CLERK_SECRET_KEY is not set', async () => {
@@ -935,7 +947,7 @@ describe('Admin Controller', () => {
         .mockResolvedValueOnce({ rows: [mockUpdatedProperty] })
         .mockResolvedValueOnce({ rows: [mockAssessment] });
 
-      await adminController.updatePropertyDetails(req, res);
+      await adminController.updatePropertyDetails(req as any, res as any);
 
       expect(mockSendAssessmentReadyNotification).not.toHaveBeenCalled();
 
@@ -957,7 +969,7 @@ describe('Admin Controller', () => {
 
       mockQuery.mockResolvedValue({ rows: [mockProperty] });
 
-      await adminController.markPropertyAsReady(req, res);
+      await adminController.markPropertyAsReady(req as any, res as any);
 
       expect(mockQuery).toHaveBeenCalledWith(
         expect.stringContaining("SET status = 'ready'"),
@@ -970,7 +982,7 @@ describe('Admin Controller', () => {
       req.params.id = 'nonexistent';
       mockQuery.mockResolvedValue({ rows: [] });
 
-      await adminController.markPropertyAsReady(req, res);
+      await adminController.markPropertyAsReady(req as any, res as any);
 
       expect(res.status).toHaveBeenCalledWith(404);
       expect(res.json).toHaveBeenCalledWith({ error: 'Property not found' });
@@ -980,7 +992,7 @@ describe('Admin Controller', () => {
       req.params.id = 'prop1';
       mockQuery.mockRejectedValue(new Error('Database error'));
 
-      await adminController.markPropertyAsReady(req, res);
+      await adminController.markPropertyAsReady(req as any, res as any);
 
       expect(res.status).toHaveBeenCalledWith(500);
       expect(res.json).toHaveBeenCalledWith({ error: 'Failed to mark property as ready' });

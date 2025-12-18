@@ -1,7 +1,7 @@
 import { initDatabase } from '../src/db/init.js';
 
 // Initialize the database before all tests
-export default async function globalSetup() {
+export default async function globalSetup(): Promise<void> {
   // Skip database setup if DATABASE_URL is not available (local testing without PostgreSQL)
   if (!process.env.DATABASE_URL) {
     console.log('Skipping database setup - DATABASE_URL not set (tests will use mocked database)');

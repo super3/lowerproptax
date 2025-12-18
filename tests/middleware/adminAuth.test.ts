@@ -13,8 +13,19 @@ jest.unstable_mockModule('@clerk/express', () => ({
 // Import the middleware after mocking
 const { requireAdmin } = await import('../../src/middleware/adminAuth.js');
 
+interface MockRequest {
+  user: { id: string } | null | undefined;
+}
+
+interface MockResponse {
+  json: jest.Mock;
+  status: jest.Mock;
+}
+
 describe('Admin Auth Middleware', () => {
-  let req, res, next;
+  let req: MockRequest;
+  let res: MockResponse;
+  let next: jest.Mock;
 
   beforeEach(() => {
     req = {
@@ -32,7 +43,7 @@ describe('Admin Auth Middleware', () => {
     it('should return 401 if user is not authenticated', async () => {
       req.user = null;
 
-      await requireAdmin(req, res, next);
+      await requireAdmin(req as any, res as any, next);
 
       expect(res.status).toHaveBeenCalledWith(401);
       expect(res.json).toHaveBeenCalledWith({ error: 'Unauthorized' });
@@ -40,9 +51,9 @@ describe('Admin Auth Middleware', () => {
     });
 
     it('should return 401 if user object has no id', async () => {
-      req.user = {};
+      req.user = {} as any;
 
-      await requireAdmin(req, res, next);
+      await requireAdmin(req as any, res as any, next);
 
       expect(res.status).toHaveBeenCalledWith(401);
       expect(res.json).toHaveBeenCalledWith({ error: 'Unauthorized' });
@@ -57,7 +68,7 @@ describe('Admin Auth Middleware', () => {
         }
       });
 
-      await requireAdmin(req, res, next);
+      await requireAdmin(req as any, res as any, next);
 
       expect(mockGetUser).toHaveBeenCalledWith('user123');
       expect(next).toHaveBeenCalled();
@@ -72,7 +83,7 @@ describe('Admin Auth Middleware', () => {
         }
       });
 
-      await requireAdmin(req, res, next);
+      await requireAdmin(req as any, res as any, next);
 
       expect(res.status).toHaveBeenCalledWith(403);
       expect(res.json).toHaveBeenCalledWith({ error: 'Forbidden: Admin access required' });
@@ -84,7 +95,7 @@ describe('Admin Auth Middleware', () => {
         id: 'user123'
       });
 
-      await requireAdmin(req, res, next);
+      await requireAdmin(req as any, res as any, next);
 
       expect(res.status).toHaveBeenCalledWith(403);
       expect(res.json).toHaveBeenCalledWith({ error: 'Forbidden: Admin access required' });
@@ -97,7 +108,7 @@ describe('Admin Auth Middleware', () => {
         publicMetadata: {}
       });
 
-      await requireAdmin(req, res, next);
+      await requireAdmin(req as any, res as any, next);
 
       expect(res.status).toHaveBeenCalledWith(403);
       expect(res.json).toHaveBeenCalledWith({ error: 'Forbidden: Admin access required' });
@@ -107,7 +118,7 @@ describe('Admin Auth Middleware', () => {
     it('should handle errors from Clerk API', async () => {
       mockGetUser.mockRejectedValue(new Error('Clerk API error'));
 
-      await requireAdmin(req, res, next);
+      await requireAdmin(req as any, res as any, next);
 
       expect(res.status).toHaveBeenCalledWith(500);
       expect(res.json).toHaveBeenCalledWith({ error: 'Failed to verify admin status' });

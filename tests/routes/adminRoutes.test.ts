@@ -1,5 +1,5 @@
 import { jest } from '@jest/globals';
-import express from 'express';
+import express, { Express } from 'express';
 import request from 'supertest';
 
 // Mock the database connection
@@ -30,7 +30,7 @@ const adminAuthModule = await import('../../src/middleware/adminAuth.js');
 const adminRoutes = await import('../../src/routes/adminRoutes.js');
 
 describe('Admin Routes', () => {
-  let app;
+  let app: Express;
   const validToken = Buffer.from(JSON.stringify({ typ: 'JWT', alg: 'RS256' })).toString('base64') + '.' +
     Buffer.from(JSON.stringify({ sid: 'session123', sub: 'user123' })).toString('base64') + '.signature';
 

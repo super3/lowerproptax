@@ -5,7 +5,7 @@ import { fileURLToPath } from 'url';
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
 // Initialize database by running migrations
-export async function initDatabase() {
+export async function initDatabase(): Promise<void> {
   // Skip migrations if DATABASE_URL is not set (test environment)
   if (!process.env.DATABASE_URL) {
     console.log('Skipping database setup - DATABASE_URL not set (tests will use mocked database)');

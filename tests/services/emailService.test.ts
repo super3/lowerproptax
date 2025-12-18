@@ -9,9 +9,9 @@ jest.unstable_mockModule('resend', () => ({
 }));
 
 describe('Email Service', () => {
-  let sendNewPropertyNotification;
-  let sendAssessmentReadyNotification;
-  let consoleSpy;
+  let sendNewPropertyNotification: (property: { id: string; address: string; city?: string; state?: string; zipCode?: string }, userEmail: string | null) => Promise<void>;
+  let sendAssessmentReadyNotification: (property: { id: string; address: string; city?: string; state?: string; zipCode?: string }, assessment: { annualTax?: number; estimatedAnnualTax?: number }, userEmail: string) => Promise<void>;
+  let consoleSpy: jest.SpiedFunction<typeof console.log>;
 
   beforeEach(() => {
     jest.clearAllMocks();

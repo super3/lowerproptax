@@ -18,8 +18,8 @@ const { createTestServer } = await import('../utils/testServer.js');
 const propertyController = await import('../../src/controllers/propertyController.js');
 
 describe('Property API Integration Tests', () => {
-  let app;
-  let validToken;
+  let app: ReturnType<typeof createTestServer>;
+  let validToken: string;
 
   beforeAll(() => {
     app = createTestServer();
