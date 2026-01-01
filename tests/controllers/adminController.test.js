@@ -189,10 +189,11 @@ describe('Admin Controller', () => {
         user_id: 'user1'
       };
 
+      const currentYear = new Date().getFullYear();
       const mockAssessments = [
         {
-          id: 'assess_prop1_2025',
-          year: 2025,
+          id: `assess_prop1_${currentYear}`,
+          year: currentYear,
           appraisedValue: 250000,
           annualTax: 5000,
           status: 'preparing',
@@ -216,7 +217,7 @@ describe('Admin Controller', () => {
           ...mockProperty,
           assessments: mockAssessments,
           currentAssessment: expect.objectContaining({
-            year: 2025,
+            year: currentYear,
             appraisedValue: 250000
           })
         })

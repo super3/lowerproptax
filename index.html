@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LowerPropTax - Property Tax Appeal Reports</title>
+    <title>LowerPropTax - Find Property Tax Savings</title>
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🏡</text></svg>">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
@@ -1267,9 +1267,9 @@
     <!-- Hero Section -->
     <section class="hero">
         <div class="hero-content">
-            <h1>Save hundreds on property taxes</h1>
-            <p class="hero-subtitle">Get a free assessment to see if you're overpaying. Only pay if we find savings. Currently serving Georgia.</p>
-            <a href="#" class="hero-cta" onclick="handleSignUp(event)">Get My Free Assessment</a>
+            <h1>Overpaying on property taxes?</h1>
+            <p class="hero-subtitle">Most homeowners miss savings they could have. We check for you. Currently serving Georgia.</p>
+            <a href="#" class="hero-cta" onclick="handleSignUp(event)">Check My Property</a>
         </div>
         <div class="hero-image">
             <div class="hero-comparison">
@@ -1279,77 +1279,59 @@
                 </div>
                 <div class="comparison-cards">
                     <div class="comparison-card before">
-                        <label>County Assessment</label>
-                        <div class="amount">$425,000</div>
-                        <div class="sub-label">Current value</div>
+                        <label>Current Tax Bill</label>
+                        <div class="amount">$4,280.67</div>
+                        <div class="sub-label">Per year</div>
                     </div>
                     <div class="comparison-card after">
-                        <label>Market Value</label>
-                        <div class="amount">$397,000</div>
-                        <div class="sub-label">Based on comparables</div>
+                        <label>After Savings</label>
+                        <div class="amount">$2,691.76</div>
+                        <div class="sub-label">Per year</div>
                     </div>
                 </div>
                 <div class="savings-result">
                     <div class="savings-info">
-                        <label>Potential Annual Savings</label>
-                        <div class="amount">$281.44</div>
+                        <label>Savings Found</label>
+                        <div class="amount">$1,588.91/yr</div>
                     </div>
-                    <span class="btn-download-report">Download Report</span>
+                    <span class="btn-download-report">Get Your Savings</span>
                 </div>
             </div>
         </div>
     </section>
 
     <!-- Features Section -->
-    <section id="how-it-works" class="features">
+    <section class="features">
         <div class="feature-section">
         <div class="feature-block reverse">
             <div class="feature-content">
-                <h2>We find comparable properties</h2>
-                <p>Our system analyzes recent sales and listings to find 3-5 properties similar to yours. We pull data from public records and multiple listing sources to build a comprehensive comparison.</p>
-                <ul>
-                    <li>Similar size, age, and condition</li>
-                    <li>Same neighborhood or nearby areas</li>
-                    <li>Recent sales within last 12 months</li>
-                    <li>Clear market value estimate</li>
-                </ul>
+                <h2>Homeowners are saving</h2>
+                <p>Many homeowners have savings they don't know about. Here's what we've found for people just like you.</p>
+                <div style="display: flex; flex-direction: column; gap: 1.5rem; margin-top: 1.5rem;">
+                    <div style="background: #f8f9fa; border-radius: 10px; padding: 1.25rem; border-left: 4px solid #16a34a;">
+                        <p style="font-size: 1rem; color: #1a1a1a; margin-bottom: 0.5rem; font-style: italic;">"I had no idea I was missing this. Now saving $1,589.06 per year."</p>
+                        <p style="font-size: 0.85rem; color: #666; margin: 0;">— Pavi, Fulton County</p>
+                    </div>
+                    <div style="background: #f8f9fa; border-radius: 10px; padding: 1.25rem; border-left: 4px solid #16a34a;">
+                        <p style="font-size: 1rem; color: #1a1a1a; margin-bottom: 0.5rem; font-style: italic;">"So easy to check. Found $1,895.08 in annual savings."</p>
+                        <p style="font-size: 0.85rem; color: #666; margin: 0;">— Shawn, Fulton County</p>
+                    </div>
+                </div>
             </div>
             <div class="feature-image">
-                <div class="financial-mockup">
-                    <div class="financial-header">
-                        <h3>Comparable Properties</h3>
+                <div style="display: flex; flex-direction: column; gap: 1rem;">
+                    <div style="background: white; border-radius: 12px; padding: 2rem; text-align: center; box-shadow: 0 4px 20px rgba(0,0,0,0.08);">
+                        <div style="font-size: 3rem; font-weight: 700; color: #16a34a; margin-bottom: 0.25rem;">$1,588.91</div>
+                        <div style="font-size: 0.9rem; color: #666;">Average annual savings</div>
                     </div>
-                    <div class="financial-summary">
-                        <div class="financial-stat">
-                            <label>Assessed Value</label>
-                            <div class="amount" style="color: #dc2626;">$425,000</div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                        <div style="background: white; border-radius: 12px; padding: 1.5rem; text-align: center; box-shadow: 0 4px 20px rgba(0,0,0,0.08);">
+                            <div style="font-size: 2rem; font-weight: 700; color: #3171ef; margin-bottom: 0.25rem;">Easy</div>
+                            <div style="font-size: 0.85rem; color: #666;">To check</div>
                         </div>
-                        <div class="financial-stat">
-                            <label>Avg Comparable</label>
-                            <div class="amount" style="color: #3171ef;">$397,000</div>
-                        </div>
-                    </div>
-                    <div class="transaction-list">
-                        <div class="transaction-item">
-                            <div class="transaction-details">
-                                <h4>118 Oak Street</h4>
-                                <p>3 bed, 2 bath • 1,900 sq ft • Sold Aug 2025</p>
-                            </div>
-                            <div class="transaction-amount" style="color: #1a1a1a; font-weight: 700;">$392,000</div>
-                        </div>
-                        <div class="transaction-item">
-                            <div class="transaction-details">
-                                <h4>215 Elm Drive</h4>
-                                <p>3 bed, 2 bath • 1,820 sq ft • Sold Jul 2025</p>
-                            </div>
-                            <div class="transaction-amount" style="color: #1a1a1a; font-weight: 700;">$401,500</div>
-                        </div>
-                        <div class="transaction-item">
-                            <div class="transaction-details">
-                                <h4>892 Maple Court</h4>
-                                <p>3 bed, 2 bath • 1,875 sq ft • Sold Sep 2025</p>
-                            </div>
-                            <div class="transaction-amount" style="color: #1a1a1a; font-weight: 700;">$398,200</div>
+                        <div style="background: white; border-radius: 12px; padding: 1.5rem; text-align: center; box-shadow: 0 4px 20px rgba(0,0,0,0.08);">
+                            <div style="font-size: 2rem; font-weight: 700; color: #3171ef; margin-bottom: 0.25rem;">100%</div>
+                            <div style="font-size: 0.85rem; color: #666;">Free</div>
                         </div>
                     </div>
                 </div>
@@ -1357,86 +1339,48 @@
         </div>
         </div>
 
-        <div class="feature-section">
+        <div id="how-it-works" class="feature-section">
         <div class="feature-block">
             <div class="feature-content">
-                <h2>Report ready for your appeal</h2>
-                <p>Get a professionally formatted PDF report that includes all comparable properties with photos, sale prices, and property details. Just download and attach it to your property tax appeal.</p>
+                <h2>Simple 3-step process</h2>
+                <p>No complicated forms or phone calls. Enter your address, see if there are savings, and we'll show you exactly what to do next.</p>
                 <ul>
-                    <li>Professional PDF format</li>
-                    <li>Property photos and details</li>
-                    <li>Sale dates and prices</li>
-                    <li>Square footage comparisons</li>
-                    <li>Market value analysis</li>
-                </ul>
-            </div>
-            <div class="feature-image">
-                <div class="document-preview">
-                    <div class="document-page">
-                        <div class="document-header">
-                            <div class="document-logo"></div>
-                            <div class="document-title-lines">
-                                <div class="line-placeholder wide"></div>
-                                <div class="line-placeholder medium"></div>
-                            </div>
-                        </div>
-                        <div class="document-section">
-                            <div class="line-placeholder narrow"></div>
-                            <div class="document-property-row">
-                                <div class="property-photo-placeholder"></div>
-                                <div class="property-lines">
-                                    <div class="line-placeholder wide"></div>
-                                    <div class="line-placeholder medium"></div>
-                                    <div class="line-placeholder short"></div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="document-section">
-                            <div class="line-placeholder narrow"></div>
-                            <div class="document-comparables">
-                                <div class="comparable-item">
-                                    <div class="comparable-photo"></div>
-                                    <div class="line-placeholder short"></div>
-                                </div>
-                                <div class="comparable-item">
-                                    <div class="comparable-photo"></div>
-                                    <div class="line-placeholder short"></div>
-                                </div>
-                                <div class="comparable-item">
-                                    <div class="comparable-photo"></div>
-                                    <div class="line-placeholder short"></div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="document-footer">
-                            <div class="line-placeholder wide"></div>
-                            <div class="line-placeholder medium"></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        </div>
-
-        <div class="feature-section">
-        <div class="feature-block reverse">
-            <div class="feature-content">
-                <h2>Simple 5-minute process</h2>
-                <p>No complicated forms or phone calls. Enter your property address, see your potential savings for free, then decide if you want the full PDF report.</p>
-                <ul>
-                    <li>Enter your property address (free)</li>
-                    <li>We analyze comparable properties</li>
-                    <li>See your estimated savings</li>
-                    <li>Pay $49 only if you want the full PDF report</li>
-                    <li>Download and attach to your appeal</li>
+                    <li>Enter your property address</li>
+                    <li>We look for savings you might be missing</li>
+                    <li>See your potential savings</li>
+                    <li>Get step-by-step instructions</li>
                 </ul>
             </div>
             <div class="feature-image">
                 <div class="feature-placeholder">
                     <div style="text-align: center; padding: 2rem;">
                         <div style="font-size: 4rem; margin-bottom: 1rem;">✓</div>
-                        <div style="font-size: 1.5rem; font-weight: 700; color: #1a1a1a; margin-bottom: 0.5rem;">Risk-Free</div>
-                        <div style="font-size: 1.1rem; color: #666;">Pay only if we find savings</div>
+                        <div style="font-size: 1.5rem; font-weight: 700; color: #1a1a1a; margin-bottom: 0.5rem;">Quick & Easy</div>
+                        <div style="font-size: 1.1rem; color: #666;">Just enter your address</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        </div>
+
+        <div class="feature-section">
+        <div class="feature-block reverse">
+            <div class="feature-content">
+                <h2>Track your property taxes</h2>
+                <p>Keep an eye on your assessments over time. We'll notify you when something changes so you never miss an opportunity to save.</p>
+                <ul>
+                    <li>Monitor your assessments</li>
+                    <li>Get notified of changes</li>
+                    <li>Track multiple properties</li>
+                    <li>Never miss a savings opportunity</li>
+                </ul>
+            </div>
+            <div class="feature-image">
+                <div class="feature-placeholder">
+                    <div style="text-align: center; padding: 2rem;">
+                        <div style="font-size: 4rem; margin-bottom: 1rem;">🔔</div>
+                        <div style="font-size: 1.5rem; font-weight: 700; color: #1a1a1a; margin-bottom: 0.5rem;">Stay Informed</div>
+                        <div style="font-size: 1.1rem; color: #666;">We track changes for you</div>
                     </div>
                 </div>
             </div>
@@ -1446,37 +1390,35 @@
 
     <!-- Pricing Section -->
     <section id="pricing" class="pricing-section">
-        <h2>Simple, transparent pricing</h2>
+        <h2>Simple pricing</h2>
         <div class="pricing-content">
             <div class="pricing-steps">
                 <div class="pricing-step free">
-                    <div class="step-number">1</div>
-                    <h3>Free Assessment</h3>
+                    <h3>Free Property Check</h3>
                     <div class="price">$0</div>
-                    <div class="price-desc">See your potential savings</div>
+                    <div class="price-desc">See if there are savings available</div>
                     <ul>
                         <li>Enter your property address</li>
-                        <li>We analyze comparable sales</li>
-                        <li>See estimated savings</li>
+                        <li>We check for tax savings</li>
+                        <li>See if you have savings</li>
                         <li>No credit card required</li>
                     </ul>
                 </div>
                 <div class="pricing-step paid">
-                    <div class="step-number">2</div>
-                    <h3>Full Report</h3>
+                    <h3>Get Your Savings</h3>
                     <div class="price">$49</div>
-                    <div class="price-desc">Only if we find savings</div>
+                    <div class="price-desc">Educational walkthrough of the process</div>
                     <ul>
-                        <li>Professional PDF report</li>
-                        <li>3-5 comparable properties</li>
-                        <li>Property photos & details</li>
-                        <li>Ready for your appeal</li>
+                        <li>Learn how the application works</li>
+                        <li>Understand what's needed</li>
+                        <li>Know where to submit</li>
+                        <li>Do it yourself with confidence</li>
                     </ul>
                 </div>
             </div>
             <div class="pricing-footer">
-                <p><strong>Risk-free guarantee:</strong> If we don't find any savings, you pay nothing.</p>
-                <a href="#" class="hero-cta" onclick="handleSignUp(event)">Get Started Free</a>
+                <p><strong>Check for free.</strong> If we find savings, we'll show you how to get them.</p>
+                <a href="#" class="hero-cta" onclick="handleSignUp(event)">Check My Property</a>
             </div>
         </div>
     </section>
@@ -1487,34 +1429,25 @@
         <div class="faq-list">
             <div class="faq-item">
                 <button class="faq-question">
-                    <span>How does the appeal process work?</span>
+                    <span>How do you find savings?</span>
                     <span class="faq-icon">+</span>
                 </button>
                 <div class="faq-answer">
-                    <p>Once you receive your report, you submit it along with your appeal form to your county assessor's office. The report provides the comparable property evidence needed to support your case for a lower assessment.</p>
+                    <p>We check your property against public county records to find savings that many homeowners miss. If we find something, we show you exactly what to do.</p>
                 </div>
             </div>
             <div class="faq-item">
                 <button class="faq-question">
-                    <span>When should I file my appeal?</span>
+                    <span>How much can I save?</span>
                     <span class="faq-icon">+</span>
                 </button>
                 <div class="faq-answer">
-                    <p>Appeal deadlines vary by county in Georgia, typically 45 days after you receive your assessment notice. We recommend starting your assessment with us as soon as you receive your notice.</p>
+                    <p>Savings vary by property, but homeowners we've helped save an average of $1,588.91 per year. The check is free, so there's no risk in finding out if you have savings.</p>
                 </div>
             </div>
             <div class="faq-item">
                 <button class="faq-question">
-                    <span>What if you don't find any savings?</span>
-                    <span class="faq-icon">+</span>
-                </button>
-                <div class="faq-answer">
-                    <p>If our analysis shows your property is fairly assessed or we can't find comparable properties that support a lower value, you pay nothing. The initial assessment is always free.</p>
-                </div>
-            </div>
-            <div class="faq-item">
-                <button class="faq-question">
-                    <span>What areas do you service?</span>
+                    <span>What areas do you cover?</span>
                     <span class="faq-icon">+</span>
                 </button>
                 <div class="faq-answer">
@@ -1523,11 +1456,20 @@
             </div>
             <div class="faq-item">
                 <button class="faq-question">
-                    <span>How long does it take to get my report?</span>
+                    <span>How long does it take?</span>
                     <span class="faq-icon">+</span>
                 </button>
                 <div class="faq-answer">
-                    <p>Most reports are ready within 24 hours of entering your property. We'll email you as soon as your assessment is complete and ready to download.</p>
+                    <p>Just enter your property address and we'll check for savings. It's quick and easy.</p>
+                </div>
+            </div>
+            <div class="faq-item">
+                <button class="faq-question">
+                    <span>Is this really free?</span>
+                    <span class="faq-icon">+</span>
+                </button>
+                <div class="faq-answer">
+                    <p>Yes, checking your property for savings is completely free. No credit card required. We just need your property address to get started.</p>
                 </div>
             </div>
         </div>
@@ -1536,17 +1478,17 @@
     <!-- CTA Section -->
     <section id="contact" class="cta-section">
         <div class="cta-content">
-            <h2>Ready to lower your property taxes?</h2>
-            <p>Get your free assessment in minutes. Only pay if we find savings.</p>
-            <a href="#" class="btn-white" onclick="handleSignUp(event)">Get My Free Assessment</a>
-            <p style="margin-top: 1rem; font-size: 0.9rem; opacity: 0.85;">No credit card required • Results in 24 hours</p>
+            <h2>See what savings you're missing</h2>
+            <p>Free to check. Quick and easy. No credit card required.</p>
+            <a href="#" class="btn-white" onclick="handleSignUp(event)">Check My Property</a>
+            <p style="margin-top: 1rem; font-size: 0.9rem; opacity: 0.85;">Currently serving Georgia</p>
         </div>
     </section>
 
     <!-- Footer -->
     <footer>
         <div class="footer-content">
-            <div class="footer-text">&copy; 2025 LowerPropTax. All rights reserved.</div>
+            <div class="footer-text">&copy; 2026 LowerPropTax. All rights reserved.</div>
             <div class="footer-links">
                 <a href="mailto:help@lowerproptax.com">Help</a>
                 <a href="terms.html#privacy-policy">Privacy</a>

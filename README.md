@@ -31,8 +31,6 @@ npm test                           # Run test suite
 
 ## Roadmap
 
-- [ ] Automate finding 3 comps
-- [ ] Allow user to generate report by themselves
 - [ ] Handle 2025, 2026 assessment years
 - [ ] Tax deadlines tracking
 - [ ] Property tax appeal guidance

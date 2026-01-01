@@ -80,44 +80,6 @@
             transform: translateY(-1px);
         }
 
-        /* Dashboard stat card overrides */
-        .stat-card {
-            opacity: 0.5;
-        }
-
-        .stat-card.active {
-            opacity: 1;
-        }
-
-        .stat-card label {
-            line-height: 1.2;
-        }
-
-        .stat-card.active label {
-            color: #666;
-        }
-
-        .stat-card .value {
-            color: #999;
-            line-height: 1.2;
-        }
-
-        .stat-card.active .value {
-            color: #1a1a1a;
-        }
-
-        .stat-card.savings .value {
-            color: #27ae60;
-        }
-
-        .stat-card.overvalued.active .value {
-            color: #d32f2f;
-        }
-
-        .stat-card.current-tax.active .value {
-            color: #3171ef;
-        }
-
         .empty-properties {
             background: linear-gradient(135deg, #f0f4ff 0%, #f8f9ff 100%);
             border-radius: 12px;
@@ -593,17 +555,6 @@
                 </div>
             </div>
 
-            <div class="stats-row">
-                <div class="stat-card overvalued">
-                    <label>Potentially Overvalued By</label>
-                    <div class="value">$0</div>
-                </div>
-                <div class="stat-card current-tax">
-                    <label>Current Annual Tax</label>
-                    <div class="value">$0</div>
-                </div>
-            </div>
-
             <div class="add-another-section hidden" id="add-another-section">
                 <form class="add-another-form" id="add-another-property-form">
                     <input
@@ -627,7 +578,7 @@
 
             <div class="empty-properties hidden" id="empty-state">
                 <h3>🏠 Add your first property</h3>
-                <p>Get a free assessment to see if you're overpaying on property taxes.</p>
+                <p>Check your property to see if there are savings available.</p>
 
                 <form class="add-property-form" id="add-property-form">
                     <input
@@ -1158,63 +1109,11 @@
 
                 renderProperties();
                 updatePropertyCount();
-                updateAggregateStats();
                 toggleEmptyState();
             } catch (error) {
                 console.error('Error loading properties:', error);
                 hideLoadingState();
                 alert('Failed to load properties. Please refresh the page.');
-            }
-        }
-
-        // Update aggregate statistics
-        function updateAggregateStats() {
-            let totalOvervaluation = 0;
-            let totalCurrentTax = 0;
-            let propertiesWithData = 0;
-
-            properties.forEach(property => {
-                const assessment = property.latestAssessment;
-                if (assessment) {
-                    // Calculate overvaluation (appraised value - estimated appraised value)
-                    if (assessment.appraisedValue && assessment.estimatedAppraisedValue) {
-                        const overvaluation = parseFloat(assessment.appraisedValue) - parseFloat(assessment.estimatedAppraisedValue);
-                        if (overvaluation > 0) {
-                            totalOvervaluation += overvaluation;
-                        }
-                    }
-
-                    // Calculate current annual tax
-                    if (assessment.annualTax) {
-                        totalCurrentTax += parseFloat(assessment.annualTax);
-                        propertiesWithData++;
-                    }
-                }
-            });
-
-            // Update the DOM
-            const statsRow = document.querySelector('.stats-row');
-            if (statsRow) {
-                const statCards = statsRow.querySelectorAll('.stat-card');
-                if (statCards.length >= 2) {
-                    // Update Potentially Overvalued By
-                    const overvaluedValue = statCards[0].querySelector('.value');
-                    if (overvaluedValue) {
-                        overvaluedValue.textContent = '$' + totalOvervaluation.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-                        if (totalOvervaluation > 0) {
-                            statCards[0].classList.add('active');
-                        }
-                    }
-
-                    // Update Current Annual Tax
-                    const currentTaxValue = statCards[1].querySelector('.value');
-                    if (currentTaxValue) {
-                        currentTaxValue.textContent = '$' + totalCurrentTax.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-                        if (totalCurrentTax > 0) {
-                            statCards[1].classList.add('active');
-                        }
-                    }
-                }
             }
         }
 
