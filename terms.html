@@ -6,6 +6,7 @@
     <title>LowerPropTax - Terms of Service</title>
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🏡</text></svg>">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
     <!-- Clerk.js -->
     <script
         async
@@ -16,6 +17,10 @@
     ></script>
     <style>
         /* Terms page styles */
+
+        .logo {
+            text-decoration: none;
+        }
 
         .terms-content {
             background: white;
@@ -530,7 +535,7 @@
 
     <footer>
         <div class="footer-content">
-            <div class="footer-text">&copy; 2025 LowerPropTax. All rights reserved.</div>
+            <div class="footer-text">&copy; 2026 LowerPropTax. All rights reserved.</div>
             <div class="footer-links">
                 <a href="mailto:help@lowerproptax.com">Help</a>
                 <a href="#privacy-policy">Privacy</a>
@@ -540,20 +545,9 @@
     </footer>
 
     <script>
-        // Clerk initialization
-        let clerkLoaded = false;
-
         window.addEventListener('load', async () => {
             try {
-                // Wait for Clerk to load
                 await window.Clerk.load();
-                clerkLoaded = true;
-
-                // Check if user is signed in
-                if (window.Clerk.user) {
-                    // User is signed in, redirect to dashboard
-                    window.location.href = 'dashboard.html';
-                }
 
                 // Handle sign in link
                 document.getElementById('sign-in-link').addEventListener('click', (e) => {
@@ -573,7 +567,9 @@
                     });
                 });
             } catch (error) {
-                console.error('Error loading Clerk:', error);
+                // Clerk failed to load (e.g., local development) - fallback to homepage
+                document.getElementById('sign-in-link').href = 'index.html';
+                document.getElementById('get-started-link').href = 'index.html';
             }
         });
     </script>
