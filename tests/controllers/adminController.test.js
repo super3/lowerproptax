@@ -189,11 +189,11 @@ describe('Admin Controller', () => {
         user_id: 'user1'
       };
 
-      const currentYear = new Date().getFullYear();
+      // Use a fixed year (2025) to test that we use the latest assessment, not current year
       const mockAssessments = [
         {
-          id: `assess_prop1_${currentYear}`,
-          year: currentYear,
+          id: 'assess_prop1_2025',
+          year: 2025,
           appraisedValue: 250000,
           annualTax: 5000,
           status: 'preparing',
@@ -217,7 +217,7 @@ describe('Admin Controller', () => {
           ...mockProperty,
           assessments: mockAssessments,
           currentAssessment: expect.objectContaining({
-            year: currentYear,
+            year: 2025,
             appraisedValue: 250000
           })
         })
@@ -454,8 +454,9 @@ describe('Admin Controller', () => {
       };
 
       mockQuery
-        .mockResolvedValueOnce({ rows: [mockUpdatedProperty] })
-        .mockResolvedValueOnce({ rows: [mockAssessment] });
+        .mockResolvedValueOnce({ rows: [mockUpdatedProperty] })  // UPDATE properties
+        .mockResolvedValueOnce({ rows: [{ year: 2025 }] })       // SELECT latest year
+        .mockResolvedValueOnce({ rows: [mockAssessment] });      // INSERT/UPDATE assessment
 
       await adminController.updatePropertyDetails(req, res);
 
@@ -495,8 +496,9 @@ describe('Admin Controller', () => {
       };
 
       mockQuery
-        .mockResolvedValueOnce({ rows: [mockUpdatedProperty] })
-        .mockResolvedValueOnce({ rows: [mockAssessment] });
+        .mockResolvedValueOnce({ rows: [mockUpdatedProperty] })  // UPDATE properties
+        .mockResolvedValueOnce({ rows: [{ year: 2025 }] })       // SELECT latest year
+        .mockResolvedValueOnce({ rows: [mockAssessment] });      // INSERT/UPDATE assessment
 
       await adminController.updatePropertyDetails(req, res);
 
@@ -558,8 +560,9 @@ describe('Admin Controller', () => {
       };
 
       mockQuery
-        .mockResolvedValueOnce({ rows: [mockUpdatedProperty] })
-        .mockResolvedValueOnce({ rows: [mockAssessment] });
+        .mockResolvedValueOnce({ rows: [mockUpdatedProperty] })  // UPDATE properties
+        .mockResolvedValueOnce({ rows: [{ year: 2025 }] })       // SELECT latest year
+        .mockResolvedValueOnce({ rows: [mockAssessment] });      // INSERT/UPDATE assessment
 
       await adminController.updatePropertyDetails(req, res);
 
@@ -602,8 +605,9 @@ describe('Admin Controller', () => {
       };
 
       mockQuery
-        .mockResolvedValueOnce({ rows: [mockUpdatedProperty] })
-        .mockResolvedValueOnce({ rows: [mockAssessment] });
+        .mockResolvedValueOnce({ rows: [mockUpdatedProperty] })  // UPDATE properties
+        .mockResolvedValueOnce({ rows: [{ year: 2025 }] })       // SELECT latest year
+        .mockResolvedValueOnce({ rows: [mockAssessment] });      // INSERT/UPDATE assessment
 
       await adminController.updatePropertyDetails(req, res);
 
@@ -636,8 +640,9 @@ describe('Admin Controller', () => {
       };
 
       mockQuery
-        .mockResolvedValueOnce({ rows: [mockUpdatedProperty] })
-        .mockResolvedValueOnce({ rows: [mockAssessment] });
+        .mockResolvedValueOnce({ rows: [mockUpdatedProperty] })  // UPDATE properties
+        .mockResolvedValueOnce({ rows: [{ year: 2025 }] })       // SELECT latest year
+        .mockResolvedValueOnce({ rows: [mockAssessment] });      // INSERT/UPDATE assessment
 
       await adminController.updatePropertyDetails(req, res);
 
@@ -680,8 +685,9 @@ describe('Admin Controller', () => {
       };
 
       mockQuery
-        .mockResolvedValueOnce({ rows: [mockUpdatedProperty] })
-        .mockResolvedValueOnce({ rows: [mockAssessment] });
+        .mockResolvedValueOnce({ rows: [mockUpdatedProperty] })  // UPDATE properties
+        .mockResolvedValueOnce({ rows: [{ year: 2025 }] })       // SELECT latest year
+        .mockResolvedValueOnce({ rows: [mockAssessment] });      // INSERT/UPDATE assessment
 
       await adminController.updatePropertyDetails(req, res);
 
@@ -725,8 +731,9 @@ describe('Admin Controller', () => {
       };
 
       mockQuery
-        .mockResolvedValueOnce({ rows: [mockUpdatedProperty] })
-        .mockResolvedValueOnce({ rows: [mockAssessment] });
+        .mockResolvedValueOnce({ rows: [mockUpdatedProperty] })  // UPDATE properties
+        .mockResolvedValueOnce({ rows: [{ year: 2025 }] })       // SELECT latest year
+        .mockResolvedValueOnce({ rows: [mockAssessment] });      // INSERT/UPDATE assessment
 
       // Mock Clerk API to return user email
       global.fetch = jest.fn().mockResolvedValue({
@@ -774,8 +781,9 @@ describe('Admin Controller', () => {
       };
 
       mockQuery
-        .mockResolvedValueOnce({ rows: [mockUpdatedProperty] })
-        .mockResolvedValueOnce({ rows: [mockAssessment] });
+        .mockResolvedValueOnce({ rows: [mockUpdatedProperty] })  // UPDATE properties
+        .mockResolvedValueOnce({ rows: [{ year: 2025 }] })       // SELECT latest year
+        .mockResolvedValueOnce({ rows: [mockAssessment] });      // INSERT/UPDATE assessment
 
       await adminController.updatePropertyDetails(req, res);
 
@@ -807,8 +815,9 @@ describe('Admin Controller', () => {
       };
 
       mockQuery
-        .mockResolvedValueOnce({ rows: [mockUpdatedProperty] })
-        .mockResolvedValueOnce({ rows: [mockAssessment] });
+        .mockResolvedValueOnce({ rows: [mockUpdatedProperty] })  // UPDATE properties
+        .mockResolvedValueOnce({ rows: [{ year: 2025 }] })       // SELECT latest year
+        .mockResolvedValueOnce({ rows: [mockAssessment] });      // INSERT/UPDATE assessment
 
       // Mock Clerk API to fail
       global.fetch = jest.fn().mockResolvedValue({
@@ -848,8 +857,9 @@ describe('Admin Controller', () => {
       };
 
       mockQuery
-        .mockResolvedValueOnce({ rows: [mockUpdatedProperty] })
-        .mockResolvedValueOnce({ rows: [mockAssessment] });
+        .mockResolvedValueOnce({ rows: [mockUpdatedProperty] })  // UPDATE properties
+        .mockResolvedValueOnce({ rows: [{ year: 2025 }] })       // SELECT latest year
+        .mockResolvedValueOnce({ rows: [mockAssessment] });      // INSERT/UPDATE assessment
 
       // Mock Clerk API to throw error
       global.fetch = jest.fn().mockRejectedValue(new Error('Clerk API error'));
@@ -889,8 +899,9 @@ describe('Admin Controller', () => {
       };
 
       mockQuery
-        .mockResolvedValueOnce({ rows: [mockUpdatedProperty] })
-        .mockResolvedValueOnce({ rows: [mockAssessment] });
+        .mockResolvedValueOnce({ rows: [mockUpdatedProperty] })  // UPDATE properties
+        .mockResolvedValueOnce({ rows: [{ year: 2025 }] })       // SELECT latest year
+        .mockResolvedValueOnce({ rows: [mockAssessment] });      // INSERT/UPDATE assessment
 
       // Mock Clerk API to return no email
       global.fetch = jest.fn().mockResolvedValue({
@@ -933,8 +944,9 @@ describe('Admin Controller', () => {
       };
 
       mockQuery
-        .mockResolvedValueOnce({ rows: [mockUpdatedProperty] })
-        .mockResolvedValueOnce({ rows: [mockAssessment] });
+        .mockResolvedValueOnce({ rows: [mockUpdatedProperty] })  // UPDATE properties
+        .mockResolvedValueOnce({ rows: [{ year: 2025 }] })       // SELECT latest year
+        .mockResolvedValueOnce({ rows: [mockAssessment] });      // INSERT/UPDATE assessment
 
       await adminController.updatePropertyDetails(req, res);
 

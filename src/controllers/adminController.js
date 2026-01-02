@@ -113,11 +113,12 @@ export async function getPropertyDetails(req, res) {
 
     property.assessments = assessmentsResult.rows;
 
-    // Get current year's assessment or create default
+    // Get the latest assessment (by year) or create default for current year
     const currentYear = new Date().getFullYear();
-    const currentAssessment = assessmentsResult.rows.find(a => a.year === currentYear);
+    // First try to find the latest assessment (results are already ordered by year DESC)
+    const latestAssessment = assessmentsResult.rows[0];
 
-    property.currentAssessment = currentAssessment || {
+    property.currentAssessment = latestAssessment || {
       year: currentYear,
       appraisedValue: null,
       annualTax: null,
@@ -198,8 +199,15 @@ export async function updatePropertyDetails(req, res) {
       return res.status(404).json({ error: 'Property not found' });
     }
 
-    // Update or create assessment for the specified year (or current year if not specified)
-    const assessmentYear = year || new Date().getFullYear();
+    // Get the latest assessment year for this property if no year is specified
+    let assessmentYear = year;
+    if (!assessmentYear) {
+      const latestAssessmentResult = await pool.query(
+        'SELECT year FROM assessments WHERE property_id = $1 ORDER BY year DESC LIMIT 1',
+        [id]
+      );
+      assessmentYear = latestAssessmentResult.rows[0]?.year || new Date().getFullYear();
+    }
 
     const assessmentQuery = `
       INSERT INTO assessments (id, property_id, year, appraised_value, annual_tax,
