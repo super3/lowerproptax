@@ -1,6 +1,6 @@
 # LowerPropTax
 
-Property tax assessment platform that helps homeowners discover if they're overpaying on property taxes and provides detailed assessment reports.
+Property tax savings platform that helps homeowners discover savings they might be missing. Currently serving Georgia.
 
 [![Frontend Status](https://img.shields.io/github/actions/workflow/status/super3/lowerproptax/frontend.yml?branch=main&label=frontend)](https://github.com/super3/lowerproptax/actions/workflows/frontend.yml)
 [![Test Status](https://img.shields.io/github/actions/workflow/status/super3/lowerproptax/tests.yml?branch=main&label=tests)](https://github.com/super3/lowerproptax/actions/workflows/tests.yml)
@@ -33,6 +33,6 @@ npm test                           # Run test suite
 
 - [ ] Handle 2025, 2026 assessment years
 - [ ] Tax deadlines tracking
-- [ ] Property tax appeal guidance
-- [ ] Payment processing (Stripe) - require payment before viewing assessment reports
+- [ ] Payment processing (Stripe) - $49 educational video calls
+- [ ] Expand to additional states
 - [ ] Mobile app (iOS & Android)
