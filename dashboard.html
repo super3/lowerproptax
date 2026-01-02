@@ -1068,8 +1068,15 @@
                     return;
                 }
 
-                // Display user info
                 const user = window.Clerk.user;
+
+                // Redirect admins to admin dashboard (uses already-loaded user metadata, no extra API calls)
+                if (user.publicMetadata?.isAdmin) {
+                    window.location.href = '/admin.html';
+                    return;
+                }
+
+                // Display user info
                 const userName = user.firstName || user.username || user.emailAddresses[0]?.emailAddress || 'User';
                 document.getElementById('user-name').textContent = userName;
 

@@ -510,6 +510,80 @@ describe('Admin Controller', () => {
       );
     });
 
+    it('should use provided year when explicitly specified', async () => {
+      req.params.id = 'prop1';
+      req.body = {
+        year: 2024,  // Explicitly provide a year
+        appraisedValue: 250000
+      };
+
+      const mockUpdatedProperty = {
+        id: 'prop1',
+        updated_at: new Date()
+      };
+
+      const mockAssessment = {
+        id: 'assess_prop1_2024',
+        property_id: 'prop1',
+        year: 2024,
+        appraisedValue: 250000,
+        created_at: new Date(),
+        updated_at: new Date()
+      };
+
+      mockQuery
+        .mockResolvedValueOnce({ rows: [mockUpdatedProperty] })  // UPDATE properties
+        // No SELECT latest year query - year was provided
+        .mockResolvedValueOnce({ rows: [mockAssessment] });      // INSERT/UPDATE assessment
+
+      await adminController.updatePropertyDetails(req, res);
+
+      expect(res.json).toHaveBeenCalledWith(
+        expect.objectContaining({
+          ...mockUpdatedProperty,
+          currentAssessment: mockAssessment
+        })
+      );
+    });
+
+    it('should use current year when property has no existing assessments', async () => {
+      req.params.id = 'prop1';
+      req.body = {
+        bedrooms: 3,
+        appraisedValue: 200000
+      };
+
+      const mockUpdatedProperty = {
+        id: 'prop1',
+        bedrooms: 3,
+        updated_at: new Date()
+      };
+
+      const currentYear = new Date().getFullYear();
+      const mockAssessment = {
+        id: `assess_prop1_${currentYear}`,
+        property_id: 'prop1',
+        year: currentYear,
+        appraisedValue: 200000,
+        created_at: new Date(),
+        updated_at: new Date()
+      };
+
+      mockQuery
+        .mockResolvedValueOnce({ rows: [mockUpdatedProperty] })  // UPDATE properties
+        .mockResolvedValueOnce({ rows: [] })                     // SELECT latest year (no existing assessments)
+        .mockResolvedValueOnce({ rows: [mockAssessment] });      // INSERT/UPDATE assessment
+
+      await adminController.updatePropertyDetails(req, res);
+
+      expect(res.json).toHaveBeenCalledWith(
+        expect.objectContaining({
+          ...mockUpdatedProperty,
+          currentAssessment: mockAssessment
+        })
+      );
+    });
+
     it('should return 404 if property does not exist', async () => {
       req.params.id = 'nonexistent';
       req.body = { bedrooms: 3 };
