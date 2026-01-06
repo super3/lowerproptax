@@ -31,8 +31,7 @@ npm test                           # Run test suite
 
 ## Roadmap
 
-- [x] Handle 2025, 2026 assessment years
 - [ ] Payment processing (Stripe) - $49 educational video calls
-- [ ] Tax deadlines tracking
-- [ ] Expand to additional states
+- [ ] Test ads (Google Ads campaign for user acquisition)
+- [ ] Automated pulls from 3 largest counties websites (Fulton, Gwinnett, Cobb)
 - [ ] Mobile app (iOS & Android)
