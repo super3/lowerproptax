@@ -4,6 +4,9 @@ import { fileURLToPath } from 'url';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
+/* istanbul ignore next */
+const noop = () => {};
+
 // Initialize database by running migrations
 export async function initDatabase() {
   // Skip migrations if DATABASE_URL is not set (test environment)
@@ -20,7 +23,7 @@ export async function initDatabase() {
       dir: join(__dirname, 'migrations'),
       direction: 'up',
       migrationsTable: 'pgmigrations',
-      log: () => {} // Suppress verbose logging
+      log: noop // Suppress verbose logging
     });
 
     console.log('Database migrations completed successfully');

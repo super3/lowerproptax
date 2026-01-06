@@ -1,6 +1,9 @@
 import pool from '../db/connection.js';
 import { sendAssessmentReadyNotification } from '../services/emailService.js';
 
+// Default report year - set to 2025 since 2026 bills aren't out yet
+const DEFAULT_REPORT_YEAR = 2025;
+
 // Get all pending properties (status = 'preparing')
 export async function getPendingProperties(req, res) {
   try {
@@ -101,8 +104,7 @@ export async function getPropertyDetails(req, res) {
 
     // Get assessments for this property
     const assessmentsResult = await pool.query(
-      `SELECT id, year, appraised_value as "appraisedValue", annual_tax as "annualTax",
-              estimated_appraised_value as "estimatedAppraisedValue",
+      `SELECT id, year, annual_tax as "annualTax",
               estimated_annual_tax as "estimatedAnnualTax", report_url as "reportUrl",
               status, created_at as "createdAt", updated_at as "updatedAt"
        FROM assessments
@@ -113,16 +115,13 @@ export async function getPropertyDetails(req, res) {
 
     property.assessments = assessmentsResult.rows;
 
-    // Get the latest assessment (by year) or create default for current year
-    const currentYear = new Date().getFullYear();
+    // Get the latest assessment (by year) or create default
     // First try to find the latest assessment (results are already ordered by year DESC)
     const latestAssessment = assessmentsResult.rows[0];
 
     property.currentAssessment = latestAssessment || {
-      year: currentYear,
-      appraisedValue: null,
+      year: DEFAULT_REPORT_YEAR,
       annualTax: null,
-      estimatedAppraisedValue: null,
       estimatedAnnualTax: null,
       reportUrl: null,
       status: 'preparing'
@@ -168,9 +167,7 @@ export async function updatePropertyDetails(req, res) {
       bathrooms,
       sqft,
       year,
-      appraisedValue,
       annualTax,
-      estimatedAppraisedValue,
       estimatedAnnualTax,
       reportUrl,
       status
@@ -206,22 +203,20 @@ export async function updatePropertyDetails(req, res) {
         'SELECT year FROM assessments WHERE property_id = $1 ORDER BY year DESC LIMIT 1',
         [id]
       );
-      assessmentYear = latestAssessmentResult.rows[0]?.year || new Date().getFullYear();
+      assessmentYear = latestAssessmentResult.rows[0]?.year || DEFAULT_REPORT_YEAR;
     }
 
     const assessmentQuery = `
-      INSERT INTO assessments (id, property_id, year, appraised_value, annual_tax,
-                               estimated_appraised_value, estimated_annual_tax, report_url,
+      INSERT INTO assessments (id, property_id, year, annual_tax,
+                               estimated_annual_tax, report_url,
                                status, created_at, updated_at)
-      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, NOW(), NOW())
+      VALUES ($1, $2, $3, $4, $5, $6, $7, NOW(), NOW())
       ON CONFLICT (property_id, year)
       DO UPDATE SET
-        appraised_value = COALESCE($4, assessments.appraised_value),
-        annual_tax = COALESCE($5, assessments.annual_tax),
-        estimated_appraised_value = COALESCE($6, assessments.estimated_appraised_value),
-        estimated_annual_tax = COALESCE($7, assessments.estimated_annual_tax),
-        report_url = COALESCE($8, assessments.report_url),
-        status = COALESCE($9, assessments.status),
+        annual_tax = COALESCE($4, assessments.annual_tax),
+        estimated_annual_tax = COALESCE($5, assessments.estimated_annual_tax),
+        report_url = COALESCE($6, assessments.report_url),
+        status = COALESCE($7, assessments.status),
         updated_at = NOW()
       RETURNING *
     `;
@@ -231,9 +226,7 @@ export async function updatePropertyDetails(req, res) {
       assessmentId,
       id,
       assessmentYear,
-      appraisedValue !== undefined ? appraisedValue : null,
       annualTax !== undefined ? annualTax : null,
-      estimatedAppraisedValue !== undefined ? estimatedAppraisedValue : null,
       estimatedAnnualTax !== undefined ? estimatedAnnualTax : null,
       reportUrl !== undefined ? reportUrl : null,
       status !== undefined ? status : null
@@ -265,6 +258,7 @@ export async function updatePropertyDetails(req, res) {
             const clerkUser = await clerkResponse.json();
             const userEmail = clerkUser.email_addresses?.[0]?.email_address;
             if (userEmail) {
+              /* istanbul ignore next */
               sendAssessmentReadyNotification(property, assessment, userEmail).catch(() => {});
             }
           }

@@ -86,9 +86,7 @@ describe('Property Controller', () => {
       addMockAssessment(createdProperty.id, {
         id: 'assess_123',
         year: 2024,
-        appraisedValue: 350000,
         annualTax: 7000,
-        estimatedAppraisedValue: 320000,
         estimatedAnnualTax: 6400,
         reportUrl: 'https://example.com/report.pdf',
         status: 'ready',
@@ -105,7 +103,7 @@ describe('Property Controller', () => {
       expect(properties[0].latestAssessment).not.toBeNull();
       expect(properties[0].latestAssessment.id).toBe('assess_123');
       expect(properties[0].latestAssessment.year).toBe(2024);
-      expect(properties[0].latestAssessment.appraisedValue).toBe(350000);
+      expect(properties[0].latestAssessment.annualTax).toBe(7000);
       expect(properties[0].latestAssessment.status).toBe('ready');
     });
   });

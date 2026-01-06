@@ -307,19 +307,6 @@
 
             <div class="status-message" id="status-message"></div>
 
-            <div class="comparison-cards">
-                <div class="comparison-card county">
-                    <label id="county-label">County Assessment</label>
-                    <div class="amount preparing" id="county-value">--</div>
-                    <div class="sub-label">Current value</div>
-                </div>
-                <div class="comparison-card market">
-                    <label>Market Value</label>
-                    <div class="amount preparing" id="market-value">--</div>
-                    <div class="sub-label">Based on comparables</div>
-                </div>
-            </div>
-
             <div class="savings-result preparing" id="savings-result">
                 <div class="savings-info">
                     <label>Potential Annual Savings</label>
@@ -400,13 +387,6 @@
                 messageEl.className = 'status-message';
             }
 
-            // County Assessment (appraised value)
-            const countyValueEl = document.getElementById('county-value');
-            if (latestAssessment && latestAssessment.appraisedValue) {
-                countyValueEl.textContent = '$' + Number(latestAssessment.appraisedValue).toLocaleString();
-                countyValueEl.classList.remove('preparing');
-            }
-
             // Update status badge with year
             const statusBadge = document.getElementById('property-status');
             const year = latestAssessment?.year || '';
@@ -425,13 +405,6 @@
 
             statusBadge.textContent = year ? `${year} ${statusText}` : statusText;
             statusBadge.classList.add(statusClass);
-
-            // Market Value (estimated appraised value)
-            const marketValueEl = document.getElementById('market-value');
-            if (latestAssessment && latestAssessment.estimatedAppraisedValue) {
-                marketValueEl.textContent = '$' + Number(latestAssessment.estimatedAppraisedValue).toLocaleString();
-                marketValueEl.classList.remove('preparing');
-            }
 
             // Potential Savings (calculate from annualTax - estimatedAnnualTax)
             const savingsEl = document.getElementById('potential-savings');

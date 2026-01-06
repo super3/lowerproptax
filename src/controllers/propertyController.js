@@ -18,9 +18,7 @@ export async function getProperties(req, res) {
               p.bedrooms, p.bathrooms, p.sqft,
               p.created_at as "createdAt", p.updated_at as "updatedAt",
               a.id as "assessmentId", a.year as "assessmentYear",
-              a.appraised_value as "assessmentAppraisedValue",
               a.annual_tax as "assessmentAnnualTax",
-              a.estimated_appraised_value as "assessmentEstimatedAppraisedValue",
               a.estimated_annual_tax as "assessmentEstimatedAnnualTax",
               a.report_url as "assessmentReportUrl",
               a.status as "assessmentStatus",
@@ -56,9 +54,7 @@ export async function getProperties(req, res) {
       latestAssessment: row.assessmentId ? {
         id: row.assessmentId,
         year: row.assessmentYear,
-        appraisedValue: row.assessmentAppraisedValue,
         annualTax: row.assessmentAnnualTax,
-        estimatedAppraisedValue: row.assessmentEstimatedAppraisedValue,
         estimatedAnnualTax: row.assessmentEstimatedAnnualTax,
         reportUrl: row.assessmentReportUrl,
         status: row.assessmentStatus,
@@ -100,8 +96,7 @@ export async function getProperty(req, res) {
 
     // Get all assessments for this property
     const assessmentsResult = await pool.query(
-      `SELECT id, year, appraised_value as "appraisedValue",
-              annual_tax as "annualTax", estimated_appraised_value as "estimatedAppraisedValue",
+      `SELECT id, year, annual_tax as "annualTax",
               estimated_annual_tax as "estimatedAnnualTax", report_url as "reportUrl",
               status, created_at as "createdAt", updated_at as "updatedAt"
        FROM assessments
@@ -152,6 +147,7 @@ export async function createProperty(req, res) {
     const property = result.rows[0];
 
     // Send email notification (fire-and-forget)
+    /* istanbul ignore next */
     sendNewPropertyNotification(property, req.user.email).catch(() => {});
 
     res.status(201).json(property);

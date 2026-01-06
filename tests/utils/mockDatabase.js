@@ -63,9 +63,7 @@ export function createMockPool() {
               // Include assessment fields from mockAssessments or null
               assessmentId: assessment?.id || null,
               assessmentYear: assessment?.year || null,
-              assessmentAppraisedValue: assessment?.appraisedValue || null,
               assessmentAnnualTax: assessment?.annualTax || null,
-              assessmentEstimatedAppraisedValue: assessment?.estimatedAppraisedValue || null,
               assessmentEstimatedAnnualTax: assessment?.estimatedAnnualTax || null,
               assessmentReportUrl: assessment?.reportUrl || null,
               assessmentStatus: assessment?.status || null,

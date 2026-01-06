@@ -194,7 +194,6 @@ describe('Admin Controller', () => {
         {
           id: 'assess_prop1_2025',
           year: 2025,
-          appraisedValue: 250000,
           annualTax: 5000,
           status: 'preparing',
           createdAt: new Date(),
@@ -218,7 +217,7 @@ describe('Admin Controller', () => {
           assessments: mockAssessments,
           currentAssessment: expect.objectContaining({
             year: 2025,
-            appraisedValue: 250000
+            annualTax: 5000
           })
         })
       );
@@ -250,8 +249,7 @@ describe('Admin Controller', () => {
           ...mockProperty,
           assessments: [],
           currentAssessment: expect.objectContaining({
-            year: new Date().getFullYear(),
-            appraisedValue: null,
+            year: 2025, // Default year since 2026 bills aren't out yet
             annualTax: null,
             status: 'preparing'
           })
@@ -430,7 +428,6 @@ describe('Admin Controller', () => {
         bedrooms: 4,
         bathrooms: 3.5,
         sqft: 2000,
-        appraisedValue: 300000,
         annualTax: 6000
       };
 
@@ -446,7 +443,6 @@ describe('Admin Controller', () => {
         id: 'assess_prop1_2025',
         property_id: 'prop1',
         year: 2025,
-        appraisedValue: 300000,
         annualTax: 6000,
         status: null,
         created_at: new Date(),
@@ -488,7 +484,6 @@ describe('Admin Controller', () => {
         id: 'assess_prop1_2025',
         property_id: 'prop1',
         year: 2025,
-        appraisedValue: null,
         annualTax: null,
         status: null,
         created_at: new Date(),
@@ -514,7 +509,7 @@ describe('Admin Controller', () => {
       req.params.id = 'prop1';
       req.body = {
         year: 2024,  // Explicitly provide a year
-        appraisedValue: 250000
+        annualTax: 2500
       };
 
       const mockUpdatedProperty = {
@@ -526,7 +521,7 @@ describe('Admin Controller', () => {
         id: 'assess_prop1_2024',
         property_id: 'prop1',
         year: 2024,
-        appraisedValue: 250000,
+        annualTax: 2500,
         created_at: new Date(),
         updated_at: new Date()
       };
@@ -550,7 +545,7 @@ describe('Admin Controller', () => {
       req.params.id = 'prop1';
       req.body = {
         bedrooms: 3,
-        appraisedValue: 200000
+        annualTax: 2000
       };
 
       const mockUpdatedProperty = {
@@ -559,12 +554,12 @@ describe('Admin Controller', () => {
         updated_at: new Date()
       };
 
-      const currentYear = new Date().getFullYear();
+      const defaultYear = 2025; // Default year since 2026 bills aren't out yet
       const mockAssessment = {
-        id: `assess_prop1_${currentYear}`,
+        id: `assess_prop1_${defaultYear}`,
         property_id: 'prop1',
-        year: currentYear,
-        appraisedValue: 200000,
+        year: defaultYear,
+        annualTax: 2000,
         created_at: new Date(),
         updated_at: new Date()
       };
@@ -612,9 +607,7 @@ describe('Admin Controller', () => {
         bedrooms: undefined,
         bathrooms: undefined,
         sqft: undefined,
-        appraisedValue: undefined,
         annualTax: undefined,
-        estimatedAppraisedValue: undefined,
         estimatedAnnualTax: undefined,
         reportUrl: undefined,
         status: undefined
@@ -651,9 +644,7 @@ describe('Admin Controller', () => {
     it('should handle mix of defined and undefined assessment values', async () => {
       req.params.id = 'prop1';
       req.body = {
-        appraisedValue: 300000,
         annualTax: 6000,
-        estimatedAppraisedValue: 280000,
         estimatedAnnualTax: undefined,
         reportUrl: 'https://example.com/report.pdf',
         status: 'ready'
@@ -668,9 +659,7 @@ describe('Admin Controller', () => {
         id: 'assess_prop1_2025',
         property_id: 'prop1',
         year: 2025,
-        appraisedValue: 300000,
         annualTax: 6000,
-        estimatedAppraisedValue: 280000,
         estimatedAnnualTax: null,
         reportUrl: 'https://example.com/report.pdf',
         status: 'ready',
@@ -731,9 +720,7 @@ describe('Admin Controller', () => {
     it('should handle zero and falsy values correctly', async () => {
       req.params.id = 'prop1';
       req.body = {
-        appraisedValue: 0,
         annualTax: 0,
-        estimatedAppraisedValue: 0,
         estimatedAnnualTax: 0,
         reportUrl: '',
         status: 'preparing'
@@ -748,9 +735,7 @@ describe('Admin Controller', () => {
         id: 'assess_prop1_2025',
         property_id: 'prop1',
         year: 2025,
-        appraisedValue: 0,
         annualTax: 0,
-        estimatedAppraisedValue: 0,
         estimatedAnnualTax: 0,
         reportUrl: '',
         status: 'preparing',
