@@ -31,8 +31,8 @@ npm test                           # Run test suite
 
 ## Roadmap
 
-- [ ] Handle 2025, 2026 assessment years
-- [ ] Tax deadlines tracking
+- [x] Handle 2025, 2026 assessment years
 - [ ] Payment processing (Stripe) - $49 educational video calls
+- [ ] Tax deadlines tracking
 - [ ] Expand to additional states
 - [ ] Mobile app (iOS & Android)
