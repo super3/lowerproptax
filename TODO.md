@@ -23,29 +23,6 @@ Changes needed to pivot from property tax appeals to homestead exemption savings
 
 - [ ] **index.html** - Feature bullets reference "assessments" without explaining what that means
 
-- [ ] **admin.html / admin-property.html** - Admin interface could use labels explaining homestead context
-
 - [ ] **README.md** - Roadmap still mentions "appeal guidance"
 
 - [ ] **src/README.md** - API documentation uses "assessment" generically without homestead context
-
-## Low Priority (Nice-to-have)
-
-- [ ] **scripts/scrapePropertyDetails.js** - Comments still reference "comps"
-
-- [ ] **Test descriptions** - Could add homestead exemption context for clarity
-
-- [ ] **Database table name** - `assessments` could be renamed to `homestead_assessments` for clarity (breaking change, complex)
-
----
-
-## What's Already Good
-
-- **Backend logic** - Already works perfectly for homestead exemption analysis
-- **Data model** - `annual_tax` vs `estimated_annual_tax` is exactly what's needed
-- **Savings calculation** - Email already shows potential savings correctly
-- **Status values** - 'preparing', 'ready', 'invalid' work well for exemption checks
-- **Sales table** - Already dropped (was for comps)
-- **Homepage hero/copy** - Already pivoted in recent commits
-
-The pivot is mostly **messaging and terminology** - the core functionality already supports homestead exemption analysis well.
