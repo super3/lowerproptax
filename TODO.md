@@ -1,28 +1,16 @@
-# Homestead Exemption Pivot - TODO
+# Property Tax Savings - TODO
 
-Changes needed to pivot from property tax appeals to homestead exemption savings discovery.
+Focus on simple, user-friendly language. Users care about "annual property tax" and "annual savings" - not technical terms like "homestead exemption" (if they knew what that was, they'd already have it).
 
-## High Priority (Legal/User-Facing)
+## High Priority (Legal)
 
-- [ ] **terms.html** - Major rewrite needed
+- [ ] **terms.html** - Remove old appeals language
   - [ ] Section 5.1 "Nature of Service" - references appeals and comparables data
   - [ ] Section 6 "User Responsibilities for Appeals" - entire section focused on appeals
   - [ ] Liability disclaimers reference "appeal success" and "missed appeal deadlines"
 
-- [ ] **emailService.js** - Update notification content
-  - [ ] Email says "Your property tax assessment is ready" - needs homestead context
-  - [ ] Should explain this is a homestead exemption eligibility analysis
-  - [ ] Add next steps like "File with your county assessor"
-
-- [ ] **property.html** - Status messages lack context
-  - [ ] "We're gathering data" and "assessment is complete" need to explain homestead exemption purpose
-
-## Medium Priority (Clarity)
-
-- [ ] **dashboard.html** - Multiple "assessment" references without homestead context
-
-- [ ] **index.html** - Feature bullets reference "assessments" without explaining what that means
+## Medium Priority
 
 - [ ] **README.md** - Roadmap still mentions "appeal guidance"
 
-- [ ] **src/README.md** - API documentation uses "assessment" generically without homestead context
+- [ ] **src/README.md** - API documentation references old appeals model
