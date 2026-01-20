@@ -878,6 +878,13 @@
                 location = property.state;
             }
 
+            // Build property details (bed/bath/sqft)
+            const propertyDetails = [];
+            if (property.bedrooms) propertyDetails.push(`${property.bedrooms} bed`);
+            if (property.bathrooms) propertyDetails.push(`${property.bathrooms} bath`);
+            if (property.sqft) propertyDetails.push(`${Number(property.sqft).toLocaleString()} sq ft`);
+            const propertyDetailsStr = propertyDetails.join(' • ');
+
             const status = property.latestAssessment?.status || 'preparing';
             let statusText, statusClass;
 
@@ -936,14 +943,13 @@
                                     <div class="savings-label">Potential Annual Savings</div>
                                     <div class="savings-amount">$${savings.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
                                 </div>
-                                <button class="btn-view-report" onclick="event.stopPropagation(); viewProperty(${index});">View Report</button>
+                                <button class="btn-view-report" onclick="event.stopPropagation(); viewProperty(${index});">Schedule Call</button>
                             </div>
                         `;
                     } else {
                         savingsInfo = `
                             <div class="no-savings-message">
-                                <span>No savings opportunity found</span>
-                                <button class="btn-view-details" onclick="event.stopPropagation(); viewProperty(${index});">View Details</button>
+                                <span>No savings found</span>
                             </div>
                         `;
                     }
@@ -956,7 +962,8 @@
                 <div class="property-header">
                     <div>
                         <div class="property-address">${streetAddress}</div>
-                        ${location ? `<div class="property-details">${location}</div>` : ''}
+                        ${location ? `<div class="property-location">${location}</div>` : ''}
+                        ${propertyDetailsStr ? `<div class="property-details">${propertyDetailsStr}</div>` : ''}
                     </div>
                     <div class="property-status ${statusClass}">${assessmentYear ? `${assessmentYear} ` : ''}${statusText}</div>
                 </div>
@@ -990,9 +997,14 @@
                 ` : ''}
             `;
 
-            // Make card clickable
-            card.style.cursor = 'pointer';
-            card.onclick = () => viewProperty(index);
+            // Only make card clickable if there are savings (leads to Calendly)
+            const assessment = property.latestAssessment;
+            const hasSavings = assessment && assessment.annualTax && assessment.estimatedAnnualTax &&
+                              (assessment.annualTax - assessment.estimatedAnnualTax) > 0;
+            if (hasSavings) {
+                card.style.cursor = 'pointer';
+                card.onclick = () => viewProperty(index);
+            }
             return card;
         }
 
@@ -1035,10 +1047,10 @@
             });
         }
 
-        // View property details
+        // Schedule a call (only called when property has savings)
         function viewProperty(index) {
-            const property = properties[index];
-            window.location.href = `/property.html?id=${property.id}`;
+            // Redirect to Calendly for scheduling a paid session
+            window.location.href = 'https://calendly.com/shawn-lowerproptax/new-meeting';
         }
 
         // Initialize Clerk and load user data

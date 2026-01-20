@@ -49,27 +49,45 @@ export async function sendAssessmentReadyNotification(property, assessment, user
     ? `$${savings.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
     : '$0.00';
 
-  const propertyUrl = `https://lowerproptax.com/property.html?id=${id}`;
+  const calendlyUrl = 'https://calendly.com/shawn-lowerproptax/new-meeting';
+  const dashboardUrl = 'https://lowerproptax.com/dashboard.html';
 
-  try {
-    await resend.emails.send({
-      from: 'LowerPropTax <help@lowerproptax.com>',
-      to: userEmail,
-      subject: `Your Property Assessment is Ready - ${savingsFormatted} in Potential Savings`,
-      text: `Great news! Your property tax assessment is ready.
+  // Different email content based on whether there are savings
+  const emailContent = savings > 0
+    ? `Great news! Your property tax assessment is ready.
 
 Property: ${fullAddress}
 Potential Annual Savings: ${savingsFormatted}
 
-View your full assessment report here (sign in required):
-${propertyUrl}
+Schedule a free consultation to discuss your homestead exemption:
+${calendlyUrl}
 
-If you're viewing this on a different device, just click the link and sign in with your account to access your report.
+During the call, we'll confirm your details and help you apply for your exemption right then and there.
 
 Questions? Reply to this email and we'll be happy to help.
 
 - The LowerPropTax Team
 `
+    : `Your property tax assessment is complete.
+
+Property: ${fullAddress}
+
+Unfortunately, we didn't find any savings opportunity for this property. You can view your dashboard here:
+${dashboardUrl}
+
+Questions? Reply to this email and we'll be happy to help.
+
+- The LowerPropTax Team
+`;
+
+  try {
+    await resend.emails.send({
+      from: 'LowerPropTax <help@lowerproptax.com>',
+      to: userEmail,
+      subject: savings > 0
+        ? `Your Property Assessment is Ready - ${savingsFormatted} in Potential Savings`
+        : `Your Property Assessment is Complete`,
+      text: emailContent
     });
     console.log(`Assessment ready notification sent for property ${id} to ${userEmail}`);
   } catch (error) {

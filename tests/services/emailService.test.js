@@ -132,13 +132,13 @@ describe('Email Service', () => {
         });
         expect(mockSend).toHaveBeenCalledWith(
           expect.objectContaining({
-            text: expect.stringContaining('https://lowerproptax.com/property.html?id=prop_123')
+            text: expect.stringContaining('https://calendly.com/shawn-lowerproptax/new-meeting')
           })
         );
         expect(consoleSpy).toHaveBeenCalledWith('Assessment ready notification sent for property prop_123 to user@example.com');
       });
 
-      it('should show $0.00 savings when no savings', async () => {
+      it('should send different email when no savings', async () => {
         mockSend.mockResolvedValueOnce({ id: 'email_123' });
 
         const property = {
@@ -155,8 +155,13 @@ describe('Email Service', () => {
 
         expect(mockSend).toHaveBeenCalledWith(
           expect.objectContaining({
-            subject: 'Your Property Assessment is Ready - $0.00 in Potential Savings',
-            text: expect.stringContaining('Potential Annual Savings: $0.00')
+            subject: 'Your Property Assessment is Complete',
+            text: expect.stringContaining('we didn\'t find any savings opportunity')
+          })
+        );
+        expect(mockSend).toHaveBeenCalledWith(
+          expect.objectContaining({
+            text: expect.stringContaining('https://lowerproptax.com/dashboard.html')
           })
         );
       });
@@ -173,9 +178,10 @@ describe('Email Service', () => {
 
         await sendAssessmentReadyNotification(property, assessment, 'user@example.com');
 
+        // When tax values are missing, savings is 0, so it uses the no-savings email
         expect(mockSend).toHaveBeenCalledWith(
           expect.objectContaining({
-            subject: 'Your Property Assessment is Ready - $0.00 in Potential Savings'
+            subject: 'Your Property Assessment is Complete'
           })
         );
       });
