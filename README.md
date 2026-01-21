@@ -31,7 +31,7 @@ npm test                           # Run test suite
 
 ## Roadmap
 
-- [ ] Payment processing (Stripe) - $49 educational video calls
-- [ ] Test ads (Google Ads campaign for user acquisition)
+- [x] Payment processing (Stripe) - $49 educational video calls
+- [x] Test ads (Google Ads campaign for user acquisition)
 - [ ] Automated pulls from 3 largest counties websites (Fulton, Gwinnett, Cobb)
 - [ ] Mobile app (iOS & Android)
