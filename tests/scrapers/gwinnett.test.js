@@ -1,8 +1,8 @@
 import { scrapeProperty } from '../../scripts/county-scraper.js';
 
-describe('Fulton County Scraper', () => {
-  const TEST_ADDRESS = '6607 ARIA BLVD';
-  const COUNTY = 'fulton';
+describe('Gwinnett County Scraper', () => {
+  const TEST_ADDRESS = '2517 Weycroft Cir';
+  const COUNTY = 'gwinnett';
 
   let result;
 
@@ -18,12 +18,12 @@ describe('Fulton County Scraper', () => {
     expect(result.bedrooms).toBe(3);
   });
 
-  test('should return correct bathrooms (including half baths)', () => {
-    expect(result.bathrooms).toBe(3.5);
+  test('should return correct bathrooms', () => {
+    expect(result.bathrooms).toBe(2);
   });
 
   test('should return correct square footage', () => {
-    expect(result.sqft).toBe(4118);
+    expect(result.sqft).toBe(2382);
   });
 
   test('should return valid assessment PDF URL', () => {
