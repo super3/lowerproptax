@@ -20,7 +20,6 @@ async function scrapeProperty(address) {
   });
 
   try {
-
     await page.goto(FULTON_SEARCH_URL, { waitUntil: 'domcontentloaded', timeout: 30000 });
 
     await page.waitForTimeout(2000);
@@ -44,15 +43,61 @@ async function scrapeProperty(address) {
     const text = await page.evaluate(() => document.body.innerText);
 
     const bedroomMatch = text.match(/Bedroom[s]?\s*[:\s]*(\d+)/i);
-    const bathroomMatch = text.match(/Full\s*Bath[s]?\s*[:\s]*(\d+)/i) || text.match(/Bath[s]?\s*[:\s]*(\d+)/i);
+
+    // Handle "Full Bath/Half Bath 3/1" format
+    const bathMatch = text.match(/Full\s*Bath\/Half\s*Bath\s*\n?\s*(\d+)\/(\d+)/i);
+    let bathrooms = null;
+    if (bathMatch) {
+      const fullBaths = parseInt(bathMatch[1]);
+      const halfBaths = parseInt(bathMatch[2]);
+      bathrooms = fullBaths + (halfBaths * 0.5);
+    } else {
+      const simpleBathMatch = text.match(/Full\s*Bath[s]?\s*[:\s]*(\d+)/i) || text.match(/Bath[s]?\s*[:\s]*(\d+)/i);
+      if (simpleBathMatch) bathrooms = parseInt(simpleBathMatch[1]);
+    }
+
     const sqftMatch = text.match(/Res\s*Sq\s*Ft\s*\n?\s*([\d,]+)/i) ||
                       text.match(/Heated\s*(?:Sq\s*Ft|Area)\s*[:\s]*([\d,]+)/i);
+
+    // Click on Assessment Notices link to get PDF URL
+    let assessmentPdfUrl = null;
+    try {
+      const assessmentLink = await page.$('a:has-text("Assessment Notices")');
+      if (assessmentLink) {
+        await assessmentLink.click();
+        await page.waitForTimeout(3000);
+
+        // Click on "Assessment Notices" header to expand it
+        const expandButton = await page.$('text=Assessment Notices');
+        if (expandButton) {
+          await expandButton.click();
+          await page.waitForTimeout(2000);
+        }
+
+        // Find the PDF button and extract URL from onclick attribute
+        assessmentPdfUrl = await page.evaluate(() => {
+          const btn = document.querySelector('input[value*="Assessment Notice"][value*="PDF"]');
+          if (btn) {
+            const onclick = btn.getAttribute('onclick');
+            const match = onclick.match(/window\.open\('([^']+)'/);
+            if (match) {
+              // Encode spaces in the URL
+              return match[1].replace(/ /g, '%20');
+            }
+          }
+          return null;
+        });
+      }
+    } catch (e) {
+      // Assessment notices page may not be available
+    }
 
     const result = {
       address,
       bedrooms: bedroomMatch ? parseInt(bedroomMatch[1]) : null,
-      bathrooms: bathroomMatch ? parseInt(bathroomMatch[1]) : null,
-      sqft: sqftMatch ? parseInt(sqftMatch[1].replace(',', '')) : null
+      bathrooms,
+      sqft: sqftMatch ? parseInt(sqftMatch[1].replace(',', '')) : null,
+      assessmentPdf: assessmentPdfUrl
     };
 
     console.log(JSON.stringify(result, null, 2));
