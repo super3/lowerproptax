@@ -4,6 +4,7 @@ Property tax savings platform that helps homeowners discover savings they might 
 
 [![Frontend Status](https://img.shields.io/github/actions/workflow/status/super3/lowerproptax/frontend.yml?branch=main&label=frontend)](https://github.com/super3/lowerproptax/actions/workflows/frontend.yml)
 [![Test Status](https://img.shields.io/github/actions/workflow/status/super3/lowerproptax/tests.yml?branch=main&label=tests)](https://github.com/super3/lowerproptax/actions/workflows/tests.yml)
+[![Scraper Status](https://img.shields.io/github/actions/workflow/status/super3/lowerproptax/scrapers.yml?branch=main&label=scrapers)](https://github.com/super3/lowerproptax/actions/workflows/scrapers.yml)
 [![Coverage Status](https://coveralls.io/repos/github/super3/lowerproptax/badge.svg?branch=main)](https://coveralls.io/github/super3/lowerproptax?branch=main)
 
 ## Installation
