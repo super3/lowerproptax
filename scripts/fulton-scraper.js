@@ -112,8 +112,10 @@ async function scrapeProperty(address) {
   }
 }
 
-// Run if called directly
-const address = process.argv[2] || '6607 ARIA BLVD';
-scrapeProperty(address);
+// Run if called directly (not imported)
+if (import.meta.url === `file://${process.argv[1]}`) {
+  const address = process.argv[2] || '6607 ARIA BLVD';
+  scrapeProperty(address);
+}
 
 export { scrapeProperty };
