@@ -1,4 +1,5 @@
 import { chromium } from 'playwright';
+import { PDFParse } from 'pdf-parse';
 
 const COUNTY_CONFIG = {
   fulton: {
@@ -161,6 +162,39 @@ async function scrapeProperty(address, county = 'fulton') {
       }
     } catch (e) {
       // Assessment notices may not be available
+    }
+
+    // For Cobb, extract homestead from PDF since it's not on the page
+    if (county.toLowerCase() === 'cobb' && assessment2025PdfUrl && homesteadExemption === null) {
+      let parser = null;
+      try {
+        // Fetch PDF as buffer to avoid worker issues
+        const response = await fetch(assessment2025PdfUrl);
+        const arrayBuffer = await response.arrayBuffer();
+        const pdfBuffer = Buffer.from(arrayBuffer);
+
+        parser = new PDFParse({ data: pdfBuffer });
+        const pdfResult = await parser.getText();
+        const pdfText = pdfResult.text;
+
+        // Look for homestead pattern in PDF
+        // Cobb PDF format: "YES - 413" or "NO" after property details
+        const pdfHomesteadMatch = pdfText.match(/\t(YES|NO)\s*(?:-\s*\d+)?[\r\n]/i);
+        if (pdfHomesteadMatch) {
+          homesteadExemption = pdfHomesteadMatch[1].toLowerCase() === 'yes';
+        }
+      } catch (e) {
+        // PDF parsing may fail
+        console.error('Error parsing PDF for homestead:', e.message);
+      } finally {
+        if (parser) {
+          try {
+            await parser.destroy();
+          } catch (e) {
+            // Ignore destroy errors
+          }
+        }
+      }
     }
 
     const result = {

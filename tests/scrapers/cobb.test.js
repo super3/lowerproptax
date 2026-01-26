@@ -26,11 +26,8 @@ describe('Cobb County Scraper', () => {
     expect(result.sqft).toBe(2254);
   });
 
-  test('should return homestead exemption status if available', () => {
-    // Homestead exemption may not be available for all counties
-    if (result.homesteadExemption !== null) {
-      expect(typeof result.homesteadExemption).toBe('boolean');
-    }
+  test('should return homestead exemption status from PDF', () => {
+    expect(result.homesteadExemption).toBe(true);
   });
 
   test('should return valid assessment PDF URL', () => {
