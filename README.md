@@ -33,5 +33,7 @@ npm test                           # Run test suite
 
 - [x] Payment processing (Stripe) - $49 educational video calls
 - [x] Test ads (Google Ads campaign for user acquisition)
-- [ ] Automated pulls from 3 largest counties websites (Fulton, Gwinnett, Cobb)
+- [ ] [Automated pulls from 3 largest counties websites (Fulton, Gwinnett, Cobb)](TODO.md)
+- [ ] Automate homestead checking on website
+- [ ] Allow users to put in address before signing up
 - [ ] Mobile app (iOS & Android)
