@@ -12,18 +12,18 @@ Fetch property assessment data from Fulton, Gwinnett, and Cobb county websites.
 
 ### Implementation
 
-- [ ] Research county website structures and APIs
-- [ ] Build base scraper with error handling and rate limiting
-- [ ] Fulton County scraper
-- [ ] Gwinnett County scraper
+- [x] Research county website structures and APIs
+- [x] Build base scraper with error handling
+- [x] Fulton County scraper
+- [x] Gwinnett County scraper
 - [ ] Cobb County scraper
-- [ ] Scheduled jobs for regular pulls
-- [ ] Integrate with property submission flow
-- [ ] Tests and monitoring
+- [ ] Integrate with admin property flow
+- [x] Tests and monitoring
 
-### Data to Extract
+### Data Extracted
 
-- Parcel ID & address
-- Current assessed value
-- Homestead exemption status
-- Assessment history (3-5 years)
+- [x] Bedrooms
+- [x] Bathrooms (including half baths)
+- [x] Square footage
+- [x] Homestead exemption status
+- [x] 2025 Assessment PDF URL

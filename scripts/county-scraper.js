@@ -65,14 +65,28 @@ async function scrapeProperty(address, county = 'fulton') {
 
     const bedroomMatch = text.match(/Bedroom[s]?\s*[:\s]*(\d+)/i);
 
-    // Handle "Full Bath/Half Bath 3/1" format
-    const bathMatch = text.match(/Full\s*Bath\/Half\s*Bath\s*\n?\s*(\d+)\/(\d+)/i);
+    // Handle various bathroom formats
     let bathrooms = null;
-    if (bathMatch) {
-      const fullBaths = parseInt(bathMatch[1]);
-      const halfBaths = parseInt(bathMatch[2]);
-      bathrooms = fullBaths + (halfBaths * 0.5);
-    } else {
+
+    // Format 1: "Full Bath/Half Bath 3/1" (Fulton)
+    const bathMatch1 = text.match(/Full\s*Bath\/Half\s*Bath\s*\n?\s*(\d+)\/(\d+)/i);
+    if (bathMatch1) {
+      bathrooms = parseInt(bathMatch1[1]) + (parseInt(bathMatch1[2]) * 0.5);
+    }
+
+    // Format 2: "Bathrooms 2" and "Half Bathrooms 1" on separate lines (Cobb)
+    if (!bathrooms) {
+      const fullBathMatch = text.match(/Bathrooms\s*\n?\s*(\d+)/i);
+      const halfBathMatch = text.match(/Half\s*Bathrooms\s*\n?\s*(\d+)/i);
+      if (fullBathMatch) {
+        const fullBaths = parseInt(fullBathMatch[1]);
+        const halfBaths = halfBathMatch ? parseInt(halfBathMatch[1]) : 0;
+        bathrooms = fullBaths + (halfBaths * 0.5);
+      }
+    }
+
+    // Format 3: Simple "Full Bath 3" or "Bath 3"
+    if (!bathrooms) {
       const simpleBathMatch = text.match(/Full\s*Bath[s]?\s*[:\s]*(\d+)/i) || text.match(/Bath[s]?\s*[:\s]*(\d+)/i);
       if (simpleBathMatch) bathrooms = parseInt(simpleBathMatch[1]);
     }
@@ -80,6 +94,7 @@ async function scrapeProperty(address, county = 'fulton') {
     const sqftMatch = text.match(/Res\s*Sq\s*Ft\s*\n?\s*([\d,]+)/i) ||
                       text.match(/GrossSqft\s*\n?\s*([\d,]+)/i) ||
                       text.match(/Heated\s*(?:Sq\s*Ft|Area)\s*[:\s]*([\d,]+)/i);
+
 
     // Check for homestead exemption
     const homesteadMatch = text.match(/Homestead\s*Exemption\s*\n?\s*(Yes|No)/i) ||
@@ -102,7 +117,20 @@ async function scrapeProperty(address, county = 'fulton') {
         return null;
       });
 
-      // Second try: Fulton style - need to navigate to Assessment Notices page
+      // Second try: Check for PDF button directly on page (Cobb style)
+      if (!assessment2025PdfUrl) {
+        assessment2025PdfUrl = await page.evaluate(() => {
+          const btn = document.querySelector('input[value*="2025"][value*="Notice"][value*="PDF"]');
+          if (btn) {
+            const onclick = btn.getAttribute('onclick');
+            const match = onclick?.match(/window\.open\('([^']+)'/);
+            if (match) return match[1].replace(/ /g, '%20');
+          }
+          return null;
+        });
+      }
+
+      // Third try: Fulton style - need to navigate to Assessment Notices page
       if (!assessment2025PdfUrl) {
         const assessmentLink = await page.$('a:has-text("Assessment Notices")');
         if (assessmentLink) {
@@ -117,8 +145,9 @@ async function scrapeProperty(address, county = 'fulton') {
           }
 
           // Find the PDF button and extract URL from onclick attribute
+          // Fulton: "2025 Assessment Notice (PDF)", Cobb: "2025 Notice (PDF)"
           assessment2025PdfUrl = await page.evaluate(() => {
-            const btn = document.querySelector('input[value*="Assessment Notice"][value*="PDF"]');
+            const btn = document.querySelector('input[value*="2025"][value*="Notice"][value*="PDF"]');
             if (btn) {
               const onclick = btn.getAttribute('onclick');
               const match = onclick.match(/window\.open\('([^']+)'/);
