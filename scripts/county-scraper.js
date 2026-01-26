@@ -81,6 +81,15 @@ async function scrapeProperty(address, county = 'fulton') {
                       text.match(/GrossSqft\s*\n?\s*([\d,]+)/i) ||
                       text.match(/Heated\s*(?:Sq\s*Ft|Area)\s*[:\s]*([\d,]+)/i);
 
+    // Check for homestead exemption
+    const homesteadMatch = text.match(/Homestead\s*Exemption\s*\n?\s*(Yes|No)/i) ||
+                           text.match(/Homestead\s*\n?\s*(Y|N)\b/i);
+    let homesteadExemption = null;
+    if (homesteadMatch) {
+      const value = homesteadMatch[1].toLowerCase();
+      homesteadExemption = value === 'yes' || value === 'y';
+    }
+
     // Get Assessment PDF URL
     let assessment2025PdfUrl = null;
     try {
@@ -131,6 +140,7 @@ async function scrapeProperty(address, county = 'fulton') {
       bedrooms: bedroomMatch ? parseInt(bedroomMatch[1]) : null,
       bathrooms,
       sqft: sqftMatch ? parseInt(sqftMatch[1].replace(',', '')) : null,
+      homesteadExemption,
       assessment2025Pdf: assessment2025PdfUrl
     };
 
