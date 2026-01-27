@@ -105,9 +105,24 @@
             transition: border-color 0.2s;
         }
 
-        .data-card input:focus {
+        .data-card input:focus,
+        .data-card select:focus {
             outline: none;
             border-color: #3171ef;
+        }
+
+        .data-card select {
+            width: 100%;
+            padding: 0.5rem;
+            border: 1px solid #e5e5e5;
+            border-radius: 6px;
+            font-size: 1.5rem;
+            font-weight: 700;
+            font-family: 'Inter', Arial, sans-serif;
+            background: white;
+            color: #1a1a1a;
+            transition: border-color 0.2s;
+            cursor: pointer;
         }
 
         /* Loading spinner */
@@ -193,6 +208,15 @@
                         <div class="data-card">
                             <label for="sqft">Square Feet</label>
                             <input type="number" id="sqft" name="sqft" min="0" step="1" placeholder="--">
+                        </div>
+
+                        <div class="data-card">
+                            <label for="homestead">Homestead</label>
+                            <select id="homestead" name="homestead">
+                                <option value="">--</option>
+                                <option value="true">Yes</option>
+                                <option value="false">No</option>
+                            </select>
                         </div>
 
                         <div class="data-card">
@@ -286,6 +310,7 @@
             document.getElementById('bedrooms').value = currentProperty.bedrooms || '';
             document.getElementById('bathrooms').value = currentProperty.bathrooms || '';
             document.getElementById('sqft').value = currentProperty.sqft || '';
+            document.getElementById('homestead').value = currentProperty.homestead !== null ? String(currentProperty.homestead) : '';
 
             // Populate assessment fields from currentAssessment
             const assessment = currentProperty.currentAssessment || {};
@@ -343,6 +368,7 @@
                     bedrooms: document.getElementById('bedrooms').value ? parseInt(document.getElementById('bedrooms').value) : null,
                     bathrooms: document.getElementById('bathrooms').value ? parseFloat(document.getElementById('bathrooms').value) : null,
                     sqft: document.getElementById('sqft').value ? parseInt(document.getElementById('sqft').value) : null,
+                    homestead: document.getElementById('homestead').value ? document.getElementById('homestead').value === 'true' : null,
                     annualTax: document.getElementById('annual_tax').value ? parseFloat(document.getElementById('annual_tax').value) : null,
                     estimatedAnnualTax: document.getElementById('estimated_annual_tax').value ? parseFloat(document.getElementById('estimated_annual_tax').value) : null,
                     reportUrl: document.getElementById('report_url').value || null
@@ -466,6 +492,9 @@
                 }
                 if (data.sqft !== null) {
                     document.getElementById('sqft').value = data.sqft;
+                }
+                if (data.homesteadExemption !== null) {
+                    document.getElementById('homestead').value = String(data.homesteadExemption);
                 }
             } catch (error) {
                 console.error('Error pulling property data:', error);

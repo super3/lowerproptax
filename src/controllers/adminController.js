@@ -89,6 +89,7 @@ export async function getPropertyDetails(req, res) {
         bedrooms,
         bathrooms,
         sqft,
+        homestead,
         created_at as "createdAt",
         updated_at as "updatedAt",
         user_id as "userId"
@@ -168,6 +169,7 @@ export async function updatePropertyDetails(req, res) {
       bedrooms,
       bathrooms,
       sqft,
+      homestead,
       year,
       annualTax,
       estimatedAnnualTax,
@@ -175,15 +177,16 @@ export async function updatePropertyDetails(req, res) {
       status
     } = req.body;
 
-    // Update property (bedrooms, bathrooms, sqft)
+    // Update property (bedrooms, bathrooms, sqft, homestead)
     const propertyQuery = `
       UPDATE properties
       SET
         bedrooms = COALESCE($1, bedrooms),
         bathrooms = COALESCE($2, bathrooms),
         sqft = COALESCE($3, sqft),
+        homestead = COALESCE($4, homestead),
         updated_at = NOW()
-      WHERE id = $4
+      WHERE id = $5
       RETURNING *
     `;
 
@@ -191,6 +194,7 @@ export async function updatePropertyDetails(req, res) {
       bedrooms !== undefined ? bedrooms : null,
       bathrooms !== undefined ? bathrooms : null,
       sqft !== undefined ? sqft : null,
+      homestead !== undefined ? homestead : null,
       id
     ]);
 

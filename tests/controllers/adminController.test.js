@@ -442,6 +442,7 @@ describe('Admin Controller', () => {
         bedrooms: 4,
         bathrooms: 3.5,
         sqft: 2000,
+        homestead: true,
         annualTax: 6000
       };
 
@@ -450,6 +451,7 @@ describe('Admin Controller', () => {
         bedrooms: 4,
         bathrooms: 3.5,
         sqft: 2000,
+        homestead: true,
         updated_at: new Date()
       };
 
@@ -472,7 +474,7 @@ describe('Admin Controller', () => {
 
       expect(mockQuery).toHaveBeenCalledWith(
         expect.stringContaining('UPDATE properties'),
-        expect.arrayContaining([4, 3.5, 2000, 'prop1'])
+        expect.arrayContaining([4, 3.5, 2000, true, 'prop1'])
       );
       expect(res.json).toHaveBeenCalledWith(
         expect.objectContaining({
