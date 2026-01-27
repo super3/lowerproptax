@@ -1,5 +1,6 @@
 import pool from '../db/connection.js';
 import { sendNewPropertyNotification } from '../services/emailService.js';
+import { parseAddress, SUPPORTED_COUNTIES } from '../../scripts/address-parser.js';
 
 // Test helper to reset storage
 export async function resetProperties() {
@@ -241,5 +242,33 @@ export async function deleteProperty(req, res) {
   } catch (error) {
     console.error('Error deleting property:', error);
     res.status(500).json({ error: 'Failed to delete property' });
+  }
+}
+
+// Preview property address (no auth required)
+export async function previewProperty(req, res) {
+  try {
+    const { address } = req.body;
+
+    if (!address) {
+      return res.status(400).json({ error: 'Address is required' });
+    }
+
+    const apiKey = process.env.GOOGLE_MAPS_API_KEY;
+    if (!apiKey) {
+      return res.status(500).json({ error: 'Google Maps API key not configured' });
+    }
+
+    const parsed = await parseAddress(address, apiKey);
+
+    res.json({
+      streetAddress: parsed.streetAddress,
+      county: parsed.county,
+      supported: parsed.isSupported,
+      supportedCounties: SUPPORTED_COUNTIES
+    });
+  } catch (error) {
+    console.error('Error previewing property:', error);
+    res.status(400).json({ error: error.message || 'Failed to validate address' });
   }
 }

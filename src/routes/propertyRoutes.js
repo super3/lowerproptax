@@ -4,7 +4,10 @@ import * as propertyController from '../controllers/propertyController.js';
 
 const router = express.Router();
 
-// All property routes require authentication
+// Public routes (no auth required)
+router.post('/properties/preview', propertyController.previewProperty);
+
+// Authenticated property routes
 router.get('/properties', requireAuth, propertyController.getProperties);
 router.get('/properties/:id', requireAuth, propertyController.getProperty);
 router.post('/properties', requireAuth, propertyController.createProperty);
