@@ -467,8 +467,6 @@
                 if (data.sqft !== null) {
                     document.getElementById('sqft').value = data.sqft;
                 }
-
-                alert(`Pulled data from ${data.county.charAt(0).toUpperCase() + data.county.slice(1)} County. Please review and save if correct.`);
             } catch (error) {
                 console.error('Error pulling property data:', error);
                 alert('Failed to pull property data: ' + error.message);
