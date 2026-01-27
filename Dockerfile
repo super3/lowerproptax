@@ -34,5 +34,5 @@ COPY . .
 # Set display for xvfb
 ENV DISPLAY=:99
 
-# Start xvfb and then the app
-CMD Xvfb :99 -screen 0 1280x720x24 & npm start
+# Start xvfb and then the app (clean up any stale lock files first)
+CMD rm -f /tmp/.X99-lock && Xvfb :99 -screen 0 1280x720x24 & npm start

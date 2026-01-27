@@ -23,9 +23,6 @@ const corsOptions = {
 // Middleware
 app.use(cors(corsOptions));
 
-// Handle preflight requests explicitly (before Clerk middleware)
-app.options('*', cors(corsOptions));
-
 app.use(express.json());
 
 // Clerk middleware for authentication
