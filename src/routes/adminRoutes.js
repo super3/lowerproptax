@@ -11,5 +11,6 @@ router.get('/admin/completed-properties', requireAuth, requireAdmin, adminContro
 router.get('/admin/properties/:id', requireAuth, requireAdmin, adminController.getPropertyDetails);
 router.put('/admin/properties/:id', requireAuth, requireAdmin, adminController.updatePropertyDetails);
 router.put('/admin/properties/:id/mark-ready', requireAuth, requireAdmin, adminController.markPropertyAsReady);
+router.post('/admin/properties/:id/pull', requireAuth, requireAdmin, adminController.pullPropertyData);
 
 export default router;

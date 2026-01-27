@@ -206,6 +206,31 @@ nav {
     transform: translateY(-1px);
 }
 
+.btn-secondary {
+    background: transparent;
+    color: #3171ef;
+    border: 2px solid #3171ef;
+    padding: 0.75rem 1.5rem;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: 'Inter', Arial, sans-serif;
+}
+
+.btn-secondary:hover {
+    background: #3171ef;
+    color: white;
+    transform: translateY(-1px);
+}
+
+.btn-secondary:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
 .btn-small {
     padding: 0.5rem 1rem;
     border-radius: 6px;
