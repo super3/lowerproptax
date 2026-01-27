@@ -35,7 +35,8 @@ npm test                           # Run test suite
 - [x] Payment processing (Stripe) - $49 educational video calls
 - [x] Test ads (Google Ads campaign for user acquisition)
 - [x] Automated pulls from 3 largest counties websites (Fulton, Gwinnett, Cobb)
-  - [ ] Integrate homestead checking on admin flow
-  - [ ] Automate homestead checking on website
+  - [ ] Integrate homestead checking on admin flow (Annual Tax)
+  - [ ] Generate assessment report and est. annual tax with Claude API on admin flow
+  - [ ] Automate homestead checking and estimated savings on website
 - [ ] Allow users to put in address before signing up
 - [ ] Mobile app (iOS & Android)
