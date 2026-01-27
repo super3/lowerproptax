@@ -27,3 +27,5 @@ jobs:
 
     - name: Run scraper tests
       run: xvfb-run --auto-servernum npm run test:scrapers
+      env:
+        GOOGLE_MAPS_API_KEY: ${{ secrets.GOOGLE_MAPS_API_KEY }}
