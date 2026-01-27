@@ -1817,6 +1817,9 @@
                     componentRestrictions: { country: ['us'] },
                 });
 
+                // Set placeholder attribute
+                autocompleteWidget.setAttribute('placeholder', 'Enter your address...');
+
                 // Replace the input with autocomplete widget
                 previewInput.parentNode.insertBefore(autocompleteWidget, previewInput);
                 previewInput.style.display = 'none';
