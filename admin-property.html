@@ -220,6 +220,12 @@
                         </div>
 
                         <div class="data-card">
+                            <label>QPublic</label>
+                            <a id="qpublic_link" href="#" target="_blank" style="font-size: 1.5rem; font-weight: 700; color: #3171ef; text-decoration: none; display: block; padding: 0.5rem 0;">--</a>
+                            <input type="hidden" id="qpublic_url" name="qpublic_url">
+                        </div>
+
+                        <div class="data-card">
                             <label for="annual_tax">Annual Tax</label>
                             <input type="number" id="annual_tax" name="annual_tax" min="0" step="0.01" placeholder="$">
                         </div>
@@ -312,6 +318,19 @@
             document.getElementById('sqft').value = currentProperty.sqft || '';
             document.getElementById('homestead').value = currentProperty.homestead !== null ? String(currentProperty.homestead) : '';
 
+            // Set qpublic link
+            const qpublicLink = document.getElementById('qpublic_link');
+            const qpublicUrl = document.getElementById('qpublic_url');
+            if (currentProperty.qpublicUrl) {
+                qpublicLink.href = currentProperty.qpublicUrl;
+                qpublicLink.textContent = 'View';
+                qpublicUrl.value = currentProperty.qpublicUrl;
+            } else {
+                qpublicLink.href = '#';
+                qpublicLink.textContent = '--';
+                qpublicUrl.value = '';
+            }
+
             // Populate assessment fields from currentAssessment
             const assessment = currentProperty.currentAssessment || {};
 
@@ -369,6 +388,7 @@
                     bathrooms: document.getElementById('bathrooms').value ? parseFloat(document.getElementById('bathrooms').value) : null,
                     sqft: document.getElementById('sqft').value ? parseInt(document.getElementById('sqft').value) : null,
                     homestead: document.getElementById('homestead').value ? document.getElementById('homestead').value === 'true' : null,
+                    qpublicUrl: document.getElementById('qpublic_url').value || null,
                     annualTax: document.getElementById('annual_tax').value ? parseFloat(document.getElementById('annual_tax').value) : null,
                     estimatedAnnualTax: document.getElementById('estimated_annual_tax').value ? parseFloat(document.getElementById('estimated_annual_tax').value) : null,
                     reportUrl: document.getElementById('report_url').value || null
@@ -495,6 +515,11 @@
                 }
                 if (data.homesteadExemption !== null) {
                     document.getElementById('homestead').value = String(data.homesteadExemption);
+                }
+                if (data.qpublicUrl) {
+                    document.getElementById('qpublic_url').value = data.qpublicUrl;
+                    document.getElementById('qpublic_link').href = data.qpublicUrl;
+                    document.getElementById('qpublic_link').textContent = 'View';
                 }
             } catch (error) {
                 console.error('Error pulling property data:', error);

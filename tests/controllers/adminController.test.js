@@ -443,6 +443,7 @@ describe('Admin Controller', () => {
         bathrooms: 3.5,
         sqft: 2000,
         homestead: true,
+        qpublicUrl: 'https://qpublic.schneidercorp.com/property/123',
         annualTax: 6000
       };
 
@@ -452,6 +453,7 @@ describe('Admin Controller', () => {
         bathrooms: 3.5,
         sqft: 2000,
         homestead: true,
+        qpublic_url: 'https://qpublic.schneidercorp.com/property/123',
         updated_at: new Date()
       };
 
@@ -474,7 +476,7 @@ describe('Admin Controller', () => {
 
       expect(mockQuery).toHaveBeenCalledWith(
         expect.stringContaining('UPDATE properties'),
-        expect.arrayContaining([4, 3.5, 2000, true, 'prop1'])
+        expect.arrayContaining([4, 3.5, 2000, true, 'https://qpublic.schneidercorp.com/property/123', 'prop1'])
       );
       expect(res.json).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -1111,7 +1113,8 @@ describe('Admin Controller', () => {
         bedrooms: 3,
         bathrooms: 2.5,
         sqft: 1800,
-        homesteadExemption: true
+        homesteadExemption: true,
+        qpublicUrl: 'https://qpublic.schneidercorp.com/property/123'
       });
 
       await adminController.pullPropertyData(req, res);
@@ -1130,6 +1133,7 @@ describe('Admin Controller', () => {
         bathrooms: 2.5,
         sqft: 1800,
         homesteadExemption: true,
+        qpublicUrl: 'https://qpublic.schneidercorp.com/property/123',
         county: 'fulton',
         streetAddress: '123 Main St'
       });

@@ -197,6 +197,9 @@ async function scrapeProperty(address, county = 'fulton') {
       }
     }
 
+    // Get the current page URL (qpublic property page)
+    const qpublicUrl = page.url();
+
     const result = {
       address,
       county,
@@ -204,7 +207,8 @@ async function scrapeProperty(address, county = 'fulton') {
       bathrooms,
       sqft: sqftMatch ? parseInt(sqftMatch[1].replace(',', '')) : null,
       homesteadExemption,
-      assessment2025Pdf: assessment2025PdfUrl
+      assessment2025Pdf: assessment2025PdfUrl,
+      qpublicUrl
     };
 
     console.log(JSON.stringify(result, null, 2));
