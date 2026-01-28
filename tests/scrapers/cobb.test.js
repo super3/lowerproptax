@@ -35,4 +35,12 @@ describe('Cobb County Scraper', () => {
     expect(result.assessment2025Pdf).toMatch(/^https:\/\//);
     expect(result.assessment2025Pdf).not.toContain(' ');
   });
+
+  test('should return correct parcel number', () => {
+    expect(result.parcelNumber).toBe('18018300540');
+  });
+
+  test('should return 2025 property tax payment', () => {
+    expect(result.propertyTax2025).toBe('1,175.65');
+  });
 });

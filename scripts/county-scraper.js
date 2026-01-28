@@ -47,6 +47,87 @@ async function scrapeGwinnettPropertyTax(parcelNumber) {
   }
 }
 
+// Scrape 2025 property tax from Cobb County Tax Payments website
+async function scrapeCobbPropertyTax(parcelNumber, browser) {
+  const url = `https://www.cobbtaxpayments.org/#/WildfireSearch/${parcelNumber}`;
+
+  const context = await browser.newContext({
+    userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+    viewport: { width: 1280, height: 720 }
+  });
+
+  const page = await context.newPage();
+
+  try {
+    await page.goto(url, { waitUntil: 'load', timeout: 60000 });
+
+    // Wait for page to load
+    await page.waitForTimeout(3000);
+
+    // Close the "First time here?" modal if it appears
+    try {
+      const closeBtn = await page.waitForSelector('button:has-text("Close")', { timeout: 5000 });
+      if (closeBtn) {
+        await closeBtn.click();
+        await page.waitForTimeout(1000);
+      }
+    } catch (e) {
+      // Modal may not appear
+    }
+
+    // Wait for search results to load
+    await page.waitForTimeout(3000);
+
+    // Click on the 2025 record's View button to view details
+    try {
+      // Wait for search results table to appear
+      await page.waitForSelector('table', { timeout: 15000 });
+
+      // Find the row with 2025 and click its View button (.btnView class)
+      const viewClicked = await page.evaluate(() => {
+        const rows = document.querySelectorAll('tr');
+        for (const row of rows) {
+          // Check if this row contains 2025
+          if (row.textContent.includes('2025')) {
+            const viewBtn = row.querySelector('button.btnView');
+            if (viewBtn) {
+              viewBtn.click();
+              return true;
+            }
+          }
+        }
+        return false;
+      });
+
+      if (!viewClicked) {
+        // Fallback: use Playwright locator
+        const row2025 = page.locator('tr', { hasText: '2025' }).first();
+        await row2025.locator('button.btnView').click();
+      }
+
+      // Wait for the detail page to load - URL should change
+      await page.waitForURL(/Record/, { timeout: 10000 }).catch(() => {});
+      await page.waitForTimeout(3000);
+
+      const text = await page.evaluate(() => document.body.innerText);
+
+      // Look for base taxes amount
+      // Format: "Base Taxes $1,175.65" or similar
+      const taxMatch = text.match(/Base\s*Taxes[:\s]*\$?([\d,]+\.\d{2})/i);
+      if (taxMatch) {
+        return taxMatch[1];
+      }
+
+      return null;
+    } catch (e) {
+      console.error('Cobb tax scraping error:', e.message);
+      return null;
+    }
+  } finally {
+    await context.close();
+  }
+}
+
 // Scrape 2025 property tax from Fulton County Taxes website
 async function scrapeFultonPropertyTax(parcelNumber, browser) {
   // URL encode the parcel number (spaces become %20)
@@ -312,6 +393,12 @@ async function scrapeProperty(address, county = 'fulton') {
         propertyTax2025 = await scrapeGwinnettPropertyTax(parcelNumber);
       } catch (e) {
         console.error('Error scraping Gwinnett property tax:', e.message);
+      }
+    } else if (county.toLowerCase() === 'cobb' && parcelNumber) {
+      try {
+        propertyTax2025 = await scrapeCobbPropertyTax(parcelNumber, browser);
+      } catch (e) {
+        console.error('Error scraping Cobb property tax:', e.message);
       }
     }
 

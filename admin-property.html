@@ -527,6 +527,9 @@
                         } else if (data.county.toLowerCase() === 'gwinnett') {
                             taxLink.href = `https://www.gwinnetttaxcommissioner.com/PropTaxBill/${encodedParcel}.pdf`;
                             taxLink.style.color = '#3171ef';
+                        } else if (data.county.toLowerCase() === 'cobb') {
+                            taxLink.href = `https://www.cobbtaxpayments.org/#/WildfireSearch/${data.parcelNumber}`;
+                            taxLink.style.color = '#3171ef';
                         }
                     }
                 }
