@@ -1,6 +1,40 @@
 import { chromium } from 'playwright';
 import { PDFParse } from 'pdf-parse';
 
+// Scrape 2025 property tax from Fulton County Taxes website
+async function scrapeFultonPropertyTax(parcelNumber, browser) {
+  // URL encode the parcel number (spaces become %20)
+  const encodedParcel = encodeURIComponent(parcelNumber);
+  const url = `https://fultoncountytaxes.org/propertytax/summary/${encodedParcel}`;
+
+  const context = await browser.newContext({
+    userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+    viewport: { width: 1280, height: 720 }
+  });
+
+  const page = await context.newPage();
+
+  try {
+    await page.goto(url, { waitUntil: 'networkidle', timeout: 60000 });
+
+    // Wait for the page to load after Cloudflare challenge - may need more time
+    await page.waitForTimeout(5000);
+
+    const text = await page.evaluate(() => document.body.innerText);
+
+    // Look for 2025 tax amount
+    // Format: "Tax Year 2025\nCycle\nCounty\nPrincipal Amount\n15,262.32"
+    const taxMatch = text.match(/Tax Year 2025[\s\S]*?Principal Amount\s*\n?\s*([\d,]+\.?\d*)/i);
+    if (taxMatch) {
+      return taxMatch[1]; // Return as string with commas, e.g., "15,262.32"
+    }
+
+    return null;
+  } finally {
+    await context.close();
+  }
+}
+
 const COUNTY_CONFIG = {
   fulton: {
     url: 'https://qpublic.schneidercorp.com/Application.aspx?AppID=936&LayerID=18251&PageTypeID=2&PageID=8154',
@@ -200,6 +234,25 @@ async function scrapeProperty(address, county = 'fulton') {
     // Get the current page URL (qpublic property page)
     const qpublicUrl = page.url();
 
+    // Extract parcel number from the URL KeyValue parameter
+    // This preserves the exact spacing (e.g., "17 0034  LL3967" with double space)
+    let parcelNumber = null;
+    const urlKeyValueMatch = qpublicUrl.match(/KeyValue=([^&]+)/i);
+    if (urlKeyValueMatch) {
+      // URL uses + for spaces, decode to get actual parcel number
+      parcelNumber = decodeURIComponent(urlKeyValueMatch[1].replace(/\+/g, ' '));
+    }
+
+    // For Fulton, try to get 2025 property tax payment
+    let propertyTax2025 = null;
+    if (county.toLowerCase() === 'fulton' && parcelNumber) {
+      try {
+        propertyTax2025 = await scrapeFultonPropertyTax(parcelNumber, browser);
+      } catch (e) {
+        console.error('Error scraping Fulton property tax:', e.message);
+      }
+    }
+
     const result = {
       address,
       county,
@@ -208,7 +261,9 @@ async function scrapeProperty(address, county = 'fulton') {
       sqft: sqftMatch ? parseInt(sqftMatch[1].replace(',', '')) : null,
       homesteadExemption,
       assessment2025Pdf: assessment2025PdfUrl,
-      qpublicUrl
+      qpublicUrl,
+      parcelNumber,
+      propertyTax2025
     };
 
     console.log(JSON.stringify(result, null, 2));
