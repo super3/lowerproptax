@@ -515,7 +515,7 @@
                 if (data.propertyTax2025) {
                     // Remove commas from the tax string (e.g., "15,262.32" -> "15262.32")
                     document.getElementById('annual_tax').value = data.propertyTax2025.replace(/,/g, '');
-                    calculateSavings();
+                    calculateAnnualSavings();
                 }
             } catch (error) {
                 console.error('Error pulling property data:', error);
