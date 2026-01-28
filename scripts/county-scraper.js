@@ -1,6 +1,52 @@
 import { chromium } from 'playwright';
 import { PDFParse } from 'pdf-parse';
 
+// Scrape 2025 property tax from Gwinnett County Tax Commissioner PDF
+async function scrapeGwinnettPropertyTax(parcelNumber) {
+  // URL encode the parcel number (spaces become %20)
+  // Parcel format: "R7058 149" -> "R7058%20149"
+  const encodedParcel = encodeURIComponent(parcelNumber);
+  const url = `https://www.gwinnetttaxcommissioner.com/PropTaxBill/${encodedParcel}.pdf`;
+
+  let parser = null;
+  try {
+    const response = await fetch(url);
+    if (!response.ok) {
+      return null;
+    }
+
+    const arrayBuffer = await response.arrayBuffer();
+    const pdfBuffer = Buffer.from(arrayBuffer);
+
+    parser = new PDFParse({ data: pdfBuffer });
+    const pdfResult = await parser.getText();
+    const pdfText = pdfResult.text;
+
+    // Look for the total tax amount in the PDF
+    // Format varies but typically shows "Total Due" or similar with amount
+    const taxMatch = pdfText.match(/Total\s*(?:Due|Tax|Amount)[:\s]*\$?([\d,]+\.\d{2})/i) ||
+                     pdfText.match(/(?:Annual|2025)\s*Tax[:\s]*\$?([\d,]+\.\d{2})/i) ||
+                     pdfText.match(/\$?([\d,]+\.\d{2})\s*$/m);
+
+    if (taxMatch) {
+      return taxMatch[1]; // Return as string with commas, e.g., "4,911.54"
+    }
+
+    return null;
+  } catch (e) {
+    console.error('Error scraping Gwinnett property tax:', e.message);
+    return null;
+  } finally {
+    if (parser) {
+      try {
+        await parser.destroy();
+      } catch (e) {
+        // Ignore destroy errors
+      }
+    }
+  }
+}
+
 // Scrape 2025 property tax from Fulton County Taxes website
 async function scrapeFultonPropertyTax(parcelNumber, browser) {
   // URL encode the parcel number (spaces become %20)
@@ -243,13 +289,19 @@ async function scrapeProperty(address, county = 'fulton') {
       parcelNumber = decodeURIComponent(urlKeyValueMatch[1].replace(/\+/g, ' '));
     }
 
-    // For Fulton, try to get 2025 property tax payment
+    // Try to get 2025 property tax payment based on county
     let propertyTax2025 = null;
     if (county.toLowerCase() === 'fulton' && parcelNumber) {
       try {
         propertyTax2025 = await scrapeFultonPropertyTax(parcelNumber, browser);
       } catch (e) {
         console.error('Error scraping Fulton property tax:', e.message);
+      }
+    } else if (county.toLowerCase() === 'gwinnett' && parcelNumber) {
+      try {
+        propertyTax2025 = await scrapeGwinnettPropertyTax(parcelNumber);
+      } catch (e) {
+        console.error('Error scraping Gwinnett property tax:', e.message);
       }
     }
 

@@ -217,7 +217,7 @@
                         </div>
 
                         <div class="data-card">
-                            <label for="annual_tax">Annual Tax</label>
+                            <label><a id="annual_tax_link" href="#" target="_blank" style="color: inherit; text-decoration: none;">Annual Tax</a></label>
                             <input type="number" id="annual_tax" name="annual_tax" min="0" step="0.01" placeholder="$">
                         </div>
 
@@ -516,6 +516,19 @@
                     // Remove commas from the tax string (e.g., "15,262.32" -> "15262.32")
                     document.getElementById('annual_tax').value = data.propertyTax2025.replace(/,/g, '');
                     calculateAnnualSavings();
+
+                    // Set the annual tax link based on county
+                    const taxLink = document.getElementById('annual_tax_link');
+                    if (data.parcelNumber && data.county) {
+                        const encodedParcel = encodeURIComponent(data.parcelNumber);
+                        if (data.county.toLowerCase() === 'fulton') {
+                            taxLink.href = `https://fultoncountytaxes.org/propertytax/summary/${encodedParcel}`;
+                            taxLink.style.color = '#3171ef';
+                        } else if (data.county.toLowerCase() === 'gwinnett') {
+                            taxLink.href = `https://www.gwinnetttaxcommissioner.com/PropTaxBill/${encodedParcel}.pdf`;
+                            taxLink.style.color = '#3171ef';
+                        }
+                    }
                 }
             } catch (error) {
                 console.error('Error pulling property data:', error);
