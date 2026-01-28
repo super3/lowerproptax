@@ -88,6 +88,121 @@
             box-shadow: 0 10px 25px rgba(49, 113, 239, 0.3);
         }
 
+        /* Google Maps PlaceAutocompleteElement Styling */
+        .address-preview-form gmp-place-autocomplete {
+            width: 100%;
+            color-scheme: light;
+        }
+
+        .address-preview-form gmp-place-autocomplete input {
+            border: 2px solid #e5e5e5 !important;
+            border-radius: 6px !important;
+            font-family: 'Inter', Arial, sans-serif !important;
+            font-size: 1rem !important;
+            color: #1a1a1a !important;
+            padding: 1rem 1.25rem !important;
+            background: white !important;
+            transition: border-color 0.2s !important;
+        }
+
+        .address-preview-form gmp-place-autocomplete input::placeholder {
+            color: #999 !important;
+        }
+
+        .address-preview-form gmp-place-autocomplete input:focus {
+            outline: none !important;
+            border-color: #3171ef !important;
+            box-shadow: 0 0 0 3px rgba(49, 113, 239, 0.15) !important;
+        }
+
+        /* Address Preview Form */
+        .address-preview-form {
+            max-width: 500px;
+        }
+
+        .address-input-wrapper {
+            display: flex;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+        }
+
+        .address-input-wrapper input {
+            flex: 1;
+            min-width: 200px;
+            padding: 1rem 1.25rem;
+            border: 2px solid #e5e5e5;
+            border-radius: 6px;
+            font-size: 1rem;
+            font-family: inherit;
+            transition: border-color 0.2s;
+        }
+
+        .address-input-wrapper input:focus {
+            outline: none;
+            border-color: #3171ef;
+        }
+
+        .address-input-wrapper .hero-cta {
+            border: none;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+
+        .address-input-wrapper .hero-cta:disabled {
+            background: #94a3b8;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .preview-result {
+            margin-top: 1rem;
+            padding: 1rem 1.25rem;
+            border-radius: 8px;
+            font-size: 0.95rem;
+        }
+
+        .preview-result.hidden {
+            display: none;
+        }
+
+        .preview-result.success {
+            background: #e8f5e9;
+            border: 1px solid #a5d6a7;
+            color: #2e7d32;
+        }
+
+        .preview-result.error {
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            color: #dc2626;
+        }
+
+        .preview-result .result-title {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .preview-result .result-action {
+            margin-top: 0.75rem;
+        }
+
+        .preview-result .btn-signup {
+            background: #16a34a;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 6px;
+            border: none;
+            font-weight: 600;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .preview-result .btn-signup:hover {
+            background: #15803d;
+        }
+
         .hero-image {
             width: 100%;
         }
@@ -908,6 +1023,23 @@
                 font-size: 1.1rem;
             }
 
+            .address-preview-form {
+                max-width: 100%;
+            }
+
+            .address-input-wrapper {
+                flex-direction: column;
+            }
+
+            .address-input-wrapper input {
+                width: 100%;
+            }
+
+            .address-input-wrapper .hero-cta {
+                width: 100%;
+                text-align: center;
+            }
+
             /* Hero comparison mobile */
             .hero-comparison {
                 padding: 1.25rem;
@@ -1287,7 +1419,13 @@
         <div class="hero-content">
             <h1>Overpaying on property taxes?</h1>
             <p class="hero-subtitle">Most homeowners miss savings they could have. We check for you. Currently serving Georgia.</p>
-            <a href="#" class="hero-cta" onclick="handleSignUp(event)">Check My Property</a>
+            <form id="address-preview-form" class="address-preview-form">
+                <div class="address-input-wrapper">
+                    <input type="text" id="preview-address" placeholder="Enter your property address" autocomplete="off" required>
+                    <button type="submit" class="hero-cta" id="check-btn">Check My Property</button>
+                </div>
+                <div id="preview-result" class="preview-result hidden"></div>
+            </form>
         </div>
         <div class="hero-image">
             <div class="hero-comparison">
@@ -1503,6 +1641,9 @@
         </div>
     </section>
 
+    <!-- Google Maps API -->
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDxdYMdPwYKYGtjb5Bw8QhEbk6gKZkG0vM&libraries=places&loading=async&callback=initAutocomplete" async defer></script>
+
     <!-- Footer -->
     <footer>
         <div class="footer-content">
@@ -1516,6 +1657,11 @@
     </footer>
 
     <script>
+        // API configuration
+        const API_BASE = window.location.hostname === 'localhost'
+            ? 'http://localhost:3001/api'
+            : 'https://lowerproptax.up.railway.app/api';
+
         // Clerk initialization
         let clerkLoaded = false;
 
@@ -1652,6 +1798,189 @@
                 item.classList.toggle('open');
             });
         });
+
+        // Address preview form variables
+        let autocompleteWidget;
+        let selectedPlace = null;
+        const previewForm = document.getElementById('address-preview-form');
+        const previewInput = document.getElementById('preview-address');
+        const previewResult = document.getElementById('preview-result');
+        const checkBtn = document.getElementById('check-btn');
+
+        // Initialize Google Maps autocomplete
+        window.initAutocomplete = async function() {
+            try {
+                const { PlaceAutocompleteElement } = await google.maps.importLibrary("places");
+
+                // Create the autocomplete widget
+                autocompleteWidget = new PlaceAutocompleteElement({
+                    componentRestrictions: { country: ['us'] },
+                });
+
+                // Set placeholder attribute
+                autocompleteWidget.setAttribute('placeholder', 'Enter your address...');
+
+                // Replace the input with autocomplete widget
+                previewInput.parentNode.insertBefore(autocompleteWidget, previewInput);
+                previewInput.style.display = 'none';
+
+                // Style the autocomplete widget container
+                autocompleteWidget.style.flex = '1';
+                autocompleteWidget.style.minWidth = '200px';
+
+                // Listen for place selection
+                autocompleteWidget.addEventListener('gmp-select', async ({ placePrediction }) => {
+                    if (!placePrediction) {
+                        return;
+                    }
+
+                    // Convert prediction to place
+                    const place = placePrediction.toPlace();
+
+                    // Fetch full place details
+                    await place.fetchFields({
+                        fields: ['addressComponents', 'formattedAddress', 'location']
+                    });
+
+                    // Extract address components
+                    const components = {};
+                    if (place.addressComponents) {
+                        place.addressComponents.forEach(component => {
+                            const type = component.types[0];
+                            components[type] = component.longText;
+                        });
+                    }
+
+                    // Store the selected place data
+                    selectedPlace = {
+                        formattedAddress: place.formattedAddress,
+                        location: {
+                            lat: place.location.lat(),
+                            lng: place.location.lng()
+                        },
+                        parsedAddress: {
+                            city: components.locality || components.sublocality || '',
+                            state: components.administrative_area_level_1 || '',
+                            zipCode: components.postal_code || '',
+                            country: components.country || ''
+                        }
+                    };
+
+                    // Update hidden input
+                    previewInput.value = place.formattedAddress;
+
+                    // Auto-submit the form after selection
+                    previewForm.dispatchEvent(new Event('submit'));
+                });
+
+            } catch (error) {
+                console.error('Error initializing Google Maps Autocomplete:', error);
+                // Fallback: show the regular input
+                previewInput.style.display = 'block';
+            }
+        };
+
+        previewForm.addEventListener('submit', async function(event) {
+            event.preventDefault();
+
+            const address = previewInput.value.trim();
+            if (!address) {
+                return;
+            }
+
+            // Show loading state
+            checkBtn.disabled = true;
+            checkBtn.textContent = 'Checking...';
+            previewResult.classList.add('hidden');
+
+            try {
+                const response = await fetch(`${API_BASE}/properties/preview`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ address })
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.error || 'Failed to check address');
+                }
+
+                if (data.supported) {
+                    // Store full property data in localStorage for after login
+                    const pendingProperty = {
+                        address: address,
+                        city: selectedPlace?.parsedAddress?.city || '',
+                        state: selectedPlace?.parsedAddress?.state || '',
+                        zipCode: selectedPlace?.parsedAddress?.zipCode || '',
+                        country: selectedPlace?.parsedAddress?.country || '',
+                        lat: selectedPlace?.location?.lat || null,
+                        lng: selectedPlace?.location?.lng || null
+                    };
+                    localStorage.setItem('pendingProperty', JSON.stringify(pendingProperty));
+
+                    previewResult.className = 'preview-result success';
+                    previewResult.innerHTML = `
+                        <div class="result-title">We found your property in ${data.county.charAt(0).toUpperCase() + data.county.slice(1)} County!</div>
+                        <div>Sign up to get your free property tax savings analysis.</div>
+                        <div class="result-action">
+                            <button type="button" class="btn-signup" onclick="handleSignUpAfterPreview()">Get My Free Analysis</button>
+                        </div>
+                    `;
+                } else {
+                    const countyName = data.county ? data.county.charAt(0).toUpperCase() + data.county.slice(1) : 'your';
+                    previewResult.className = 'preview-result error';
+                    previewResult.innerHTML = `
+                        <div class="result-title">We don't support ${countyName} County yet</div>
+                        <div>We currently serve Fulton, Gwinnett, and Cobb counties in Georgia. We're expanding soon!</div>
+                    `;
+                }
+            } catch (error) {
+                previewResult.className = 'preview-result error';
+                previewResult.innerHTML = `
+                    <div class="result-title">Unable to verify address</div>
+                    <div>${error.message}</div>
+                `;
+            } finally {
+                checkBtn.disabled = false;
+                checkBtn.textContent = 'Check My Property';
+                previewResult.classList.remove('hidden');
+            }
+        });
+
+        // Handle sign up after successful preview
+        async function handleSignUpAfterPreview() {
+            if (!clerkLoaded) {
+                alert('Authentication is loading, please wait...');
+                return;
+            }
+
+            try {
+                // If user is already signed in, redirect to dashboard
+                if (window.Clerk.user) {
+                    window.location.href = '/dashboard.html';
+                    return;
+                }
+
+                // Open sign up modal
+                await window.Clerk.openSignUp({
+                    fallbackRedirectUrl: '/dashboard.html'
+                });
+            } catch (error) {
+                console.error('Error opening sign up:', error);
+            }
+        }
+
+        // Error handling for Google Maps API load failure
+        window.gm_authFailure = function() {
+            console.error('Google Maps API authentication failed.');
+            // Show the regular input as fallback
+            if (previewInput) {
+                previewInput.style.display = 'block';
+            }
+        };
     </script>
 </body>
 </html>
