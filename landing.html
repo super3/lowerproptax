@@ -1,0 +1,1986 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=AW-17894024709"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-TEFR1PWB8Q');
+      gtag('config', 'AW-17894024709');
+    </script>
+    <!-- Microsoft Clarity -->
+    <script type="text/javascript">
+      (function(c,l,a,r,i,t,y){
+        c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+        t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+        y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+      })(window, document, "clarity", "script", "v7totve23z");
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LowerPropTax - Find Property Tax Savings</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🏡</text></svg>">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <!-- Clerk.js -->
+    <script
+        async
+        crossorigin="anonymous"
+        data-clerk-publishable-key="pk_live_Y2xlcmsubG93ZXJwcm9wdGF4LmNvbSQ"
+        src="https://cdn.jsdelivr.net/npm/@clerk/clerk-js@5/dist/clerk.browser.js"
+        type="text/javascript"
+    ></script>
+    <style>
+        /* Homepage-specific styles */
+        body {
+            overflow-x: hidden;
+        }
+
+        /* Hero Section */
+        .hero {
+            padding: 80px 7% 60px;
+            background: white;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+            align-items: center;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .hero-content {
+            text-align: left;
+        }
+
+        .hero h1 {
+            font-size: 3.5rem;
+            font-weight: 700;
+            color: #1a1a1a;
+            margin-bottom: 1.25rem;
+            line-height: 1.15;
+        }
+
+        .hero-subtitle {
+            font-size: 1.25rem;
+            color: #555;
+            margin-bottom: 2rem;
+            line-height: 1.6;
+        }
+
+        .hero-cta {
+            background: #3171ef;
+            color: white;
+            padding: 1.1rem 2.5rem;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1.05rem;
+            display: inline-block;
+            transition: all 0.2s;
+        }
+
+        .hero-cta:hover {
+            background: #2560d9;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(49, 113, 239, 0.3);
+        }
+
+        /* Google Maps PlaceAutocompleteElement Styling */
+        .address-preview-form gmp-place-autocomplete {
+            width: 100%;
+            color-scheme: light;
+        }
+
+        .address-preview-form gmp-place-autocomplete input {
+            border: 2px solid #e5e5e5 !important;
+            border-radius: 6px !important;
+            font-family: 'Inter', Arial, sans-serif !important;
+            font-size: 1rem !important;
+            color: #1a1a1a !important;
+            padding: 1rem 1.25rem !important;
+            background: white !important;
+            transition: border-color 0.2s !important;
+        }
+
+        .address-preview-form gmp-place-autocomplete input::placeholder {
+            color: #999 !important;
+        }
+
+        .address-preview-form gmp-place-autocomplete input:focus {
+            outline: none !important;
+            border-color: #3171ef !important;
+            box-shadow: 0 0 0 3px rgba(49, 113, 239, 0.15) !important;
+        }
+
+        /* Address Preview Form */
+        .address-preview-form {
+            max-width: 500px;
+        }
+
+        .address-input-wrapper {
+            display: flex;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+        }
+
+        .address-input-wrapper input {
+            flex: 1;
+            min-width: 200px;
+            padding: 1rem 1.25rem;
+            border: 2px solid #e5e5e5;
+            border-radius: 6px;
+            font-size: 1rem;
+            font-family: inherit;
+            transition: border-color 0.2s;
+        }
+
+        .address-input-wrapper input:focus {
+            outline: none;
+            border-color: #3171ef;
+        }
+
+        .address-input-wrapper .hero-cta {
+            border: none;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+
+        .address-input-wrapper .hero-cta:disabled {
+            background: #94a3b8;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .preview-result {
+            margin-top: 1rem;
+            padding: 1rem 1.25rem;
+            border-radius: 8px;
+            font-size: 0.95rem;
+        }
+
+        .preview-result.hidden {
+            display: none;
+        }
+
+        .preview-result.success {
+            background: #e8f5e9;
+            border: 1px solid #a5d6a7;
+            color: #2e7d32;
+        }
+
+        .preview-result.error {
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            color: #dc2626;
+        }
+
+        .preview-result .result-title {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .preview-result .result-action {
+            margin-top: 0.75rem;
+        }
+
+        .preview-result .btn-signup {
+            background: #16a34a;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 6px;
+            border: none;
+            font-weight: 600;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .preview-result .btn-signup:hover {
+            background: #15803d;
+        }
+
+        .hero-image {
+            width: 100%;
+        }
+
+        .hero-image img {
+            width: 100%;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        /* Features Section */
+        .features {
+            padding: 0;
+            background: white;
+        }
+
+        .feature-section {
+            padding: 60px 7%;
+        }
+
+        .feature-section:nth-child(odd) {
+            background: #f8f9fa;
+        }
+
+        .feature-section:nth-child(even) {
+            background: white;
+        }
+
+        .feature-block {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 80px;
+            max-width: 1200px;
+            margin: 0 auto;
+            align-items: center;
+        }
+
+        .feature-block.reverse {
+            direction: rtl;
+        }
+
+        .feature-block.reverse > * {
+            direction: ltr;
+        }
+
+        .feature-content h2 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #1a1a1a;
+            margin-bottom: 1.5rem;
+            line-height: 1.2;
+        }
+
+        .feature-content p {
+            font-size: 1.15rem;
+            color: #555;
+            line-height: 1.7;
+            margin-bottom: 1.5rem;
+        }
+
+        .feature-content ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .feature-content li {
+            padding: 0.75rem 0;
+            padding-left: 2rem;
+            position: relative;
+            color: #555;
+            font-size: 1.05rem;
+        }
+
+        .feature-content li::before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            color: #2e7d32;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+
+        .feature-image {
+            width: 100%;
+        }
+
+        .feature-image img {
+            width: 100%;
+            border-radius: 12px;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .feature-placeholder {
+            width: 100%;
+            aspect-ratio: 4/3;
+            background: linear-gradient(135deg, #e8f0ff 0%, #f5f8ff 100%);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+        }
+
+        /* Social Proof */
+        .social-proof {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-top: 1.5rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid #e5e5e5;
+        }
+
+        .social-proof-text {
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        .social-proof-text strong {
+            color: #1a1a1a;
+        }
+
+        .service-area-note {
+            font-size: 0.9rem;
+            color: #666;
+            margin-top: 1.5rem;
+        }
+
+        /* Hero Before/After Comparison */
+        .hero-comparison {
+            width: 100%;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+            padding: 1.5rem;
+            overflow: hidden;
+        }
+
+        .comparison-header {
+            text-align: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #e5e5e5;
+        }
+
+        .comparison-header h3 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 0.25rem;
+        }
+
+        .comparison-header span {
+            font-size: 0.85rem;
+            color: #666;
+        }
+
+        .comparison-cards {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .comparison-card {
+            padding: 1.25rem;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .comparison-card.before {
+            background: #f8f9fa;
+            border: 1px solid #e5e5e5;
+        }
+
+        .comparison-card.after {
+            background: #f8f9fa;
+            border: 1px solid #e5e5e5;
+        }
+
+        .comparison-card label {
+            font-size: 0.75rem;
+            color: #666;
+            display: block;
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 600;
+        }
+
+        .comparison-card .amount {
+            font-size: 1.75rem;
+            font-weight: 700;
+        }
+
+        .comparison-card.before .amount {
+            color: #dc2626;
+        }
+
+        .comparison-card.after .amount {
+            color: #3171ef;
+        }
+
+        .comparison-card .sub-label {
+            font-size: 0.8rem;
+            color: #666;
+            margin-top: 0.25rem;
+        }
+
+        .savings-result {
+            background: linear-gradient(135deg, #e8f5e9 0%, #f1f8f4 100%);
+            border-left: 4px solid #16a34a;
+            border-radius: 8px;
+            padding: 1.25rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .savings-info {
+            flex: 1;
+        }
+
+        .savings-result label {
+            font-size: 0.75rem;
+            color: #16a34a;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+
+        .savings-result .amount {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: #16a34a;
+        }
+
+        .btn-download-report {
+            background: #16a34a;
+            color: white;
+            padding: 0.75rem 1.25rem;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            white-space: nowrap;
+            cursor: default;
+        }
+
+        /* Guarantee Badge */
+        .guarantee-badge {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-top: 1rem;
+            padding: 0.75rem;
+            background: #f8f9fa;
+            border: 1px solid #e5e5e5;
+            border-radius: 8px;
+        }
+
+        .guarantee-badge .badge-icon {
+            font-size: 1.25rem;
+        }
+
+        .guarantee-badge .badge-text {
+            font-size: 0.85rem;
+            color: #555;
+            font-weight: 500;
+        }
+
+        /* Financial Tracking Mockup */
+        .financial-mockup {
+            width: 100%;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+            padding: 1.5rem;
+            overflow: hidden;
+        }
+
+        .financial-header {
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #e5e5e5;
+        }
+
+        .financial-header h3 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 0.5rem;
+        }
+
+        .financial-summary {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+        }
+
+        .financial-stat {
+            background: #f8f9fa;
+            padding: 0.875rem;
+            border-radius: 8px;
+            border: 1px solid #e5e5e5;
+        }
+
+        .financial-stat label {
+            font-size: 0.7rem;
+            color: #666;
+            display: block;
+            margin-bottom: 0.25rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .financial-stat .amount {
+            font-size: 1.2rem;
+            font-weight: 700;
+        }
+
+        .financial-stat .amount.positive {
+            color: #2e7d32;
+        }
+
+        .financial-stat .amount.negative {
+            color: #d32f2f;
+        }
+
+        .transaction-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .transaction-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.875rem;
+            background: white;
+            border: 1px solid #e5e5e5;
+            border-radius: 8px;
+        }
+
+        .transaction-details {
+            flex: 1;
+        }
+
+        .transaction-details h4 {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 0.25rem;
+        }
+
+        .transaction-details p {
+            font-size: 0.75rem;
+            color: #666;
+        }
+
+        .transaction-amount {
+            font-size: 0.875rem;
+            font-weight: 700;
+        }
+
+        .transaction-amount.income {
+            color: #2e7d32;
+        }
+
+        .transaction-amount.expense {
+            color: #d32f2f;
+        }
+
+        /* Maintenance Mockup */
+        .maintenance-mockup {
+            width: 100%;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+            padding: 1.5rem;
+            overflow: hidden;
+        }
+
+        .maintenance-header {
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #e5e5e5;
+        }
+
+        .maintenance-header h3 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #1a1a1a;
+        }
+
+        .request-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .request-item {
+            background: white;
+            border: 1px solid #e5e5e5;
+            border-radius: 8px;
+            padding: 0.875rem;
+        }
+
+        .request-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .request-info h4 {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 0.25rem;
+        }
+
+        .request-info p {
+            font-size: 0.75rem;
+            color: #666;
+        }
+
+        .request-status {
+            font-size: 0.7rem;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-weight: 600;
+            width: 80px;
+            text-align: center;
+            display: inline-block;
+        }
+
+        .request-status.completed {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+
+        .request-status.in-progress {
+            background: #e3f2fd;
+            color: #1976d2;
+        }
+
+        .request-status.pending {
+            background: #fff3e0;
+            color: #f57c00;
+        }
+
+        .request-meta {
+            font-size: 0.7rem;
+            color: #999;
+            margin-top: 0.5rem;
+        }
+
+        /* Pricing Section */
+        .pricing-section {
+            padding: 40px 7% 80px;
+            background: #f8f9fa;
+        }
+
+        .pricing-section h2 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #1a1a1a;
+            margin-bottom: 2.5rem;
+            text-align: center;
+        }
+
+        .pricing-content {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 16px;
+            padding: 0;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        }
+
+        .pricing-steps {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+        }
+
+        .pricing-step {
+            padding: 2.5rem;
+            text-align: center;
+        }
+
+        .pricing-step.free {
+            background: #f8f9fa;
+            border-right: 1px solid #e5e5e5;
+        }
+
+        .pricing-step.paid {
+            background: white;
+        }
+
+        .step-number {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            background: #3171ef;
+            border-radius: 50%;
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: white;
+            margin-bottom: 1rem;
+        }
+
+        .pricing-step h3 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 0.5rem;
+        }
+
+        .pricing-step .price {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 0.25rem;
+            color: #3171ef;
+        }
+
+        .pricing-step .price-desc {
+            font-size: 0.9rem;
+            color: #666;
+            margin-bottom: 1rem;
+        }
+
+        .pricing-step ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            text-align: left;
+        }
+
+        .pricing-step li {
+            font-size: 0.9rem;
+            color: #555;
+            padding: 0.4rem 0;
+            padding-left: 1.5rem;
+            position: relative;
+        }
+
+        .pricing-step li::before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            color: #3171ef;
+            font-weight: bold;
+        }
+
+        .pricing-footer {
+            padding: 1.5rem 2.5rem;
+            background: #f8f9fa;
+            border-top: 1px solid #e5e5e5;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .pricing-footer p {
+            font-size: 0.9rem;
+            color: #666;
+            margin: 0;
+            flex: 1;
+        }
+
+        .pricing-footer strong {
+            color: #1a1a1a;
+        }
+
+        /* FAQ Section */
+        .faq-section {
+            padding: 60px 7%;
+            background: white;
+        }
+
+        .faq-section h2 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #1a1a1a;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .faq-list {
+            max-width: 700px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .faq-item {
+            background: #f8f9fa;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .faq-question {
+            width: 100%;
+            padding: 1rem 1.25rem;
+            background: none;
+            border: none;
+            text-align: left;
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: #1a1a1a;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+            font-family: inherit;
+        }
+
+        .faq-question:hover,
+        .faq-item.open .faq-question {
+            background: #f0f0f0;
+        }
+
+        .faq-icon {
+            font-size: 1.25rem;
+            color: #666;
+            transition: transform 0.2s;
+            flex-shrink: 0;
+        }
+
+        .faq-item.open .faq-icon {
+            transform: rotate(45deg);
+        }
+
+        .faq-answer {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+
+        .faq-item.open .faq-answer {
+            max-height: 200px;
+        }
+
+        .faq-answer p {
+            padding: 1rem 1.25rem;
+            font-size: 0.9rem;
+            color: #555;
+            line-height: 1.6;
+            margin: 0;
+        }
+
+        /* CTA Section */
+        .cta-section {
+            padding: 80px 7%;
+            background: linear-gradient(135deg, #3171ef 0%, #1e56c7 100%);
+            text-align: center;
+            color: white;
+        }
+
+        .cta-content {
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .cta-section h2 {
+            font-size: 2.25rem;
+            font-weight: 700;
+            margin-bottom: 0.75rem;
+        }
+
+        .cta-section p {
+            font-size: 1.1rem;
+            margin-bottom: 1.5rem;
+            opacity: 0.95;
+        }
+
+        .btn-white {
+            background: white;
+            color: #3171ef;
+            padding: 1rem 2.5rem;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1.05rem;
+            display: inline-block;
+            transition: all 0.2s;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn-white:hover {
+            background: #f0f0f0;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+        }
+
+        /* Secondary CTA style */
+        .btn-secondary {
+            background: transparent;
+            color: #3171ef;
+            border: 2px solid #3171ef;
+            padding: 0.9rem 2rem;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1rem;
+            display: inline-block;
+            transition: all 0.2s;
+        }
+
+        .btn-secondary:hover {
+            background: #3171ef;
+            color: white;
+        }
+
+        .cta-preview {
+            display: none;
+        }
+
+        .interface-placeholder {
+            width: 100%;
+            aspect-ratio: 16/10;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 4rem;
+            color: #3171ef;
+        }
+
+        /* Mobile Menu */
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #1a1a1a;
+            z-index: 1001;
+        }
+
+        .mobile-menu {
+            display: none;
+            position: fixed;
+            top: 72px;
+            left: 0;
+            right: 0;
+            background: white;
+            border-bottom: 1px solid #e5e5e5;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            padding: 1rem 5%;
+            z-index: 1000;
+        }
+
+        .mobile-menu.active {
+            display: block;
+        }
+
+        .mobile-menu a {
+            display: block;
+            padding: 0.75rem 0;
+            text-decoration: none;
+            color: #1a1a1a;
+            font-weight: 500;
+            font-size: 1rem;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .mobile-menu a:last-child {
+            border-bottom: none;
+        }
+
+        .mobile-menu a:hover {
+            color: #3171ef;
+        }
+
+        .mobile-menu .btn-get-started {
+            display: block;
+            width: 100%;
+            margin-top: 0.75rem;
+            text-align: center;
+            padding: 0.85rem 1.5rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 968px) {
+            .mobile-menu-btn {
+                display: block;
+            }
+
+            .hero {
+                padding: 60px 5%;
+                grid-template-columns: 1fr;
+                gap: 40px;
+            }
+
+            .hero-content {
+                text-align: center;
+            }
+
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+
+            .hero-subtitle {
+                font-size: 1.1rem;
+            }
+
+            .address-preview-form {
+                max-width: 100%;
+            }
+
+            .address-input-wrapper {
+                flex-direction: column;
+            }
+
+            .address-input-wrapper input {
+                width: 100%;
+            }
+
+            .address-input-wrapper .hero-cta {
+                width: 100%;
+                text-align: center;
+            }
+
+            /* Hero comparison mobile */
+            .hero-comparison {
+                padding: 1.25rem;
+            }
+
+            .comparison-header h3 {
+                font-size: 1rem;
+            }
+
+            .comparison-cards {
+                grid-template-columns: 1fr;
+                gap: 0.75rem;
+            }
+
+            .comparison-card {
+                padding: 1rem;
+            }
+
+            .comparison-card .amount {
+                font-size: 1.5rem;
+            }
+
+            .savings-result .amount {
+                font-size: 1.75rem;
+            }
+
+            .guarantee-badge {
+                flex-direction: column;
+                text-align: center;
+                gap: 0.25rem;
+            }
+
+            /* Feature sections mobile */
+            .feature-section {
+                padding: 60px 5%;
+            }
+
+            .feature-block {
+                grid-template-columns: 1fr;
+                gap: 40px;
+            }
+
+            .feature-block.reverse {
+                direction: ltr;
+            }
+
+            .feature-content h2 {
+                font-size: 1.75rem;
+            }
+
+            .feature-content p {
+                font-size: 1rem;
+            }
+
+            /* Pricing mobile */
+            .pricing-section {
+                padding: 60px 5%;
+            }
+
+            .pricing-section h2 {
+                font-size: 2rem;
+                margin-bottom: 2rem;
+            }
+
+            .pricing-steps {
+                grid-template-columns: 1fr;
+            }
+
+            .pricing-step {
+                padding: 2rem;
+            }
+
+            .pricing-step.free {
+                border-right: none;
+                border-bottom: 1px solid #e5e5e5;
+            }
+
+            .pricing-step .price {
+                font-size: 2.5rem;
+            }
+
+            .pricing-footer {
+                flex-direction: column;
+                text-align: center;
+                padding: 1.5rem;
+            }
+
+            .pricing-footer p {
+                margin-bottom: 1rem;
+            }
+
+            /* FAQ mobile */
+            .faq-section {
+                padding: 40px 5%;
+            }
+
+            .faq-section h2 {
+                font-size: 1.75rem;
+            }
+
+            /* CTA mobile */
+            .cta-section {
+                padding: 60px 5%;
+            }
+
+            .cta-section h2 {
+                font-size: 1.75rem;
+            }
+
+            .cta-section p {
+                font-size: 1rem;
+            }
+
+            /* Feature mockups mobile */
+            .financial-mockup,
+            .maintenance-mockup {
+                padding: 1rem;
+            }
+
+            .financial-header h3,
+            .maintenance-header h3 {
+                font-size: 1rem;
+            }
+
+            .financial-summary {
+                grid-template-columns: 1fr;
+            }
+
+            .transaction-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.5rem;
+            }
+
+            .request-header {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .hero h1 {
+                font-size: 2rem;
+            }
+
+            .hero-cta {
+                padding: 1rem 2rem;
+                font-size: 1rem;
+                width: 100%;
+                text-align: center;
+            }
+
+            .comparison-card .amount {
+                font-size: 1.25rem;
+            }
+
+            .savings-result {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .savings-result .amount {
+                font-size: 1.5rem;
+            }
+
+            .btn-download-report {
+                width: 100%;
+                text-align: center;
+                margin-top: 0.5rem;
+            }
+
+            .feature-content h2 {
+                font-size: 1.5rem;
+            }
+
+            .pricing-step .price {
+                font-size: 2rem;
+            }
+
+            .btn-white {
+                padding: 1rem 2rem;
+                width: 100%;
+                text-align: center;
+            }
+        }
+
+        /* Abstract document preview */
+        .document-preview {
+            position: relative;
+            display: flex;
+            justify-content: center;
+            padding: 2.5rem;
+            background: #e8f0fe;
+            border-radius: 12px;
+        }
+
+        .document-stack {
+            position: relative;
+        }
+
+        .document-page {
+            background: white;
+            border-radius: 6px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15), 0 2px 10px rgba(0, 0, 0, 0.08);
+            padding: 1.75rem;
+            width: 300px;
+            position: relative;
+            z-index: 3;
+        }
+
+        .document-page::before {
+            content: '';
+            position: absolute;
+            top: 4px;
+            left: 4px;
+            right: -4px;
+            bottom: -4px;
+            background: #f0f0f0;
+            border-radius: 6px;
+            z-index: -1;
+        }
+
+        .document-page::after {
+            content: '';
+            position: absolute;
+            top: 8px;
+            left: 8px;
+            right: -8px;
+            bottom: -8px;
+            background: #e5e5e5;
+            border-radius: 6px;
+            z-index: -2;
+        }
+
+        .document-header {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+            margin-bottom: 1.25rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .document-logo {
+            width: 44px;
+            height: 44px;
+            background: linear-gradient(135deg, #3171ef 0%, #1a5ed9 100%);
+            border-radius: 8px;
+            flex-shrink: 0;
+            box-shadow: 0 2px 6px rgba(49, 113, 239, 0.3);
+        }
+
+        .document-title-lines {
+            flex: 1;
+            padding-top: 0.25rem;
+        }
+
+        .line-placeholder {
+            height: 10px;
+            background: linear-gradient(90deg, #e8e8e8 0%, #f2f2f2 50%, #e8e8e8 100%);
+            border-radius: 5px;
+            margin-bottom: 0.5rem;
+        }
+
+        .line-placeholder.wide {
+            width: 100%;
+        }
+
+        .line-placeholder.medium {
+            width: 70%;
+        }
+
+        .line-placeholder.short {
+            width: 50%;
+        }
+
+        .line-placeholder.narrow {
+            width: 35%;
+            height: 8px;
+            background: linear-gradient(90deg, #d8d8d8 0%, #e5e5e5 50%, #d8d8d8 100%);
+            margin-bottom: 0.75rem;
+            text-transform: uppercase;
+        }
+
+        .document-section {
+            margin-bottom: 1.25rem;
+        }
+
+        .document-property-row {
+            display: flex;
+            gap: 0.75rem;
+        }
+
+        .property-photo-placeholder {
+            width: 70px;
+            height: 52px;
+            background: linear-gradient(145deg, #e8f4e8 0%, #d4e8d4 100%);
+            border-radius: 6px;
+            flex-shrink: 0;
+            border: 1px solid #c8e0c8;
+        }
+
+        .property-lines {
+            flex: 1;
+        }
+
+        .document-comparables {
+            display: flex;
+            gap: 0.6rem;
+        }
+
+        .comparable-item {
+            flex: 1;
+            text-align: center;
+        }
+
+        .comparable-photo {
+            width: 100%;
+            height: 44px;
+            background: linear-gradient(145deg, #f5f5f5 0%, #e8e8e8 100%);
+            border-radius: 6px;
+            margin-bottom: 0.5rem;
+            border: 1px solid #e0e0e0;
+        }
+
+        .comparable-item .line-placeholder.short {
+            width: 80%;
+            margin: 0 auto;
+            height: 6px;
+        }
+
+        .document-footer {
+            padding-top: 1rem;
+            margin-top: 0.5rem;
+            border-top: 2px solid #e8f5e9;
+            background: linear-gradient(180deg, rgba(232, 245, 233, 0.3) 0%, transparent 100%);
+            margin: 0 -1.75rem -1.75rem -1.75rem;
+            padding: 1rem 1.75rem 1.25rem 1.75rem;
+            border-radius: 0 0 6px 6px;
+        }
+
+        .document-footer .line-placeholder {
+            height: 8px;
+            margin-bottom: 0.4rem;
+        }
+
+        .document-footer .line-placeholder.wide {
+            background: linear-gradient(90deg, #c8e6c9 0%, #a5d6a7 50%, #c8e6c9 100%);
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav>
+        <div class="logo">🏡 LowerPropTax</div>
+        <ul class="nav-links">
+            <li><a href="#how-it-works">How It Works</a></li>
+            <li><a href="#pricing">Pricing</a></li>
+        </ul>
+        <div class="nav-auth" id="nav-auth">
+            <a href="#" id="nav-signin" onclick="handleSignIn(event)">Log In</a>
+            <a href="#" id="nav-signup" class="btn-get-started" onclick="handleSignUp(event)">Get Started</a>
+        </div>
+        <button class="mobile-menu-btn" id="mobile-menu-btn" aria-label="Toggle menu">☰</button>
+    </nav>
+
+    <!-- Mobile Menu -->
+    <div class="mobile-menu" id="mobile-menu">
+        <a href="#how-it-works">How It Works</a>
+        <a href="#pricing">Pricing</a>
+        <a href="#" onclick="handleSignIn(event)">Log In</a>
+        <a href="#" class="btn-get-started" onclick="handleSignUp(event)">Get Started</a>
+    </div>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <h1>Overpaying on property taxes?</h1>
+            <p class="hero-subtitle">Most homeowners miss savings they could have. We check for you. Currently serving Georgia.</p>
+            <form id="address-preview-form" class="address-preview-form">
+                <div class="address-input-wrapper">
+                    <input type="text" id="preview-address" placeholder="Enter your property address" autocomplete="off" required>
+                    <button type="submit" class="hero-cta" id="check-btn">Check My Property</button>
+                </div>
+                <div id="preview-result" class="preview-result hidden"></div>
+            </form>
+        </div>
+        <div class="hero-image">
+            <div class="hero-comparison">
+                <div class="comparison-header">
+                    <h3>123 Oak Street</h3>
+                    <span>3 bed, 2 bath • 1,850 sq ft</span>
+                </div>
+                <div class="comparison-cards">
+                    <div class="comparison-card before">
+                        <label>Current Tax Bill</label>
+                        <div class="amount">$4,280.67</div>
+                        <div class="sub-label">Per year</div>
+                    </div>
+                    <div class="comparison-card after">
+                        <label>After Savings</label>
+                        <div class="amount">$2,691.76</div>
+                        <div class="sub-label">Per year</div>
+                    </div>
+                </div>
+                <div class="savings-result">
+                    <div class="savings-info">
+                        <label>Savings Found</label>
+                        <div class="amount">$1,588.91/yr</div>
+                    </div>
+                    <span class="btn-download-report">Get Your Savings</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features">
+        <div class="feature-section">
+        <div class="feature-block reverse">
+            <div class="feature-content">
+                <h2>Homeowners are saving</h2>
+                <p>Many homeowners have savings they don't know about. Here's what we've found for people just like you.</p>
+                <div style="display: flex; flex-direction: column; gap: 1.5rem; margin-top: 1.5rem;">
+                    <div style="background: #f8f9fa; border-radius: 10px; padding: 1.25rem; border-left: 4px solid #16a34a;">
+                        <p style="font-size: 1rem; color: #1a1a1a; margin-bottom: 0.5rem; font-style: italic;">"I had no idea I was missing this. Now saving $1,589.06 per year."</p>
+                        <p style="font-size: 0.85rem; color: #666; margin: 0;">— Pavi, Fulton County</p>
+                    </div>
+                    <div style="background: #f8f9fa; border-radius: 10px; padding: 1.25rem; border-left: 4px solid #16a34a;">
+                        <p style="font-size: 1rem; color: #1a1a1a; margin-bottom: 0.5rem; font-style: italic;">"So easy to check. Found $1,895.08 in annual savings."</p>
+                        <p style="font-size: 0.85rem; color: #666; margin: 0;">— Shawn, Fulton County</p>
+                    </div>
+                </div>
+            </div>
+            <div class="feature-image">
+                <div style="display: flex; flex-direction: column; gap: 1rem;">
+                    <div style="background: white; border-radius: 12px; padding: 2rem; text-align: center; box-shadow: 0 4px 20px rgba(0,0,0,0.08);">
+                        <div style="font-size: 3rem; font-weight: 700; color: #16a34a; margin-bottom: 0.25rem;">$1,588.91</div>
+                        <div style="font-size: 0.9rem; color: #666;">Average annual savings</div>
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                        <div style="background: white; border-radius: 12px; padding: 1.5rem; text-align: center; box-shadow: 0 4px 20px rgba(0,0,0,0.08);">
+                            <div style="font-size: 2rem; font-weight: 700; color: #3171ef; margin-bottom: 0.25rem;">Easy</div>
+                            <div style="font-size: 0.85rem; color: #666;">To check</div>
+                        </div>
+                        <div style="background: white; border-radius: 12px; padding: 1.5rem; text-align: center; box-shadow: 0 4px 20px rgba(0,0,0,0.08);">
+                            <div style="font-size: 2rem; font-weight: 700; color: #3171ef; margin-bottom: 0.25rem;">100%</div>
+                            <div style="font-size: 0.85rem; color: #666;">Free</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        </div>
+
+        <div id="how-it-works" class="feature-section">
+        <div class="feature-block">
+            <div class="feature-content">
+                <h2>Simple 3-step process</h2>
+                <p>No complicated forms or phone calls. Enter your address, see if there are savings, and we'll show you exactly what to do next.</p>
+                <ul>
+                    <li>Enter your property address</li>
+                    <li>We look for savings you might be missing</li>
+                    <li>See your potential savings</li>
+                    <li>Get step-by-step instructions</li>
+                </ul>
+            </div>
+            <div class="feature-image">
+                <div class="feature-placeholder">
+                    <div style="text-align: center; padding: 2rem;">
+                        <div style="font-size: 4rem; margin-bottom: 1rem;">✓</div>
+                        <div style="font-size: 1.5rem; font-weight: 700; color: #1a1a1a; margin-bottom: 0.5rem;">Quick & Easy</div>
+                        <div style="font-size: 1.1rem; color: #666;">Just enter your address</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        </div>
+
+        <div class="feature-section">
+        <div class="feature-block reverse">
+            <div class="feature-content">
+                <h2>Track your property taxes</h2>
+                <p>Keep an eye on your assessments over time. We'll notify you when something changes so you never miss an opportunity to save.</p>
+                <ul>
+                    <li>Monitor your assessments</li>
+                    <li>Get notified of changes</li>
+                    <li>Track multiple properties</li>
+                    <li>Never miss a savings opportunity</li>
+                </ul>
+            </div>
+            <div class="feature-image">
+                <div class="feature-placeholder">
+                    <div style="text-align: center; padding: 2rem;">
+                        <div style="font-size: 4rem; margin-bottom: 1rem;">🔔</div>
+                        <div style="font-size: 1.5rem; font-weight: 700; color: #1a1a1a; margin-bottom: 0.5rem;">Stay Informed</div>
+                        <div style="font-size: 1.1rem; color: #666;">We track changes for you</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        </div>
+    </section>
+
+    <!-- Pricing Section -->
+    <section id="pricing" class="pricing-section">
+        <h2>Simple pricing</h2>
+        <div class="pricing-content">
+            <div class="pricing-steps">
+                <div class="pricing-step free">
+                    <h3>Free Property Check</h3>
+                    <div class="price">$0</div>
+                    <div class="price-desc">See if there are savings available</div>
+                    <ul>
+                        <li>Enter your property address</li>
+                        <li>We check for tax savings</li>
+                        <li>See if you have savings</li>
+                        <li>No credit card required</li>
+                    </ul>
+                </div>
+                <div class="pricing-step paid">
+                    <h3>Get Your Savings</h3>
+                    <div class="price">$49</div>
+                    <div class="price-desc">Educational walkthrough of the process</div>
+                    <ul>
+                        <li>Learn how the application works</li>
+                        <li>Understand what's needed</li>
+                        <li>Know where to submit</li>
+                        <li>Do it yourself with confidence</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="pricing-footer">
+                <p><strong>Check for free.</strong> If we find savings, we'll show you how to get them.</p>
+                <a href="#" class="hero-cta" onclick="handleSignUp(event)">Check My Property</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQ Section -->
+    <section class="faq-section">
+        <h2>Frequently asked questions</h2>
+        <div class="faq-list">
+            <div class="faq-item">
+                <button class="faq-question">
+                    <span>How do you find savings?</span>
+                    <span class="faq-icon">+</span>
+                </button>
+                <div class="faq-answer">
+                    <p>We check your property against public county records to find savings that many homeowners miss. If we find something, we show you exactly what to do.</p>
+                </div>
+            </div>
+            <div class="faq-item">
+                <button class="faq-question">
+                    <span>How much can I save?</span>
+                    <span class="faq-icon">+</span>
+                </button>
+                <div class="faq-answer">
+                    <p>Savings vary by property, but homeowners we've helped save an average of $1,588.91 per year. The check is free, so there's no risk in finding out if you have savings.</p>
+                </div>
+            </div>
+            <div class="faq-item">
+                <button class="faq-question">
+                    <span>What areas do you cover?</span>
+                    <span class="faq-icon">+</span>
+                </button>
+                <div class="faq-answer">
+                    <p>We currently serve homeowners throughout Georgia. We're working on expanding to other states soon. Enter your address to see if we can help with your property.</p>
+                </div>
+            </div>
+            <div class="faq-item">
+                <button class="faq-question">
+                    <span>How long does it take?</span>
+                    <span class="faq-icon">+</span>
+                </button>
+                <div class="faq-answer">
+                    <p>Just enter your property address and we'll check for savings. It's quick and easy.</p>
+                </div>
+            </div>
+            <div class="faq-item">
+                <button class="faq-question">
+                    <span>Is this really free?</span>
+                    <span class="faq-icon">+</span>
+                </button>
+                <div class="faq-answer">
+                    <p>Yes, checking your property for savings is completely free. No credit card required. We just need your property address to get started.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section id="contact" class="cta-section">
+        <div class="cta-content">
+            <h2>See what savings you're missing</h2>
+            <p>Free to check. Quick and easy. No credit card required.</p>
+            <a href="#" class="btn-white" onclick="handleSignUp(event)">Check My Property</a>
+            <p style="margin-top: 1rem; font-size: 0.9rem; opacity: 0.85;">Currently serving Georgia</p>
+        </div>
+    </section>
+
+    <!-- Google Maps API -->
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCC7VD-pdNDJC9CpwmxtS9m59e6Hp82YCk&libraries=places&loading=async&callback=initAutocomplete" async defer></script>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-content">
+            <div class="footer-text">&copy; 2026 LowerPropTax. All rights reserved.</div>
+            <div class="footer-links">
+                <a href="mailto:help@lowerproptax.com">Help</a>
+                <a href="terms.html#privacy-policy">Privacy</a>
+                <a href="terms.html">Terms</a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // API configuration
+        const API_BASE = window.location.hostname === 'localhost'
+            ? 'http://localhost:3001/api'
+            : 'https://lowerproptax.up.railway.app/api';
+
+        // Clerk initialization
+        let clerkLoaded = false;
+
+        window.addEventListener('load', async () => {
+            try {
+                // Wait for Clerk to load
+                await window.Clerk.load();
+                clerkLoaded = true;
+
+                // Check if user is already signed in
+                if (window.Clerk.user) {
+                    // User is signed in, update nav to show dashboard link
+                    updateNavForSignedInUser();
+                }
+            } catch (error) {
+                console.error('Error loading Clerk:', error);
+            }
+        });
+
+        // Get redirect URL from query params (for deep linking from emails)
+        function getRedirectUrl() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const redirect = urlParams.get('redirect');
+            // Validate redirect URL is on our domain to prevent open redirect attacks
+            if (redirect) {
+                try {
+                    const url = new URL(redirect);
+                    if (url.hostname === window.location.hostname || url.hostname === 'lowerproptax.com') {
+                        return redirect;
+                    }
+                } catch (e) {
+                    // If it's a relative URL, it's safe
+                    if (redirect.startsWith('/')) {
+                        return redirect;
+                    }
+                }
+            }
+            return '/dashboard.html';
+        }
+
+        function updateNavForSignedInUser() {
+            const navAuth = document.getElementById('nav-auth');
+            navAuth.innerHTML = '<a href="dashboard.html" class="btn-get-started">Go to Dashboard</a>';
+        }
+
+        async function handleSignIn(event) {
+            event.preventDefault();
+            if (!clerkLoaded) {
+                alert('Authentication is loading, please wait...');
+                return;
+            }
+            try {
+                const redirectUrl = getRedirectUrl();
+
+                // If user is already signed in, redirect
+                if (window.Clerk.user) {
+                    window.location.href = redirectUrl;
+                    return;
+                }
+
+                // Otherwise, open sign in modal
+                await window.Clerk.openSignIn({
+                    fallbackRedirectUrl: redirectUrl
+                });
+            } catch (error) {
+                console.error('Error opening sign in:', error);
+            }
+        }
+
+        async function handleSignUp(event) {
+            event.preventDefault();
+            if (!clerkLoaded) {
+                alert('Authentication is loading, please wait...');
+                return;
+            }
+            try {
+                const redirectUrl = getRedirectUrl();
+
+                // If user is already signed in, redirect
+                if (window.Clerk.user) {
+                    window.location.href = redirectUrl;
+                    return;
+                }
+
+                // Otherwise, open sign up modal
+                await window.Clerk.openSignUp({
+                    fallbackRedirectUrl: redirectUrl
+                });
+            } catch (error) {
+                console.error('Error opening sign up:', error);
+            }
+        }
+
+        // Mobile menu toggle
+        const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+        const mobileMenu = document.getElementById('mobile-menu');
+
+        mobileMenuBtn.addEventListener('click', function() {
+            const isActive = mobileMenu.classList.toggle('active');
+            mobileMenuBtn.textContent = isActive ? '✕' : '☰';
+            mobileMenuBtn.setAttribute('aria-expanded', isActive);
+        });
+
+        // Close mobile menu when clicking a link
+        mobileMenu.querySelectorAll('a').forEach(link => {
+            link.addEventListener('click', function() {
+                mobileMenu.classList.remove('active');
+                mobileMenuBtn.textContent = '☰';
+                mobileMenuBtn.setAttribute('aria-expanded', 'false');
+            });
+        });
+
+        // Smooth scrolling for navigation links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                const href = this.getAttribute('href');
+                if (href !== '#' && href.length > 1) {
+                    e.preventDefault();
+                    const target = document.querySelector(href);
+                    if (target) {
+                        target.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'start'
+                        });
+                    }
+                }
+            });
+        });
+
+        // FAQ accordion
+        document.querySelectorAll('.faq-question').forEach(button => {
+            button.addEventListener('click', function() {
+                const item = this.parentElement;
+                item.classList.toggle('open');
+            });
+        });
+
+        // Address preview form variables
+        let autocompleteWidget;
+        let selectedPlace = null;
+        const previewForm = document.getElementById('address-preview-form');
+        const previewInput = document.getElementById('preview-address');
+        const previewResult = document.getElementById('preview-result');
+        const checkBtn = document.getElementById('check-btn');
+
+        // Initialize Google Maps autocomplete
+        window.initAutocomplete = async function() {
+            try {
+                const { PlaceAutocompleteElement } = await google.maps.importLibrary("places");
+
+                // Create the autocomplete widget
+                autocompleteWidget = new PlaceAutocompleteElement({
+                    componentRestrictions: { country: ['us'] },
+                });
+
+                // Set placeholder attribute
+                autocompleteWidget.setAttribute('placeholder', 'Enter your address...');
+
+                // Replace the input with autocomplete widget
+                previewInput.parentNode.insertBefore(autocompleteWidget, previewInput);
+                previewInput.style.display = 'none';
+
+                // Style the autocomplete widget container
+                autocompleteWidget.style.flex = '1';
+                autocompleteWidget.style.minWidth = '200px';
+
+                // Listen for place selection
+                autocompleteWidget.addEventListener('gmp-select', async ({ placePrediction }) => {
+                    if (!placePrediction) {
+                        return;
+                    }
+
+                    // Convert prediction to place
+                    const place = placePrediction.toPlace();
+
+                    // Fetch full place details
+                    await place.fetchFields({
+                        fields: ['addressComponents', 'formattedAddress', 'location']
+                    });
+
+                    // Extract address components
+                    const components = {};
+                    if (place.addressComponents) {
+                        place.addressComponents.forEach(component => {
+                            const type = component.types[0];
+                            components[type] = component.longText;
+                        });
+                    }
+
+                    // Store the selected place data
+                    selectedPlace = {
+                        formattedAddress: place.formattedAddress,
+                        location: {
+                            lat: place.location.lat(),
+                            lng: place.location.lng()
+                        },
+                        parsedAddress: {
+                            city: components.locality || components.sublocality || '',
+                            state: components.administrative_area_level_1 || '',
+                            zipCode: components.postal_code || '',
+                            country: components.country || ''
+                        }
+                    };
+
+                    // Update hidden input
+                    previewInput.value = place.formattedAddress;
+
+                    // Auto-submit the form after selection
+                    previewForm.dispatchEvent(new Event('submit'));
+                });
+
+            } catch (error) {
+                console.error('Error initializing Google Maps Autocomplete:', error);
+                // Fallback: show the regular input
+                previewInput.style.display = 'block';
+            }
+        };
+
+        previewForm.addEventListener('submit', async function(event) {
+            event.preventDefault();
+
+            const address = previewInput.value.trim();
+            if (!address) {
+                return;
+            }
+
+            // Show loading state
+            checkBtn.disabled = true;
+            checkBtn.textContent = 'Checking...';
+            previewResult.classList.add('hidden');
+
+            try {
+                const response = await fetch(`${API_BASE}/properties/preview`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ address })
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.error || 'Failed to check address');
+                }
+
+                if (data.supported) {
+                    // Store full property data in localStorage for after login
+                    const pendingProperty = {
+                        address: address,
+                        city: selectedPlace?.parsedAddress?.city || '',
+                        state: selectedPlace?.parsedAddress?.state || '',
+                        zipCode: selectedPlace?.parsedAddress?.zipCode || '',
+                        country: selectedPlace?.parsedAddress?.country || '',
+                        lat: selectedPlace?.location?.lat || null,
+                        lng: selectedPlace?.location?.lng || null
+                    };
+                    localStorage.setItem('pendingProperty', JSON.stringify(pendingProperty));
+
+                    previewResult.className = 'preview-result success';
+                    previewResult.innerHTML = `
+                        <div class="result-title">We found your property in ${data.county.charAt(0).toUpperCase() + data.county.slice(1)} County!</div>
+                        <div>Sign up to get your free property tax savings analysis.</div>
+                        <div class="result-action">
+                            <button type="button" class="btn-signup" onclick="handleSignUpAfterPreview()">Get My Free Analysis</button>
+                        </div>
+                    `;
+                } else {
+                    const countyName = data.county ? data.county.charAt(0).toUpperCase() + data.county.slice(1) : 'your';
+                    previewResult.className = 'preview-result error';
+                    previewResult.innerHTML = `
+                        <div class="result-title">We don't support ${countyName} County yet</div>
+                        <div>We currently serve Fulton, Gwinnett, and Cobb counties in Georgia. We're expanding soon!</div>
+                    `;
+                }
+            } catch (error) {
+                previewResult.className = 'preview-result error';
+                previewResult.innerHTML = `
+                    <div class="result-title">Unable to verify address</div>
+                    <div>${error.message}</div>
+                `;
+            } finally {
+                checkBtn.disabled = false;
+                checkBtn.textContent = 'Check My Property';
+                previewResult.classList.remove('hidden');
+            }
+        });
+
+        // Handle sign up after successful preview
+        async function handleSignUpAfterPreview() {
+            if (!clerkLoaded) {
+                alert('Authentication is loading, please wait...');
+                return;
+            }
+
+            try {
+                // If user is already signed in, redirect to dashboard
+                if (window.Clerk.user) {
+                    window.location.href = '/dashboard.html';
+                    return;
+                }
+
+                // Open sign up modal
+                await window.Clerk.openSignUp({
+                    fallbackRedirectUrl: '/dashboard.html'
+                });
+            } catch (error) {
+                console.error('Error opening sign up:', error);
+            }
+        }
+
+        // Error handling for Google Maps API load failure
+        window.gm_authFailure = function() {
+            console.error('Google Maps API authentication failed.');
+            // Show the regular input as fallback
+            if (previewInput) {
+                previewInput.style.display = 'block';
+            }
+        };
+    </script>
+</body>
+</html>

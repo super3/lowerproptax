@@ -1116,11 +1116,41 @@
 
                 // Load properties from backend
                 await loadProperties();
+
+                // Check for pending property from homepage
+                await checkPendingProperty();
             } catch (error) {
                 console.error('Error initializing Clerk:', error);
                 if (!isDevelopment) {
                     window.location.href = '/index.html';
                 }
+            }
+        }
+
+        // Check for pending property from localStorage
+        async function checkPendingProperty() {
+            const pendingPropertyJson = localStorage.getItem('pendingProperty');
+            if (!pendingPropertyJson) {
+                return;
+            }
+
+            // Clear localStorage immediately to prevent duplicate adds
+            localStorage.removeItem('pendingProperty');
+
+            try {
+                const pendingProperty = JSON.parse(pendingPropertyJson);
+                // Create the property with full data from homepage
+                await addProperty({
+                    address: pendingProperty.address,
+                    city: pendingProperty.city || '',
+                    state: pendingProperty.state || '',
+                    zipCode: pendingProperty.zipCode || '',
+                    country: pendingProperty.country || '',
+                    lat: pendingProperty.lat || null,
+                    lng: pendingProperty.lng || null
+                });
+            } catch (error) {
+                console.error('Error creating pending property:', error);
             }
         }
 

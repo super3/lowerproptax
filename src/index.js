@@ -12,13 +12,17 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 3001;
 
-// Middleware
-app.use(cors({
+// CORS configuration
+const corsOptions = {
   origin: ['https://lowerproptax.com', 'https://super3.github.io', 'http://localhost:8000'],
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
-}));
+};
+
+// Middleware
+app.use(cors(corsOptions));
+
 app.use(express.json());
 
 // Clerk middleware for authentication
