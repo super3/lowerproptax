@@ -1,6 +1,6 @@
 import pool from '../db/connection.js';
 import { sendNewPropertyNotification } from '../services/emailService.js';
-import { parseAddress, SUPPORTED_COUNTIES } from '../../scripts/address-parser.js';
+import { parseAddress, SUPPORTED_COUNTIES } from '../scrapers/address-parser.js';
 
 // Test helper to reset storage
 export async function resetProperties() {
