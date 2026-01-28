@@ -51,7 +51,7 @@ async function scrapeGwinnettPropertyTax(parcelNumber) {
 async function scrapeFultonPropertyTax(parcelNumber, browser) {
   // URL encode the parcel number (spaces become %20)
   const encodedParcel = encodeURIComponent(parcelNumber);
-  const url = `https://fultoncountytaxes.org/propertytax/summary/${encodedParcel}`;
+  const url = `https://fultoncountytaxes.org/propertytax/details/${encodedParcel}/2025/`;
 
   const context = await browser.newContext({
     userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
@@ -61,16 +61,26 @@ async function scrapeFultonPropertyTax(parcelNumber, browser) {
   const page = await context.newPage();
 
   try {
-    await page.goto(url, { waitUntil: 'networkidle', timeout: 60000 });
+    // Use load to wait for full page, then wait for JavaScript data to load
+    await page.goto(url, { waitUntil: 'load', timeout: 60000 });
 
-    // Wait for the page to load after Cloudflare challenge - may need more time
-    await page.waitForTimeout(5000);
+    // Wait for the actual tax data to load (page uses JavaScript to fetch data)
+    // Look for "Total Amount Billed" which indicates data has loaded
+    try {
+      await page.waitForFunction(
+        () => document.body.innerText.includes('Total Amount Billed'),
+        { timeout: 45000 }
+      );
+    } catch (e) {
+      // If data doesn't load, wait a bit more and try once more
+      await page.waitForTimeout(10000);
+    }
 
     const text = await page.evaluate(() => document.body.innerText);
 
-    // Look for 2025 tax amount
-    // Format: "Tax Year 2025\nCycle\nCounty\nPrincipal Amount\n15,262.32"
-    const taxMatch = text.match(/Tax Year 2025[\s\S]*?Principal Amount\s*\n?\s*([\d,]+\.?\d*)/i);
+    // Look for 2025 tax amount on details page
+    // Format: "Total Amount Billed	 	$15,262.32"
+    const taxMatch = text.match(/Total Amount Billed[\s\t]*\$?([\d,]+\.\d{2})/i);
     if (taxMatch) {
       return taxMatch[1]; // Return as string with commas, e.g., "15,262.32"
     }

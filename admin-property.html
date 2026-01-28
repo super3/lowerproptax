@@ -522,7 +522,7 @@
                     if (data.parcelNumber && data.county) {
                         const encodedParcel = encodeURIComponent(data.parcelNumber);
                         if (data.county.toLowerCase() === 'fulton') {
-                            taxLink.href = `https://fultoncountytaxes.org/propertytax/summary/${encodedParcel}`;
+                            taxLink.href = `https://fultoncountytaxes.org/propertytax/details/${encodedParcel}/2025/`;
                             taxLink.style.color = '#3171ef';
                         } else if (data.county.toLowerCase() === 'gwinnett') {
                             taxLink.href = `https://www.gwinnetttaxcommissioner.com/PropTaxBill/${encodedParcel}.pdf`;
