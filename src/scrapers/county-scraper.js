@@ -235,6 +235,18 @@ async function scrapeProperty(address, county = 'fulton') {
     await page.click(config.searchButton);
     await page.waitForTimeout(3000);
 
+    // Click on first search result to navigate to property details page
+    try {
+      // Look for the results table and click the first property link
+      const resultLink = await page.$('table.SearchResults a');
+      if (resultLink) {
+        await resultLink.click();
+        await page.waitForTimeout(3000);
+      }
+    } catch (e) {
+      // May already be on details page if only one result
+    }
+
     // Extract data from results page
     const text = await page.evaluate(() => document.body.innerText);
 
