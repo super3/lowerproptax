@@ -1843,12 +1843,24 @@
                 const taxValue = parseFloat(data.propertyTax2025.replace(/,/g, ''));
                 currentTaxAmount.textContent = `$${data.propertyTax2025}`;
 
-                // Calculate estimated savings (37% reduction as example)
-                const estimatedSavings = taxValue * 0.37;
-                const afterSavings = taxValue - estimatedSavings;
+                if (data.homesteadExemption === false) {
+                    // No homestead - show savings range (30-35%)
+                    const savingsLow = taxValue * 0.30;
+                    const savingsHigh = taxValue * 0.35;
+                    const afterSavingsLow = taxValue - savingsHigh;
+                    const afterSavingsHigh = taxValue - savingsLow;
 
-                afterTaxAmount.textContent = `$${afterSavings.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-                savingsAmount.textContent = `$${estimatedSavings.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}/yr`;
+                    afterTaxAmount.textContent = `$${afterSavingsLow.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 })} - $${afterSavingsHigh.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`;
+                    savingsAmount.textContent = `$${savingsLow.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 })} - $${savingsHigh.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}/yr`;
+                } else if (data.homesteadExemption === true) {
+                    // Already has homestead - no savings
+                    afterTaxAmount.textContent = `$${data.propertyTax2025}`;
+                    savingsAmount.textContent = '$0/yr';
+                } else {
+                    // Unknown homestead status - encourage signup
+                    afterTaxAmount.textContent = 'Sign up!';
+                    savingsAmount.textContent = 'Sign up!';
+                }
             }
         }
 
@@ -2031,6 +2043,7 @@
                             <div class="result-title">We don't support ${countyName} County yet</div>
                             <div>We currently serve Fulton, Gwinnett, and Cobb counties in Georgia. We're expanding soon!</div>
                         `;
+                        previewResult.classList.remove('hidden');
                         resetComparisonCard();
                     } else {
                         throw new Error(data.error || 'Failed to analyze property');
@@ -2050,16 +2063,6 @@
                         lng: selectedPlace?.location?.lng || null
                     };
                     localStorage.setItem('pendingProperty', JSON.stringify(pendingProperty));
-
-                    const countyName = data.county.charAt(0).toUpperCase() + data.county.slice(1);
-                    previewResult.className = 'preview-result success';
-                    previewResult.innerHTML = `
-                        <div class="result-title">Found savings for your property in ${countyName} County!</div>
-                        <div>Sign up to claim your savings and get step-by-step instructions.</div>
-                        <div class="result-action">
-                            <button type="button" class="btn-signup" onclick="handleSignUpAfterPreview()">Get My Savings</button>
-                        </div>
-                    `;
                 }
             } catch (error) {
                 stopLoadingAnimation();
@@ -2069,11 +2072,11 @@
                     <div class="result-title">Unable to analyze property</div>
                     <div>${error.message}</div>
                 `;
+                previewResult.classList.remove('hidden');
                 resetComparisonCard();
             } finally {
                 checkBtn.disabled = false;
                 checkBtn.textContent = 'Check My Property';
-                previewResult.classList.remove('hidden');
             }
         }
 
