@@ -16,13 +16,13 @@ jest.unstable_mockModule('../../src/services/emailService.js', () => ({
 
 // Mock the address parser
 const mockParseAddressForScraping = jest.fn();
-jest.unstable_mockModule('../../scripts/address-parser.js', () => ({
+jest.unstable_mockModule('../../src/scrapers/address-parser.js', () => ({
   parseAddressForScraping: mockParseAddressForScraping
 }));
 
 // Mock the county scraper
 const mockScrapeProperty = jest.fn();
-jest.unstable_mockModule('../../scripts/county-scraper.js', () => ({
+jest.unstable_mockModule('../../src/scrapers/county-scraper.js', () => ({
   scrapeProperty: mockScrapeProperty
 }));
 

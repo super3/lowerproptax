@@ -1,4 +1,4 @@
-import { scrapeProperty } from '../../scripts/county-scraper.js';
+import { scrapeProperty } from '../../src/scrapers/county-scraper.js';
 
 describe('Gwinnett County Scraper', () => {
   const TEST_ADDRESS = '2517 Weycroft Cir';

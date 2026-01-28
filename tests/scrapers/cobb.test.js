@@ -1,4 +1,4 @@
-import { scrapeProperty } from '../../scripts/county-scraper.js';
+import { scrapeProperty } from '../../src/scrapers/county-scraper.js';
 
 describe('Cobb County Scraper', () => {
   const TEST_ADDRESS = '443 VININGS VINTAGE CIR';

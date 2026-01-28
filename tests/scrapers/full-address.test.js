@@ -1,5 +1,5 @@
-import { parseAddressForScraping } from '../../scripts/address-parser.js';
-import { scrapeProperty } from '../../scripts/county-scraper.js';
+import { parseAddressForScraping } from '../../src/scrapers/address-parser.js';
+import { scrapeProperty } from '../../src/scrapers/county-scraper.js';
 
 describe('Full Address Scraping', () => {
   const FULL_ADDRESS = '2517 Weycroft Cir NE, Dacula, GA 30019, USA';

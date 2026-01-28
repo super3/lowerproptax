@@ -1,4 +1,4 @@
-import { scrapeProperty } from '../../scripts/county-scraper.js';
+import { scrapeProperty } from '../../src/scrapers/county-scraper.js';
 
 describe('Fulton County Scraper', () => {
   const TEST_ADDRESS = '6607 ARIA BLVD';
