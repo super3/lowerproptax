@@ -148,4 +148,20 @@ describe('scrapePreview', () => {
     expect(res.status).toHaveBeenCalledWith(500);
     expect(res.json).toHaveBeenCalledWith({ error: 'Scraper timeout' });
   });
+
+  it('should return generic error message when error has no message', async () => {
+    req.body = { address: '123 Main St, Atlanta, GA 30301' };
+    mockParseAddress.mockResolvedValue({
+      streetAddress: '123 Main St',
+      county: 'fulton',
+      isSupported: true,
+      raw: {}
+    });
+    mockScrapeProperty.mockRejectedValue(new Error());
+
+    await propertyController.scrapePreview(req, res);
+
+    expect(res.status).toHaveBeenCalledWith(500);
+    expect(res.json).toHaveBeenCalledWith({ error: 'Failed to scrape property data' });
+  });
 });
