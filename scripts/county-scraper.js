@@ -105,9 +105,12 @@ async function scrapeCobbPropertyTax(parcelNumber, browser) {
         await row2025.locator('button.btnView').click();
       }
 
-      // Wait for the detail page to load - URL should change
+      // Wait for the detail page to load - URL should change to Record page
       await page.waitForURL(/Record/, { timeout: 10000 }).catch(() => {});
       await page.waitForTimeout(3000);
+
+      // Capture the Record URL for linking
+      const recordUrl = page.url();
 
       const text = await page.evaluate(() => document.body.innerText);
 
@@ -115,7 +118,7 @@ async function scrapeCobbPropertyTax(parcelNumber, browser) {
       // Format: "Base Taxes $1,175.65" or similar
       const taxMatch = text.match(/Base\s*Taxes[:\s]*\$?([\d,]+\.\d{2})/i);
       if (taxMatch) {
-        return taxMatch[1];
+        return { tax: taxMatch[1], recordUrl };
       }
 
       return null;
@@ -382,21 +385,30 @@ async function scrapeProperty(address, county = 'fulton') {
 
     // Try to get 2025 property tax payment based on county
     let propertyTax2025 = null;
+    let taxRecordUrl = null;
+    const encodedParcel = parcelNumber ? encodeURIComponent(parcelNumber) : null;
+
     if (county.toLowerCase() === 'fulton' && parcelNumber) {
       try {
         propertyTax2025 = await scrapeFultonPropertyTax(parcelNumber, browser);
+        taxRecordUrl = `https://fultoncountytaxes.org/propertytax/details/${encodedParcel}/2025/`;
       } catch (e) {
         console.error('Error scraping Fulton property tax:', e.message);
       }
     } else if (county.toLowerCase() === 'gwinnett' && parcelNumber) {
       try {
         propertyTax2025 = await scrapeGwinnettPropertyTax(parcelNumber);
+        taxRecordUrl = `https://www.gwinnetttaxcommissioner.com/PropTaxBill/${encodedParcel}.pdf`;
       } catch (e) {
         console.error('Error scraping Gwinnett property tax:', e.message);
       }
     } else if (county.toLowerCase() === 'cobb' && parcelNumber) {
       try {
-        propertyTax2025 = await scrapeCobbPropertyTax(parcelNumber, browser);
+        const cobbResult = await scrapeCobbPropertyTax(parcelNumber, browser);
+        if (cobbResult) {
+          propertyTax2025 = cobbResult.tax;
+          taxRecordUrl = cobbResult.recordUrl;
+        }
       } catch (e) {
         console.error('Error scraping Cobb property tax:', e.message);
       }
@@ -412,7 +424,8 @@ async function scrapeProperty(address, county = 'fulton') {
       assessment2025Pdf: assessment2025PdfUrl,
       qpublicUrl,
       parcelNumber,
-      propertyTax2025
+      propertyTax2025,
+      taxRecordUrl
     };
 
     console.log(JSON.stringify(result, null, 2));

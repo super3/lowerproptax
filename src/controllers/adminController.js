@@ -92,6 +92,7 @@ export async function getPropertyDetails(req, res) {
         homestead,
         qpublic_url as "qpublicUrl",
         parcel_number as "parcelNumber",
+        tax_record_url as "taxRecordUrl",
         created_at as "createdAt",
         updated_at as "updatedAt",
         user_id as "userId"
@@ -174,6 +175,7 @@ export async function updatePropertyDetails(req, res) {
       homestead,
       qpublicUrl,
       parcelNumber,
+      taxRecordUrl,
       year,
       annualTax,
       estimatedAnnualTax,
@@ -181,7 +183,7 @@ export async function updatePropertyDetails(req, res) {
       status
     } = req.body;
 
-    // Update property (bedrooms, bathrooms, sqft, homestead, qpublic_url, parcel_number)
+    // Update property (bedrooms, bathrooms, sqft, homestead, qpublic_url, parcel_number, tax_record_url)
     const propertyQuery = `
       UPDATE properties
       SET
@@ -191,8 +193,9 @@ export async function updatePropertyDetails(req, res) {
         homestead = COALESCE($4, homestead),
         qpublic_url = COALESCE($5, qpublic_url),
         parcel_number = COALESCE($6, parcel_number),
+        tax_record_url = COALESCE($7, tax_record_url),
         updated_at = NOW()
-      WHERE id = $7
+      WHERE id = $8
       RETURNING *
     `;
 
@@ -203,6 +206,7 @@ export async function updatePropertyDetails(req, res) {
       homestead !== undefined ? homestead : null,
       qpublicUrl !== undefined ? qpublicUrl : null,
       parcelNumber !== undefined ? parcelNumber : null,
+      taxRecordUrl !== undefined ? taxRecordUrl : null,
       id
     ]);
 
@@ -372,6 +376,7 @@ export async function pullPropertyData(req, res) {
       qpublicUrl: scraperResult.qpublicUrl,
       parcelNumber: scraperResult.parcelNumber,
       propertyTax2025: scraperResult.propertyTax2025,
+      taxRecordUrl: scraperResult.taxRecordUrl,
       county: parsed.county,
       streetAddress: parsed.streetAddress
     });

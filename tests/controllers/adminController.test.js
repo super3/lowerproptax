@@ -445,6 +445,7 @@ describe('Admin Controller', () => {
         homestead: true,
         qpublicUrl: 'https://qpublic.schneidercorp.com/property/123',
         parcelNumber: '17 0034  LL3967',
+        taxRecordUrl: 'https://fultoncountytaxes.org/propertytax/details/17%200034%20%20LL3967/2025/',
         annualTax: 6000
       };
 
@@ -456,6 +457,7 @@ describe('Admin Controller', () => {
         homestead: true,
         qpublic_url: 'https://qpublic.schneidercorp.com/property/123',
         parcel_number: '17 0034  LL3967',
+        tax_record_url: 'https://fultoncountytaxes.org/propertytax/details/17%200034%20%20LL3967/2025/',
         updated_at: new Date()
       };
 
@@ -478,7 +480,7 @@ describe('Admin Controller', () => {
 
       expect(mockQuery).toHaveBeenCalledWith(
         expect.stringContaining('UPDATE properties'),
-        expect.arrayContaining([4, 3.5, 2000, true, 'https://qpublic.schneidercorp.com/property/123', '17 0034  LL3967', 'prop1'])
+        expect.arrayContaining([4, 3.5, 2000, true, 'https://qpublic.schneidercorp.com/property/123', '17 0034  LL3967', 'https://fultoncountytaxes.org/propertytax/details/17%200034%20%20LL3967/2025/', 'prop1'])
       );
       expect(res.json).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -1118,7 +1120,8 @@ describe('Admin Controller', () => {
         homesteadExemption: true,
         qpublicUrl: 'https://qpublic.schneidercorp.com/property/123',
         parcelNumber: '17 0034  LL3967',
-        propertyTax2025: '15,262.32'
+        propertyTax2025: '15,262.32',
+        taxRecordUrl: 'https://fultoncountytaxes.org/propertytax/details/17%200034%20%20LL3967/2025/'
       });
 
       await adminController.pullPropertyData(req, res);
@@ -1140,6 +1143,7 @@ describe('Admin Controller', () => {
         qpublicUrl: 'https://qpublic.schneidercorp.com/property/123',
         parcelNumber: '17 0034  LL3967',
         propertyTax2025: '15,262.32',
+        taxRecordUrl: 'https://fultoncountytaxes.org/propertytax/details/17%200034%20%20LL3967/2025/',
         county: 'fulton',
         streetAddress: '123 Main St'
       });
