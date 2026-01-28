@@ -30,12 +30,6 @@ describe('Cobb County Scraper', () => {
     expect(result.homesteadExemption).toBe(true);
   });
 
-  test('should return valid assessment PDF URL', () => {
-    expect(result.assessment2025Pdf).toBeTruthy();
-    expect(result.assessment2025Pdf).toMatch(/^https:\/\//);
-    expect(result.assessment2025Pdf).not.toContain(' ');
-  });
-
   test('should return correct parcel number', () => {
     expect(result.parcelNumber).toBe('18018300540');
   });

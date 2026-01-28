@@ -421,7 +421,6 @@ async function scrapeProperty(address, county = 'fulton') {
       bathrooms,
       sqft: sqftMatch ? parseInt(sqftMatch[1].replace(',', '')) : null,
       homesteadExemption,
-      assessment2025Pdf: assessment2025PdfUrl,
       qpublicUrl,
       parcelNumber,
       propertyTax2025,

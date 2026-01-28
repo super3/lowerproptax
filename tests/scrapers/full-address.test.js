@@ -50,10 +50,5 @@ describe('Full Address Scraping', () => {
     test('should return homestead exemption status', () => {
       expect(result.homesteadExemption).toBe(true);
     });
-
-    test('should return valid assessment PDF URL', () => {
-      expect(result.assessment2025Pdf).toBeTruthy();
-      expect(result.assessment2025Pdf).toMatch(/^https:\/\//);
-    });
   });
 });
