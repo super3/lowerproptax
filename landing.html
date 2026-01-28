@@ -1430,25 +1430,25 @@
         <div class="hero-image">
             <div class="hero-comparison">
                 <div class="comparison-header">
-                    <h3>123 Oak Street</h3>
-                    <span>3 bed, 2 bath • 1,850 sq ft</span>
+                    <h3 id="comparison-address">123 Oak Street</h3>
+                    <span id="comparison-specs">3 bed, 2 bath • 1,850 sq ft</span>
                 </div>
                 <div class="comparison-cards">
                     <div class="comparison-card before">
                         <label>Current Tax Bill</label>
-                        <div class="amount">$4,280.67</div>
+                        <div class="amount" id="current-tax-amount">$4,280.67</div>
                         <div class="sub-label">Per year</div>
                     </div>
                     <div class="comparison-card after">
                         <label>After Savings</label>
-                        <div class="amount">$2,691.76</div>
+                        <div class="amount" id="after-tax-amount">$2,691.76</div>
                         <div class="sub-label">Per year</div>
                     </div>
                 </div>
                 <div class="savings-result">
                     <div class="savings-info">
                         <label>Savings Found</label>
-                        <div class="amount">$1,588.91/yr</div>
+                        <div class="amount" id="savings-amount">$1,588.91/yr</div>
                     </div>
                     <span class="btn-download-report">Get Your Savings</span>
                 </div>
@@ -1807,6 +1807,68 @@
         const previewResult = document.getElementById('preview-result');
         const checkBtn = document.getElementById('check-btn');
 
+        // Comparison card elements
+        const comparisonAddress = document.getElementById('comparison-address');
+        const comparisonSpecs = document.getElementById('comparison-specs');
+        const currentTaxAmount = document.getElementById('current-tax-amount');
+        const afterTaxAmount = document.getElementById('after-tax-amount');
+        const savingsAmount = document.getElementById('savings-amount');
+
+        // Default values for comparison card
+        const defaultValues = {
+            address: '123 Oak Street',
+            specs: '3 bed, 2 bath • 1,850 sq ft',
+            currentTax: '$4,280.67',
+            afterTax: '$2,691.76',
+            savings: '$1,588.91/yr'
+        };
+
+        // Update comparison card with property data
+        function updateComparisonCard(data) {
+            if (data.address) {
+                // Extract just the street address (before the first comma)
+                const streetAddress = data.address.split(',')[0];
+                comparisonAddress.textContent = streetAddress;
+            }
+
+            if (data.bedrooms !== null || data.bathrooms !== null || data.sqft !== null) {
+                const parts = [];
+                if (data.bedrooms !== null) parts.push(`${data.bedrooms} bed`);
+                if (data.bathrooms !== null) parts.push(`${data.bathrooms} bath`);
+                if (data.sqft !== null) parts.push(`${data.sqft.toLocaleString()} sq ft`);
+                comparisonSpecs.textContent = parts.join(', ');
+            }
+
+            if (data.propertyTax2025) {
+                const taxValue = parseFloat(data.propertyTax2025.replace(/,/g, ''));
+                currentTaxAmount.textContent = `$${data.propertyTax2025}`;
+
+                // Calculate estimated savings (37% reduction as example)
+                const estimatedSavings = taxValue * 0.37;
+                const afterSavings = taxValue - estimatedSavings;
+
+                afterTaxAmount.textContent = `$${afterSavings.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+                savingsAmount.textContent = `$${estimatedSavings.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}/yr`;
+            }
+        }
+
+        // Show loading state on comparison card
+        function showComparisonLoading() {
+            comparisonSpecs.textContent = 'Loading property data...';
+            currentTaxAmount.textContent = '...';
+            afterTaxAmount.textContent = '...';
+            savingsAmount.textContent = '...';
+        }
+
+        // Reset comparison card to defaults
+        function resetComparisonCard() {
+            comparisonAddress.textContent = defaultValues.address;
+            comparisonSpecs.textContent = defaultValues.specs;
+            currentTaxAmount.textContent = defaultValues.currentTax;
+            afterTaxAmount.textContent = defaultValues.afterTax;
+            savingsAmount.textContent = defaultValues.savings;
+        }
+
         // Initialize Google Maps autocomplete
         window.initAutocomplete = async function() {
             try {
@@ -1827,6 +1889,18 @@
                 // Style the autocomplete widget container
                 autocompleteWidget.style.flex = '1';
                 autocompleteWidget.style.minWidth = '200px';
+
+                // Listen for input changes to update comparison address in real-time
+                autocompleteWidget.addEventListener('input', (event) => {
+                    const inputValue = event.target?.value || '';
+                    if (inputValue.trim()) {
+                        // Update the comparison address as user types
+                        comparisonAddress.textContent = inputValue;
+                    } else {
+                        // Reset to default if empty
+                        comparisonAddress.textContent = defaultValues.address;
+                    }
+                });
 
                 // Listen for place selection
                 autocompleteWidget.addEventListener('gmp-select', async ({ placePrediction }) => {
@@ -1869,7 +1943,11 @@
                     // Update hidden input
                     previewInput.value = place.formattedAddress;
 
-                    // Auto-submit the form after selection
+                    // Update comparison card address immediately
+                    const streetAddress = place.formattedAddress.split(',')[0];
+                    comparisonAddress.textContent = streetAddress;
+
+                    // Auto-submit the form after selection (which triggers fetchPropertyData)
                     previewForm.dispatchEvent(new Event('submit'));
                 });
 
@@ -1880,21 +1958,58 @@
             }
         };
 
-        previewForm.addEventListener('submit', async function(event) {
-            event.preventDefault();
+        // Loading messages to cycle through
+        const loadingMessages = [
+            'Searching county records...',
+            'Finding your property...',
+            'Pulling tax data...',
+            'Calculating potential savings...',
+            'Almost there...'
+        ];
 
-            const address = previewInput.value.trim();
-            if (!address) {
-                return;
+        let countdownInterval = null;
+        let messageInterval = null;
+
+        // Start the loading countdown animation
+        function startLoadingAnimation() {
+            let seconds = 0;
+            let messageIndex = 0;
+
+            // Update countdown every second
+            countdownInterval = setInterval(() => {
+                seconds++;
+                comparisonSpecs.textContent = `${loadingMessages[messageIndex]} (${seconds}s)`;
+            }, 1000);
+
+            // Cycle through messages every 3 seconds
+            messageInterval = setInterval(() => {
+                messageIndex = (messageIndex + 1) % loadingMessages.length;
+            }, 3000);
+        }
+
+        // Stop the loading animation
+        function stopLoadingAnimation() {
+            if (countdownInterval) {
+                clearInterval(countdownInterval);
+                countdownInterval = null;
             }
+            if (messageInterval) {
+                clearInterval(messageInterval);
+                messageInterval = null;
+            }
+        }
 
-            // Show loading state
+        // Fetch property data from the scraper
+        async function fetchPropertyData(address) {
+            // Show loading state with animation
+            showComparisonLoading();
+            startLoadingAnimation();
             checkBtn.disabled = true;
-            checkBtn.textContent = 'Checking...';
+            checkBtn.textContent = 'Analyzing...';
             previewResult.classList.add('hidden');
 
             try {
-                const response = await fetch(`${API_BASE}/properties/preview`, {
+                const response = await fetch(`${API_BASE}/properties/scrape-preview`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
@@ -1904,11 +2019,26 @@
 
                 const data = await response.json();
 
-                if (!response.ok) {
-                    throw new Error(data.error || 'Failed to check address');
-                }
+                stopLoadingAnimation();
 
-                if (data.supported) {
+                if (!response.ok) {
+                    // Check if it's an unsupported county error
+                    if (data.error && data.error.includes('not supported')) {
+                        const countyMatch = data.error.match(/County not supported: (\w+)/);
+                        const countyName = countyMatch ? countyMatch[1].charAt(0).toUpperCase() + countyMatch[1].slice(1) : 'your';
+                        previewResult.className = 'preview-result error';
+                        previewResult.innerHTML = `
+                            <div class="result-title">We don't support ${countyName} County yet</div>
+                            <div>We currently serve Fulton, Gwinnett, and Cobb counties in Georgia. We're expanding soon!</div>
+                        `;
+                        resetComparisonCard();
+                    } else {
+                        throw new Error(data.error || 'Failed to analyze property');
+                    }
+                } else {
+                    // Success! Update the comparison card with real data
+                    updateComparisonCard(data);
+
                     // Store full property data in localStorage for after login
                     const pendingProperty = {
                         address: address,
@@ -1921,33 +2051,42 @@
                     };
                     localStorage.setItem('pendingProperty', JSON.stringify(pendingProperty));
 
+                    const countyName = data.county.charAt(0).toUpperCase() + data.county.slice(1);
                     previewResult.className = 'preview-result success';
                     previewResult.innerHTML = `
-                        <div class="result-title">We found your property in ${data.county.charAt(0).toUpperCase() + data.county.slice(1)} County!</div>
-                        <div>Sign up to get your free property tax savings analysis.</div>
+                        <div class="result-title">Found savings for your property in ${countyName} County!</div>
+                        <div>Sign up to claim your savings and get step-by-step instructions.</div>
                         <div class="result-action">
-                            <button type="button" class="btn-signup" onclick="handleSignUpAfterPreview()">Get My Free Analysis</button>
+                            <button type="button" class="btn-signup" onclick="handleSignUpAfterPreview()">Get My Savings</button>
                         </div>
-                    `;
-                } else {
-                    const countyName = data.county ? data.county.charAt(0).toUpperCase() + data.county.slice(1) : 'your';
-                    previewResult.className = 'preview-result error';
-                    previewResult.innerHTML = `
-                        <div class="result-title">We don't support ${countyName} County yet</div>
-                        <div>We currently serve Fulton, Gwinnett, and Cobb counties in Georgia. We're expanding soon!</div>
                     `;
                 }
             } catch (error) {
+                stopLoadingAnimation();
+                console.error('Error fetching property data:', error);
                 previewResult.className = 'preview-result error';
                 previewResult.innerHTML = `
-                    <div class="result-title">Unable to verify address</div>
+                    <div class="result-title">Unable to analyze property</div>
                     <div>${error.message}</div>
                 `;
+                resetComparisonCard();
             } finally {
                 checkBtn.disabled = false;
                 checkBtn.textContent = 'Check My Property';
                 previewResult.classList.remove('hidden');
             }
+        }
+
+        previewForm.addEventListener('submit', async function(event) {
+            event.preventDefault();
+
+            const address = previewInput.value.trim();
+            if (!address) {
+                return;
+            }
+
+            // Fetch property data (this now handles everything)
+            fetchPropertyData(address);
         });
 
         // Handle sign up after successful preview

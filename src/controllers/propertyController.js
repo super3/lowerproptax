@@ -1,6 +1,7 @@
 import pool from '../db/connection.js';
 import { sendNewPropertyNotification } from '../services/emailService.js';
 import { parseAddress, SUPPORTED_COUNTIES } from '../scrapers/address-parser.js';
+import { scrapeProperty } from '../scrapers/county-scraper.js';
 
 // Test helper to reset storage
 export async function resetProperties() {
@@ -245,8 +246,8 @@ export async function deleteProperty(req, res) {
   }
 }
 
-// Preview property address (no auth required)
-export async function previewProperty(req, res) {
+// Scrape property data for preview (no auth required)
+export async function scrapePreview(req, res) {
   try {
     const { address } = req.body;
 
@@ -259,16 +260,32 @@ export async function previewProperty(req, res) {
       return res.status(500).json({ error: 'Google Maps API key not configured' });
     }
 
+    // Parse the address to get the county
     const parsed = await parseAddress(address, apiKey);
 
+    if (!parsed.isSupported) {
+      return res.status(400).json({ error: `County not supported: ${parsed.county}` });
+    }
+
+    // Scrape the property data
+    const propertyData = await scrapeProperty(parsed.streetAddress, parsed.county);
+
+    if (!propertyData) {
+      return res.status(404).json({ error: 'Could not find property data' });
+    }
+
     res.json({
-      streetAddress: parsed.streetAddress,
+      address: parsed.streetAddress,
       county: parsed.county,
-      supported: parsed.isSupported,
-      supportedCounties: SUPPORTED_COUNTIES
+      bedrooms: propertyData.bedrooms,
+      bathrooms: propertyData.bathrooms,
+      sqft: propertyData.sqft,
+      homesteadExemption: propertyData.homesteadExemption,
+      propertyTax2025: propertyData.propertyTax2025,
+      parcelNumber: propertyData.parcelNumber
     });
   } catch (error) {
-    console.error('Error previewing property:', error);
-    res.status(400).json({ error: error.message || 'Failed to validate address' });
+    console.error('Error scraping property preview:', error);
+    res.status(500).json({ error: error.message || 'Failed to scrape property data' });
   }
 }

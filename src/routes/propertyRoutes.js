@@ -5,7 +5,7 @@ import * as propertyController from '../controllers/propertyController.js';
 const router = express.Router();
 
 // Public routes (no auth required)
-router.post('/properties/preview', propertyController.previewProperty);
+router.post('/properties/scrape-preview', propertyController.scrapePreview);
 
 // Authenticated property routes
 router.get('/properties', requireAuth, propertyController.getProperties);

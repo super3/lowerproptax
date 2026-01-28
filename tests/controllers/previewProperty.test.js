@@ -21,10 +21,16 @@ jest.unstable_mockModule('../../src/scrapers/address-parser.js', () => ({
   SUPPORTED_COUNTIES: MOCK_SUPPORTED_COUNTIES
 }));
 
+// Mock the county scraper
+const mockScrapeProperty = jest.fn();
+jest.unstable_mockModule('../../src/scrapers/county-scraper.js', () => ({
+  scrapeProperty: mockScrapeProperty
+}));
+
 // Import the controller after mocking
 const propertyController = await import('../../src/controllers/propertyController.js');
 
-describe('previewProperty', () => {
+describe('scrapePreview', () => {
   let req, res;
   const originalEnv = process.env;
 
@@ -37,6 +43,7 @@ describe('previewProperty', () => {
       status: jest.fn().mockReturnThis()
     };
     mockParseAddress.mockClear();
+    mockScrapeProperty.mockClear();
     process.env = { ...originalEnv, GOOGLE_MAPS_API_KEY: 'test-api-key' };
   });
 
@@ -47,7 +54,7 @@ describe('previewProperty', () => {
   it('should return 400 if address is missing', async () => {
     req.body = {};
 
-    await propertyController.previewProperty(req, res);
+    await propertyController.scrapePreview(req, res);
 
     expect(res.status).toHaveBeenCalledWith(400);
     expect(res.json).toHaveBeenCalledWith({ error: 'Address is required' });
@@ -57,33 +64,13 @@ describe('previewProperty', () => {
     delete process.env.GOOGLE_MAPS_API_KEY;
     req.body = { address: '123 Main St, Atlanta, GA' };
 
-    await propertyController.previewProperty(req, res);
+    await propertyController.scrapePreview(req, res);
 
     expect(res.status).toHaveBeenCalledWith(500);
     expect(res.json).toHaveBeenCalledWith({ error: 'Google Maps API key not configured' });
   });
 
-  it('should return preview data for supported county', async () => {
-    req.body = { address: '123 Main St, Atlanta, GA 30301' };
-    mockParseAddress.mockResolvedValue({
-      streetAddress: '123 Main St',
-      county: 'fulton',
-      isSupported: true,
-      raw: {}
-    });
-
-    await propertyController.previewProperty(req, res);
-
-    expect(mockParseAddress).toHaveBeenCalledWith('123 Main St, Atlanta, GA 30301', 'test-api-key');
-    expect(res.json).toHaveBeenCalledWith({
-      streetAddress: '123 Main St',
-      county: 'fulton',
-      supported: true,
-      supportedCounties: MOCK_SUPPORTED_COUNTIES
-    });
-  });
-
-  it('should return preview data for unsupported county', async () => {
+  it('should return 400 for unsupported county', async () => {
     req.body = { address: '456 Oak Ave, Macon, GA 31201' };
     mockParseAddress.mockResolvedValue({
       streetAddress: '456 Oak Ave',
@@ -92,33 +79,73 @@ describe('previewProperty', () => {
       raw: {}
     });
 
-    await propertyController.previewProperty(req, res);
+    await propertyController.scrapePreview(req, res);
 
+    expect(res.status).toHaveBeenCalledWith(400);
+    expect(res.json).toHaveBeenCalledWith({ error: 'County not supported: bibb' });
+  });
+
+  it('should return 404 if scraper returns no data', async () => {
+    req.body = { address: '123 Main St, Atlanta, GA 30301' };
+    mockParseAddress.mockResolvedValue({
+      streetAddress: '123 Main St',
+      county: 'fulton',
+      isSupported: true,
+      raw: {}
+    });
+    mockScrapeProperty.mockResolvedValue(null);
+
+    await propertyController.scrapePreview(req, res);
+
+    expect(res.status).toHaveBeenCalledWith(404);
+    expect(res.json).toHaveBeenCalledWith({ error: 'Could not find property data' });
+  });
+
+  it('should return scraped property data for supported county', async () => {
+    req.body = { address: '123 Main St, Atlanta, GA 30301' };
+    mockParseAddress.mockResolvedValue({
+      streetAddress: '123 Main St',
+      county: 'fulton',
+      isSupported: true,
+      raw: {}
+    });
+    mockScrapeProperty.mockResolvedValue({
+      bedrooms: 3,
+      bathrooms: 2.5,
+      sqft: 2500,
+      homesteadExemption: true,
+      propertyTax2025: '4,500.00',
+      parcelNumber: '12345'
+    });
+
+    await propertyController.scrapePreview(req, res);
+
+    expect(mockScrapeProperty).toHaveBeenCalledWith('123 Main St', 'fulton');
     expect(res.json).toHaveBeenCalledWith({
-      streetAddress: '456 Oak Ave',
-      county: 'bibb',
-      supported: false,
-      supportedCounties: MOCK_SUPPORTED_COUNTIES
+      address: '123 Main St',
+      county: 'fulton',
+      bedrooms: 3,
+      bathrooms: 2.5,
+      sqft: 2500,
+      homesteadExemption: true,
+      propertyTax2025: '4,500.00',
+      parcelNumber: '12345'
     });
   });
 
-  it('should return 400 when parseAddress throws an error', async () => {
-    req.body = { address: 'invalid address' };
-    mockParseAddress.mockRejectedValue(new Error('Geocoding failed: ZERO_RESULTS'));
+  it('should return 500 when scraper throws an error', async () => {
+    req.body = { address: '123 Main St, Atlanta, GA 30301' };
+    mockParseAddress.mockResolvedValue({
+      streetAddress: '123 Main St',
+      county: 'fulton',
+      isSupported: true,
+      raw: {}
+    });
+    mockScrapeProperty.mockRejectedValue(new Error('Scraper timeout'));
 
-    await propertyController.previewProperty(req, res);
+    await propertyController.scrapePreview(req, res);
 
-    expect(res.status).toHaveBeenCalledWith(400);
-    expect(res.json).toHaveBeenCalledWith({ error: 'Geocoding failed: ZERO_RESULTS' });
-  });
-
-  it('should return generic error message when error has no message', async () => {
-    req.body = { address: '123 Main St' };
-    mockParseAddress.mockRejectedValue(new Error());
-
-    await propertyController.previewProperty(req, res);
-
-    expect(res.status).toHaveBeenCalledWith(400);
-    expect(res.json).toHaveBeenCalledWith({ error: 'Failed to validate address' });
+    expect(res.status).toHaveBeenCalledWith(500);
+    expect(res.json).toHaveBeenCalledWith({ error: 'Scraper timeout' });
   });
 });
