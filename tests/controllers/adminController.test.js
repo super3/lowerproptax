@@ -1039,48 +1039,6 @@ describe('Admin Controller', () => {
     });
   });
 
-  describe('markPropertyAsReady', () => {
-    it('should mark property as ready', async () => {
-      req.params.id = 'prop1';
-      const mockProperty = {
-        id: 'prop1',
-        address: '123 Main St',
-        status: 'ready',
-        updated_at: new Date()
-      };
-
-      mockQuery.mockResolvedValue({ rows: [mockProperty] });
-
-      await adminController.markPropertyAsReady(req, res);
-
-      expect(mockQuery).toHaveBeenCalledWith(
-        expect.stringContaining("SET status = 'ready'"),
-        ['prop1']
-      );
-      expect(res.json).toHaveBeenCalledWith(mockProperty);
-    });
-
-    it('should return 404 if property does not exist', async () => {
-      req.params.id = 'nonexistent';
-      mockQuery.mockResolvedValue({ rows: [] });
-
-      await adminController.markPropertyAsReady(req, res);
-
-      expect(res.status).toHaveBeenCalledWith(404);
-      expect(res.json).toHaveBeenCalledWith({ error: 'Property not found' });
-    });
-
-    it('should handle database errors', async () => {
-      req.params.id = 'prop1';
-      mockQuery.mockRejectedValue(new Error('Database error'));
-
-      await adminController.markPropertyAsReady(req, res);
-
-      expect(res.status).toHaveBeenCalledWith(500);
-      expect(res.json).toHaveBeenCalledWith({ error: 'Failed to mark property as ready' });
-    });
-  });
-
   describe('pullPropertyData', () => {
     const originalEnv = process.env.GOOGLE_MAPS_API_KEY;
 

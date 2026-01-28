@@ -73,11 +73,7 @@ All admin routes require both authentication and admin role.
 - Can update assessment: `year`, `appraised_value`, `annual_tax`, `estimated_appraised_value`, `estimated_annual_tax`, `report_url`, `status`
 - Creates or updates assessment for specified year (or current year)
 - Returns combined property and assessment data
-
-#### `PUT /api/admin/properties/:id/mark-ready`
-- Mark property assessment as ready
-- Updates status to "ready" and sets updated_at timestamp
-- Legacy endpoint maintained for backward compatibility
+- Setting `status: 'ready'` triggers email notification to property owner
 
 ---
 

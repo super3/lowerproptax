@@ -293,31 +293,6 @@ export async function updatePropertyDetails(req, res) {
   }
 }
 
-// Mark property as ready (legacy function, kept for backward compatibility)
-export async function markPropertyAsReady(req, res) {
-  try {
-    const { id } = req.params;
-
-    const query = `
-      UPDATE properties
-      SET status = 'ready', updated_at = NOW()
-      WHERE id = $1
-      RETURNING *
-    `;
-
-    const result = await pool.query(query, [id]);
-
-    if (result.rows.length === 0) {
-      return res.status(404).json({ error: 'Property not found' });
-    }
-
-    res.json(result.rows[0]);
-  } catch (error) {
-    console.error('Error marking property as ready:', error);
-    res.status(500).json({ error: 'Failed to mark property as ready' });
-  }
-}
-
 // Pull property data from county website
 export async function pullPropertyData(req, res) {
   try {
