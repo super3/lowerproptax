@@ -1641,7 +1641,21 @@
         </div>
     </section>
 
-    <!-- Google Maps API -->
+    <!-- Google Maps API - define callback first to avoid race condition -->
+    <script>
+        // Define initAutocomplete globally before Google Maps loads
+        // The actual implementation is set up in the main script below
+        window._googleMapsReady = false;
+        window._initAutocompleteImpl = null;
+
+        window.initAutocomplete = function() {
+            window._googleMapsReady = true;
+            // If the actual implementation is ready, call it
+            if (window._initAutocompleteImpl) {
+                window._initAutocompleteImpl();
+            }
+        };
+    </script>
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCC7VD-pdNDJC9CpwmxtS9m59e6Hp82YCk&libraries=places&loading=async&callback=initAutocomplete" async defer></script>
 
     <!-- Footer -->
@@ -1882,7 +1896,8 @@
         }
 
         // Initialize Google Maps autocomplete
-        window.initAutocomplete = async function() {
+        // Register the actual implementation
+        window._initAutocompleteImpl = async function() {
             try {
                 const { PlaceAutocompleteElement } = await google.maps.importLibrary("places");
 
@@ -1969,6 +1984,11 @@
                 previewInput.style.display = 'block';
             }
         };
+
+        // If Google Maps has already loaded, call the implementation now
+        if (window._googleMapsReady) {
+            window._initAutocompleteImpl();
+        }
 
         // Loading messages to cycle through
         const loadingMessages = [
