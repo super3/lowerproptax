@@ -1912,6 +1912,7 @@
                 // Replace the input with autocomplete widget
                 previewInput.parentNode.insertBefore(autocompleteWidget, previewInput);
                 previewInput.style.display = 'none';
+                previewInput.removeAttribute('required'); // Remove required to prevent validation error on hidden field
 
                 // Style the autocomplete widget container
                 autocompleteWidget.style.flex = '1';
