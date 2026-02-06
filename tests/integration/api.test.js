@@ -9,8 +9,13 @@ import {
 
 // Mock the Clerk SDK before importing anything else
 const mockClerkClient = createMockClerkClient();
+const mockVerifyToken = jest.fn().mockResolvedValue({
+  sub: mockUser.id,
+  sid: mockSession.id
+});
 jest.unstable_mockModule('@clerk/express', () => ({
-  clerkClient: mockClerkClient
+  clerkClient: mockClerkClient,
+  verifyToken: mockVerifyToken
 }));
 
 // Import after mocking

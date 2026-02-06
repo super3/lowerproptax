@@ -3,7 +3,6 @@ import {
   createMockRequest,
   createMockResponse,
   createMockNext,
-  createMockToken,
   createMockClerkClient,
   mockUser,
   mockSession
@@ -11,8 +10,10 @@ import {
 
 // Mock the Clerk SDK
 const mockClerkClient = createMockClerkClient();
+const mockVerifyToken = jest.fn();
 jest.unstable_mockModule('@clerk/express', () => ({
-  clerkClient: mockClerkClient
+  clerkClient: mockClerkClient,
+  verifyToken: mockVerifyToken
 }));
 
 // Import the middleware after mocking
@@ -26,6 +27,12 @@ describe('Authentication Middleware', () => {
     res = createMockResponse();
     next = createMockNext();
     jest.clearAllMocks();
+
+    // Default: verifyToken resolves with a valid payload
+    mockVerifyToken.mockResolvedValue({
+      sub: mockUser.id,
+      sid: mockSession.id
+    });
   });
 
   describe('requireAuth', () => {
@@ -51,8 +58,9 @@ describe('Authentication Middleware', () => {
       expect(next).not.toHaveBeenCalled();
     });
 
-    test('should return 401 if token format is invalid', async () => {
+    test('should return 401 if token verification fails', async () => {
       req.headers.authorization = 'Bearer invalid.token';
+      mockVerifyToken.mockRejectedValueOnce(new Error('Invalid token'));
 
       await requireAuth(req, res, next);
 
@@ -63,13 +71,14 @@ describe('Authentication Middleware', () => {
       expect(next).not.toHaveBeenCalled();
     });
 
-    test('should authenticate user with valid token containing session ID', async () => {
-      const token = createMockToken({ sid: mockSession.id });
-      req.headers.authorization = `Bearer ${token}`;
+    test('should authenticate user with valid token', async () => {
+      req.headers.authorization = 'Bearer valid.session.token';
 
       await requireAuth(req, res, next);
 
-      expect(mockClerkClient.sessions.getSession).toHaveBeenCalledWith(mockSession.id);
+      expect(mockVerifyToken).toHaveBeenCalledWith('valid.session.token', {
+        secretKey: process.env.CLERK_SECRET_KEY
+      });
       expect(mockClerkClient.users.getUser).toHaveBeenCalledWith(mockUser.id);
       expect(req.user).toEqual({
         id: mockUser.id,
@@ -78,39 +87,6 @@ describe('Authentication Middleware', () => {
       });
       expect(next).toHaveBeenCalled();
       expect(res.status).not.toHaveBeenCalled();
-    });
-
-    test('should authenticate user with valid token using sub claim fallback', async () => {
-      const token = createMockToken({ sub: mockUser.id, sid: undefined, sess: undefined }); // No session ID
-      req.headers.authorization = `Bearer ${token}`;
-
-      await requireAuth(req, res, next);
-
-      expect(mockClerkClient.users.getUser).toHaveBeenCalledWith(mockUser.id);
-      expect(req.user).toEqual({
-        id: mockUser.id,
-        email: mockUser.emailAddresses[0].emailAddress,
-        username: mockUser.username
-      });
-      expect(next).toHaveBeenCalled();
-      expect(res.status).not.toHaveBeenCalled();
-    });
-
-    test('should return 401 if Clerk session verification fails', async () => {
-      mockClerkClient.sessions.getSession.mockRejectedValueOnce(
-        new Error('Invalid session')
-      );
-
-      const token = createMockToken({ sid: mockSession.id });
-      req.headers.authorization = `Bearer ${token}`;
-
-      await requireAuth(req, res, next);
-
-      expect(res.status).toHaveBeenCalledWith(401);
-      expect(res.json).toHaveBeenCalledWith({
-        error: 'Invalid or expired token'
-      });
-      expect(next).not.toHaveBeenCalled();
     });
 
     test('should return 401 if user retrieval fails', async () => {
@@ -118,8 +94,7 @@ describe('Authentication Middleware', () => {
         new Error('User not found')
       );
 
-      const token = createMockToken({ sub: mockUser.id });
-      req.headers.authorization = `Bearer ${token}`;
+      req.headers.authorization = 'Bearer valid.session.token';
 
       await requireAuth(req, res, next);
 
@@ -127,16 +102,6 @@ describe('Authentication Middleware', () => {
       expect(res.json).toHaveBeenCalledWith({
         error: 'Invalid or expired token'
       });
-      expect(next).not.toHaveBeenCalled();
-    });
-
-    test('should handle unexpected errors gracefully', async () => {
-      req.headers.authorization = 'Bearer malformed';
-
-      await requireAuth(req, res, next);
-
-      expect(res.status).toHaveBeenCalledWith(401);
-      expect(res.json).toHaveBeenCalled();
       expect(next).not.toHaveBeenCalled();
     });
 
@@ -153,28 +118,6 @@ describe('Authentication Middleware', () => {
       expect(res.status).toHaveBeenCalledWith(500);
       expect(res.json).toHaveBeenCalledWith({
         error: 'Authentication error'
-      });
-      expect(next).not.toHaveBeenCalled();
-    });
-
-    test('should handle error when getting user via sub claim', async () => {
-      // Clear previous mocks
-      mockClerkClient.users.getUser.mockClear();
-
-      // Make getUser throw an error for sub claim path
-      mockClerkClient.users.getUser.mockRejectedValueOnce(
-        new Error('User service unavailable')
-      );
-
-      const token = createMockToken({ sub: mockUser.id, sid: undefined, sess: undefined }); // No sid, will use sub
-      req.headers.authorization = `Bearer ${token}`;
-
-      await requireAuth(req, res, next);
-
-      expect(mockClerkClient.users.getUser).toHaveBeenCalledWith(mockUser.id);
-      expect(res.status).toHaveBeenCalledWith(401);
-      expect(res.json).toHaveBeenCalledWith({
-        error: 'Invalid or expired token'
       });
       expect(next).not.toHaveBeenCalled();
     });

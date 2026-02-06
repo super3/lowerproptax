@@ -6,6 +6,26 @@ import { scrapeProperty } from '../scrapers/county-scraper.js';
 // Default report year - set to 2025 since 2026 bills aren't out yet
 const DEFAULT_REPORT_YEAR = 2025;
 
+// Fetch a user's primary email address from the Clerk API
+async function fetchUserEmailFromClerk(userId) {
+  const clerkApiKey = process.env.CLERK_SECRET_KEY;
+  if (!clerkApiKey || !userId) return null;
+
+  try {
+    const response = await fetch(`https://api.clerk.com/v1/users/${userId}`, {
+      headers: { 'Authorization': `Bearer ${clerkApiKey}` }
+    });
+
+    if (!response.ok) return null;
+
+    const user = await response.json();
+    return user.email_addresses?.[0]?.email_address || null;
+  } catch (error) {
+    console.error('Error fetching user from Clerk:', error);
+    return null;
+  }
+}
+
 // Get all pending properties (status = 'preparing')
 export async function getPendingProperties(req, res) {
   try {
@@ -134,28 +154,7 @@ export async function getPropertyDetails(req, res) {
     };
 
     // Fetch user email from Clerk
-    try {
-      const clerkApiKey = process.env.CLERK_SECRET_KEY;
-      if (clerkApiKey && property.userId) {
-        const clerkResponse = await fetch(`https://api.clerk.com/v1/users/${property.userId}`, {
-          headers: {
-            'Authorization': `Bearer ${clerkApiKey}`
-          }
-        });
-
-        if (clerkResponse.ok) {
-          const clerkUser = await clerkResponse.json();
-          property.userEmail = clerkUser.email_addresses?.[0]?.email_address || null;
-        } else {
-          property.userEmail = null;
-        }
-      } else {
-        property.userEmail = null;
-      }
-    } catch (clerkError) {
-      console.error('Error fetching user from Clerk:', clerkError);
-      property.userEmail = null;
-    }
+    property.userEmail = await fetchUserEmailFromClerk(property.userId);
 
     res.json(property);
   } catch (error) {
@@ -264,25 +263,11 @@ export async function updatePropertyDetails(req, res) {
         estimatedAnnualTax: assessmentResult.rows[0].estimated_annual_tax
       };
 
-      // Fetch user email from Clerk
-      try {
-        const clerkApiKey = process.env.CLERK_SECRET_KEY;
-        if (clerkApiKey && property.user_id) {
-          const clerkResponse = await fetch(`https://api.clerk.com/v1/users/${property.user_id}`, {
-            headers: { 'Authorization': `Bearer ${clerkApiKey}` }
-          });
-
-          if (clerkResponse.ok) {
-            const clerkUser = await clerkResponse.json();
-            const userEmail = clerkUser.email_addresses?.[0]?.email_address;
-            if (userEmail) {
-              /* istanbul ignore next */
-              sendAssessmentReadyNotification(property, assessment, userEmail).catch(() => {});
-            }
-          }
-        }
-      } catch (clerkError) {
-        console.error('Error fetching user for notification:', clerkError);
+      // Fetch user email from Clerk and send notification
+      const userEmail = await fetchUserEmailFromClerk(property.user_id);
+      if (userEmail) {
+        /* istanbul ignore next */
+        sendAssessmentReadyNotification(property, assessment, userEmail).catch(() => {});
       }
     }
 

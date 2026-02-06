@@ -12,9 +12,10 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 3001;
 
-// CORS configuration
+// CORS configuration - override allowed origins via CORS_ORIGINS env var (comma-separated)
+const defaultOrigins = ['https://lowerproptax.com', 'https://super3.github.io', 'http://localhost:8000'];
 const corsOptions = {
-  origin: ['https://lowerproptax.com', 'https://super3.github.io', 'http://localhost:8000'],
+  origin: process.env.CORS_ORIGINS ? process.env.CORS_ORIGINS.split(',').map(o => o.trim()) : defaultOrigins,
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
