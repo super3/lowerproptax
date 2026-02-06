@@ -13,6 +13,7 @@ jest.unstable_mockModule('../../src/db/connection.js', () => ({
 // Mock Clerk SDK
 const mockGetUser = jest.fn();
 const mockGetSession = jest.fn();
+const mockVerifyToken = jest.fn();
 jest.unstable_mockModule('@clerk/express', () => ({
   clerkClient: {
     users: {
@@ -21,7 +22,8 @@ jest.unstable_mockModule('@clerk/express', () => ({
     sessions: {
       getSession: mockGetSession
     }
-  }
+  },
+  verifyToken: mockVerifyToken
 }));
 
 // Import routes after mocking
@@ -41,6 +43,7 @@ describe('Admin Routes', () => {
     mockQuery.mockClear();
     mockGetUser.mockClear();
     mockGetSession.mockClear();
+    mockVerifyToken.mockClear();
   });
 
   describe('GET /api/admin/pending-properties', () => {
@@ -52,7 +55,7 @@ describe('Admin Routes', () => {
     });
 
     it('should return 403 if user is not admin', async () => {
-      mockGetSession.mockResolvedValue({ userId: 'user123' });
+      mockVerifyToken.mockResolvedValue({ sub: 'user123' });
       mockGetUser.mockResolvedValue({
         id: 'user123',
         emailAddresses: [{ emailAddress: 'user@example.com' }],
@@ -72,7 +75,7 @@ describe('Admin Routes', () => {
         { id: 'prop1', status: 'preparing', user_id: 'user1' }
       ];
 
-      mockGetSession.mockResolvedValue({ userId: 'admin123' });
+      mockVerifyToken.mockResolvedValue({ sub: 'admin123' });
       mockGetUser.mockResolvedValue({
         id: 'admin123',
         emailAddresses: [{ emailAddress: 'admin@example.com' }],
@@ -105,7 +108,7 @@ describe('Admin Routes', () => {
         { id: 'prop2', status: 'ready', user_id: 'user2' }
       ];
 
-      mockGetSession.mockResolvedValue({ userId: 'admin123' });
+      mockVerifyToken.mockResolvedValue({ sub: 'admin123' });
       mockGetUser.mockResolvedValue({
         id: 'admin123',
         emailAddresses: [{ emailAddress: 'admin@example.com' }],

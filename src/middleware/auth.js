@@ -1,4 +1,4 @@
-import { clerkClient } from '@clerk/express';
+import { clerkClient, verifyToken } from '@clerk/express';
 
 async function requireAuth(req, res, next) {
   try {
@@ -10,47 +10,23 @@ async function requireAuth(req, res, next) {
 
     const sessionToken = authHeader.split(' ')[1];
 
-    // Verify the session token with Clerk
+    // Verify the token signature and decode the payload
     try {
-      // Decode the JWT to get the session ID
-      const tokenParts = sessionToken.split('.');
-      if (tokenParts.length !== 3) {
-        throw new Error('Invalid token format');
-      }
+      const payload = await verifyToken(sessionToken, {
+        secretKey: process.env.CLERK_SECRET_KEY
+      });
 
-      // Decode the JWT payload
-      const payload = JSON.parse(Buffer.from(tokenParts[1], 'base64').toString());
+      // Get user details from the verified sub claim
+      const user = await clerkClient.users.getUser(payload.sub);
 
-      // Get the session using the session ID from the token
-      const sessionId = payload.sid || payload.sess;
-      if (sessionId) {
-        const session = await clerkClient.sessions.getSession(sessionId);
+      // Attach user to request
+      req.user = {
+        id: user.id,
+        email: user.emailAddresses[0]?.emailAddress,
+        username: user.username
+      };
 
-        // Get user details
-        const user = await clerkClient.users.getUser(session.userId);
-
-        // Attach user to request
-        req.user = {
-          id: user.id,
-          email: user.emailAddresses[0]?.emailAddress,
-          username: user.username
-        };
-
-        next();
-      } else {
-        // If no session ID, try to get user directly from sub claim
-        const userId = payload.sub;
-        const user = await clerkClient.users.getUser(userId);
-
-        // Attach user to request
-        req.user = {
-          id: user.id,
-          email: user.emailAddresses[0]?.emailAddress,
-          username: user.username
-        };
-
-        next();
-      }
+      next();
     } catch (error) {
       console.error('Token verification failed:', error);
       return res.status(401).json({ error: 'Invalid or expired token' });

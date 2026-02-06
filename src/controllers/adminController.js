@@ -3,8 +3,8 @@ import { sendAssessmentReadyNotification } from '../services/emailService.js';
 import { parseAddressForScraping } from '../scrapers/address-parser.js';
 import { scrapeProperty } from '../scrapers/county-scraper.js';
 
-// Default report year - configurable via environment variable
-const DEFAULT_REPORT_YEAR = parseInt(process.env.DEFAULT_REPORT_YEAR, 10) || 2025;
+// Default report year - set to 2025 since 2026 bills aren't out yet
+const DEFAULT_REPORT_YEAR = 2025;
 
 // Fetch a user's primary email address from the Clerk API
 async function fetchUserEmailFromClerk(userId) {
