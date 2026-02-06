@@ -200,7 +200,7 @@ async function scrapeProperty(address, county = 'fulton') {
   }
 
   const browser = await chromium.launch({
-    headless: true,
+    headless: false,
     args: ['--disable-blink-features=AutomationControlled']
   });
 
@@ -237,36 +237,14 @@ async function scrapeProperty(address, county = 'fulton') {
 
     // Click on first search result to navigate to property details page
     try {
-      // Wait for page to stabilize after search
-      await page.waitForTimeout(2000);
-
-      // Try multiple selectors for search results - QPublic uses different structures
-      const selectors = [
-        'table.SearchResults a',           // Common QPublic pattern
-        '.SearchResults a',                 // Class without table
-        'table a[href*="PageTypeID=4"]',   // Link to property details page
-        'a[href*="KeyValue="]',            // Link with property key
-        '#ctlBodyPane a[href*="Application"]' // Any application link in body
-      ];
-
-      let clicked = false;
-      for (const selector of selectors) {
-        const resultLink = await page.$(selector);
-        if (resultLink) {
-          await resultLink.click();
-          await page.waitForTimeout(3000);
-          clicked = true;
-          break;
-        }
-      }
-
-      // If no link found, check if only one result auto-redirected to details
-      if (!clicked) {
-        // Wait a bit more in case of auto-redirect
-        await page.waitForTimeout(2000);
+      // Look for the results table and click the first property link
+      const resultLink = await page.$('table.SearchResults a');
+      if (resultLink) {
+        await resultLink.click();
+        await page.waitForTimeout(3000);
       }
     } catch (e) {
-      // May already be on details page if only one result, or no results found
+      // May already be on details page if only one result
     }
 
     // Extract data from results page
