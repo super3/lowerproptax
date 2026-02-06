@@ -200,7 +200,7 @@ async function scrapeProperty(address, county = 'fulton') {
   }
 
   const browser = await chromium.launch({
-    headless: false,
+    headless: true,
     args: ['--disable-blink-features=AutomationControlled']
   });
 
@@ -237,14 +237,15 @@ async function scrapeProperty(address, county = 'fulton') {
 
     // Click on first search result to navigate to property details page
     try {
-      // Look for the results table and click the first property link
+      // Wait for the results table to load, then click the first property link
+      await page.waitForSelector('table.SearchResults a', { timeout: 10000 });
       const resultLink = await page.$('table.SearchResults a');
       if (resultLink) {
         await resultLink.click();
         await page.waitForTimeout(3000);
       }
     } catch (e) {
-      // May already be on details page if only one result
+      // May already be on details page if only one result, or no results found
     }
 
     // Extract data from results page
