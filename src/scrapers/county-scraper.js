@@ -200,7 +200,7 @@ async function scrapeProperty(address, county = 'fulton') {
   }
 
   const browser = await chromium.launch({
-    headless: false,
+    headless: true,
     args: ['--disable-blink-features=AutomationControlled']
   });
 

@@ -2,6 +2,10 @@ import { Resend } from 'resend';
 
 const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
 
+const EMAIL_FROM = process.env.EMAIL_FROM || 'LowerPropTax <help@lowerproptax.com>';
+const CALENDLY_URL = process.env.CALENDLY_URL || 'https://calendly.com/shawn-lowerproptax/new-meeting';
+const DASHBOARD_URL = process.env.DASHBOARD_URL || 'https://lowerproptax.com/dashboard.html';
+
 export async function sendNewPropertyNotification(property, userEmail) {
   if (!resend) {
     console.log('Email service not configured (RESEND_API_KEY missing)');
@@ -14,7 +18,7 @@ export async function sendNewPropertyNotification(property, userEmail) {
 
   try {
     await resend.emails.send({
-      from: 'LowerPropTax <help@lowerproptax.com>',
+      from: EMAIL_FROM,
       to: 'help@lowerproptax.com',
       subject: `New Property Added - ${address}`,
       text: `A new property has been added to LowerPropTax:
@@ -49,8 +53,8 @@ export async function sendAssessmentReadyNotification(property, assessment, user
     ? `$${savings.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
     : '$0.00';
 
-  const calendlyUrl = 'https://calendly.com/shawn-lowerproptax/new-meeting';
-  const dashboardUrl = 'https://lowerproptax.com/dashboard.html';
+  const calendlyUrl = CALENDLY_URL;
+  const dashboardUrl = DASHBOARD_URL;
 
   // Different email content based on whether there are savings
   const emailContent = savings > 0
@@ -82,7 +86,7 @@ Questions? Reply to this email and we'll be happy to help.
 
   try {
     await resend.emails.send({
-      from: 'LowerPropTax <help@lowerproptax.com>',
+      from: EMAIL_FROM,
       to: userEmail,
       subject: savings > 0
         ? `Your Property Assessment is Ready - ${savingsFormatted} in Potential Savings`
