@@ -11,7 +11,7 @@
     "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js --testPathIgnorePatterns=tests/scrapers",
     "test:watch": "node --experimental-vm-modules node_modules/jest/bin/jest.js --watch --testPathIgnorePatterns=tests/scrapers",
     "test:coverage": "node --experimental-vm-modules node_modules/jest/bin/jest.js --coverage --testPathIgnorePatterns=tests/scrapers",
-    "test:scrapers": "node --experimental-vm-modules node_modules/jest/bin/jest.js tests/scrapers --forceExit",
+    "test:scrapers": "node --experimental-vm-modules node_modules/jest/bin/jest.js tests/scrapers --runInBand --forceExit",
     "migrate": "node-pg-migrate -m src/db/migrations",
     "migrate:up": "node-pg-migrate up -m src/db/migrations",
     "migrate:down": "node-pg-migrate down -m src/db/migrations",
