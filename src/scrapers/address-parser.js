@@ -4,7 +4,10 @@
  * 2. Extract a clean street address for county scraper searches
  */
 
-const SUPPORTED_COUNTIES = ['fulton', 'gwinnett', 'cobb', 'dekalb', 'clayton'];
+const SUPPORTED_COUNTIES = [
+  'fulton', 'gwinnett', 'cobb', 'dekalb', 'clayton',
+  'paulding', 'newton', 'dougherty', 'muscogee', 'carroll', 'hall'
+];
 
 /**
  * Parse a full address using Google Maps Geocoding API
