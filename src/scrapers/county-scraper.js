@@ -1,5 +1,83 @@
 import { chromium } from 'playwright';
 import { PDFParse } from 'pdf-parse';
+import http from 'http';
+import os from 'os';
+import { EnvHttpProxyAgent, setGlobalDispatcher, fetch as undiciFetch } from 'undici';
+
+// Detect gVisor container runtime (kernel 4.4.0) which requires single-process Chromium
+const _isGVisor = os.release() === '4.4.0';
+
+// Configure fetch to use HTTP proxy from environment (for Node.js fetch calls)
+const _proxyEnv = process.env.HTTPS_PROXY || process.env.https_proxy || process.env.HTTP_PROXY || process.env.http_proxy;
+if (_proxyEnv) {
+  // Disable TLS verification for fetch through proxy (proxy may use self-signed certs)
+  process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+  setGlobalDispatcher(new EnvHttpProxyAgent());
+}
+
+// Use undici fetch for direct HTTP requests (respects EnvHttpProxyAgent)
+const fetchUrl = _proxyEnv ? undiciFetch : globalThis.fetch;
+
+// Create a local proxy server that forwards through an upstream authenticated proxy.
+// Chromium does not support proxy auth natively, so we bridge via a local unauthenticated
+// proxy that injects the Proxy-Authorization header on upstream CONNECT requests.
+function createLocalProxy() {
+  const upstreamUrl = process.env.HTTPS_PROXY || process.env.https_proxy || process.env.HTTP_PROXY || process.env.http_proxy;
+  if (!upstreamUrl) return Promise.resolve(null);
+
+  let parsed;
+  try { parsed = new URL(upstreamUrl); } catch (e) { return Promise.resolve(null); }
+  if (!parsed.username) return Promise.resolve(null);
+
+  const upstreamHost = parsed.hostname;
+  const upstreamPort = parseInt(parsed.port);
+  const proxyAuth = 'Basic ' + Buffer.from(
+    decodeURIComponent(parsed.username) + ':' + decodeURIComponent(parsed.password)
+  ).toString('base64');
+
+  const server = http.createServer((req, res) => {
+    const proxyReq = http.request({
+      hostname: upstreamHost,
+      port: upstreamPort,
+      path: req.url,
+      method: req.method,
+      headers: { ...req.headers, 'Proxy-Authorization': proxyAuth }
+    }, (proxyRes) => {
+      res.writeHead(proxyRes.statusCode, proxyRes.headers);
+      proxyRes.pipe(res);
+    });
+    proxyReq.on('error', () => res.end());
+    req.pipe(proxyReq);
+  });
+
+  server.on('connect', (req, clientSocket, head) => {
+    const connectReq = http.request({
+      hostname: upstreamHost,
+      port: upstreamPort,
+      method: 'CONNECT',
+      path: req.url,
+      headers: { 'Host': req.url, 'Proxy-Authorization': proxyAuth }
+    });
+    connectReq.on('connect', (res, socket) => {
+      if (res.statusCode === 200) {
+        clientSocket.write('HTTP/1.1 200 Connection Established\r\n\r\n');
+        socket.write(head);
+        socket.pipe(clientSocket);
+        clientSocket.pipe(socket);
+      } else {
+        clientSocket.end('HTTP/1.1 502 Bad Gateway\r\n\r\n');
+      }
+    });
+    connectReq.on('error', () => clientSocket.end('HTTP/1.1 502 Bad Gateway\r\n\r\n'));
+    connectReq.end();
+  });
+
+  return new Promise((resolve) => {
+    server.listen(0, '127.0.0.1', () => {
+      resolve({ port: server.address().port, close: () => server.close() });
+    });
+  });
+}
 
 // Scrape 2025 property tax from Gwinnett County Tax Commissioner PDF
 async function scrapeGwinnettPropertyTax(parcelNumber) {
@@ -10,7 +88,7 @@ async function scrapeGwinnettPropertyTax(parcelNumber) {
 
   let parser = null;
   try {
-    const response = await fetch(url);
+    const response = await fetchUrl(url);
     if (!response.ok) {
       return null;
     }
@@ -52,6 +130,7 @@ async function scrapeCobbPropertyTax(parcelNumber, browser) {
   const url = `https://www.cobbtaxpayments.org/#/WildfireSearch/${parcelNumber}`;
 
   const context = await browser.newContext({
+    ignoreHTTPSErrors: true,
     userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
     viewport: { width: 1280, height: 720 }
   });
@@ -138,6 +217,7 @@ async function scrapeFultonPropertyTax(parcelNumber, browser) {
   const url = `https://fultoncountytaxes.org/propertytax/details/${encodedParcel}/2025/`;
 
   const context = await browser.newContext({
+    ignoreHTTPSErrors: true,
     userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
     viewport: { width: 1280, height: 720 }
   });
@@ -175,6 +255,86 @@ async function scrapeFultonPropertyTax(parcelNumber, browser) {
   }
 }
 
+// Tax commissioner URLs for counties with public access portals
+const COUNTY_TAX_URLS = {
+  dekalb: 'https://publicaccess.dekalbtax.org/Search/Properties.aspx',
+  clayton: 'https://publicaccess.claytoncountyga.gov/Search/Properties.aspx',
+  paulding: 'https://paulding.paytaxes.net/intro/paulding/',
+  newton: 'https://esearch.newtontax.org/',
+  dougherty: 'https://doughertycountyga.governmentwindow.com/',
+  muscogee: 'https://publicaccess.columbusga.gov/',
+  carroll: 'https://carrollcountygatax.com/',
+  hall: 'https://hallcountytax.org/pay-bill/'
+};
+
+// Generic tax scraper for counties with public access portals
+// Attempts to search by parcel number and extract 2025 tax amount
+async function scrapeGenericPropertyTax(parcelNumber, browser, taxUrl) {
+  const context = await browser.newContext({
+    ignoreHTTPSErrors: true,
+    userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+    viewport: { width: 1280, height: 720 }
+  });
+
+  const page = await context.newPage();
+
+  try {
+    await page.goto(taxUrl, { waitUntil: 'load', timeout: 60000 });
+    await page.waitForTimeout(3000);
+
+    // Try to find and fill a parcel/property search input
+    try {
+      const searchInput = await page.waitForSelector(
+        'input[name*="ParcelID"], input[name*="parcel"], input[id*="ParcelID"], input[id*="txtParcel"], input[name*="SearchText"], input[id*="Search"], input[type="text"]',
+        { timeout: 10000 }
+      );
+      if (searchInput) {
+        await searchInput.fill(parcelNumber);
+      }
+
+      // Click search button
+      const searchBtn = await page.$('input[type="submit"][value*="Search"], button[type="submit"], input[id*="btnSearch"], button:has-text("Search")');
+      if (searchBtn) {
+        await searchBtn.click();
+        await page.waitForTimeout(5000);
+      }
+    } catch (e) {
+      // Search form not found or not compatible
+      return null;
+    }
+
+    // Click on the first result if on a search results page
+    try {
+      const resultLink = await page.$('a[href*="Datalet"], a[href*="pin="], a[href*="parcel"], table a');
+      if (resultLink) {
+        await resultLink.click();
+        await page.waitForTimeout(3000);
+      }
+    } catch (e) {
+      // May already be on details page
+    }
+
+    const text = await page.evaluate(() => document.body.innerText);
+
+    // Look for 2025 tax amount with various patterns
+    const taxMatch = text.match(/2025\s*(?:Tax|Total)[:\s]*\$?([\d,]+\.\d{2})/i) ||
+                     text.match(/Total\s*(?:Due|Tax|Billed|Amount)[:\s]*\$?([\d,]+\.\d{2})/i) ||
+                     text.match(/Net\s*Tax[:\s]*\$?([\d,]+\.\d{2})/i) ||
+                     text.match(/Base\s*Taxes?[:\s]*\$?([\d,]+\.\d{2})/i);
+
+    if (taxMatch) {
+      return taxMatch[1];
+    }
+
+    return null;
+  } catch (e) {
+    console.error('Error scraping property tax:', e.message);
+    return null;
+  } finally {
+    await context.close();
+  }
+}
+
 const COUNTY_CONFIG = {
   fulton: {
     url: 'https://qpublic.schneidercorp.com/Application.aspx?AppID=936&LayerID=18251&PageTypeID=2&PageID=8154',
@@ -190,6 +350,46 @@ const COUNTY_CONFIG = {
     url: 'https://qpublic.schneidercorp.com/Application.aspx?AppID=1051&LayerID=23951&PageTypeID=2&PageID=9967',
     addressInput: '#ctlBodyPane_ctl01_ctl01_txtAddress',
     searchButton: '#ctlBodyPane_ctl01_ctl01_btnSearch'
+  },
+  dekalb: {
+    url: 'https://qpublic.schneidercorp.com/Application.aspx?AppID=994&LayerID=20256&PageTypeID=2&PageID=8822',
+    addressInput: '#ctlBodyPane_ctl01_ctl01_txtAddress',
+    searchButton: '#ctlBodyPane_ctl01_ctl01_btnSearch'
+  },
+  clayton: {
+    url: 'https://beacon.schneidercorp.com/Application.aspx?AppID=1234&LayerID=39180&PageTypeID=2&PageID=14578',
+    addressInput: '#ctlBodyPane_ctl01_ctl01_txtAddress',
+    searchButton: '#ctlBodyPane_ctl01_ctl01_btnSearch'
+  },
+  paulding: {
+    url: 'https://qpublic.schneidercorp.com/Application.aspx?App=PauldingCountyGA&Layer=Parcels&PageType=Search',
+    addressInput: '#ctlBodyPane_ctl01_ctl01_txtAddress',
+    searchButton: '#ctlBodyPane_ctl01_ctl01_btnSearch'
+  },
+  newton: {
+    url: 'https://qpublic.schneidercorp.com/Application.aspx?App=NewtonCountyGA&Layer=Parcels&PageType=Search',
+    addressInput: '#ctlBodyPane_ctl01_ctl01_txtAddress',
+    searchButton: '#ctlBodyPane_ctl01_ctl01_btnSearch'
+  },
+  dougherty: {
+    url: 'https://qpublic.schneidercorp.com/Application.aspx?AppID=762&LayerID=11798&PageTypeID=2&PageID=5904',
+    addressInput: '#ctlBodyPane_ctl01_ctl01_txtAddress',
+    searchButton: '#ctlBodyPane_ctl01_ctl01_btnSearch'
+  },
+  muscogee: {
+    url: 'https://qpublic.schneidercorp.com/Application.aspx?App=MuscogeeCountyGA&PageType=Search',
+    addressInput: '#ctlBodyPane_ctl01_ctl01_txtAddress',
+    searchButton: '#ctlBodyPane_ctl01_ctl01_btnSearch'
+  },
+  carroll: {
+    url: 'https://qpublic.schneidercorp.com/Application.aspx?App=CarrollCountyGA&Layer=Parcels&PageType=Search',
+    addressInput: '#ctlBodyPane_ctl01_ctl01_txtAddress',
+    searchButton: '#ctlBodyPane_ctl01_ctl01_btnSearch'
+  },
+  hall: {
+    url: 'https://qpublic.schneidercorp.com/Application.aspx?App=HallCountyGA&Layer=Parcels&PageType=Search',
+    addressInput: '#ctlBodyPane_ctl01_ctl01_txtAddress',
+    searchButton: '#ctlBodyPane_ctl01_ctl01_btnSearch'
   }
 };
 
@@ -199,12 +399,31 @@ async function scrapeProperty(address, county = 'fulton') {
     throw new Error(`Unknown county: ${county}. Supported: ${Object.keys(COUNTY_CONFIG).join(', ')}`);
   }
 
-  const browser = await chromium.launch({
+  // Start local proxy if an authenticated upstream proxy is configured
+  const localProxy = await createLocalProxy();
+
+  const launchOptions = {
     headless: false,
-    args: ['--disable-blink-features=AutomationControlled']
-  });
+    args: [
+      '--no-sandbox',
+      '--disable-setuid-sandbox',
+      '--disable-dev-shm-usage',
+      '--disable-gpu',
+      // gVisor requires single-process mode (renderer crashes otherwise),
+      // but standard Linux should use multi-process for browser.newContext() support
+      ...(_isGVisor ? ['--single-process', '--no-zygote'] : []),
+      '--disable-features=VizDisplayCompositor',
+      '--disable-blink-features=AutomationControlled'
+    ]
+  };
+  if (localProxy) {
+    launchOptions.proxy = { server: `http://127.0.0.1:${localProxy.port}` };
+  }
+
+  const browser = await chromium.launch(launchOptions);
 
   const context = await browser.newContext({
+    ignoreHTTPSErrors: true,
     userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
     viewport: { width: 1280, height: 720 }
   });
@@ -216,35 +435,109 @@ async function scrapeProperty(address, county = 'fulton') {
   });
 
   try {
-    await page.goto(config.url, { waitUntil: 'domcontentloaded', timeout: 30000 });
+    await page.goto(config.url, { waitUntil: 'domcontentloaded', timeout: 60000 });
 
     await page.waitForTimeout(2000);
 
-    // Accept Terms and Conditions modal
-    try {
-      await page.waitForSelector('.modal', { timeout: 5000 });
-      await page.click('.modal a.btn-primary[data-dismiss="modal"]', { timeout: 5000 });
-      await page.waitForTimeout(2000);
-    } catch (e) {
-      // Modal may not appear if already accepted
+    // Accept Terms and Conditions modal (QPublic and Beacon variants)
+    // Some counties show multiple modals (e.g., T&C + homestead notice)
+    for (let modalAttempt = 0; modalAttempt < 3; modalAttempt++) {
+      try {
+        await page.waitForSelector('.modal.in, .modal.show, [aria-label="Terms and Conditions"]', { timeout: 3000 });
+        // Try QPublic-style modal dismiss button
+        const qpublicBtn = await page.$('.modal a.btn-primary[data-dismiss="modal"], .modal button.btn-primary[data-dismiss="modal"]');
+        if (qpublicBtn) {
+          await qpublicBtn.click();
+          await page.waitForTimeout(1000);
+          continue;
+        }
+        // Try Beacon-style modal
+        const beaconBtn = await page.$('[aria-label="Terms and Conditions"] .button-1, [aria-label="Terms and Conditions"] button');
+        if (beaconBtn) {
+          await beaconBtn.click();
+          await page.waitForTimeout(1000);
+          continue;
+        }
+        // Try any visible modal close/accept button
+        const genericBtn = await page.$('.modal.in .btn-primary, .modal.show .btn-primary, .modal .btn[data-dismiss="modal"]');
+        if (genericBtn) {
+          await genericBtn.click();
+          await page.waitForTimeout(1000);
+          continue;
+        }
+        break;
+      } catch (e) {
+        // No more modals
+        break;
+      }
     }
+    await page.waitForTimeout(1000);
 
-    // Search by address
-    await page.waitForSelector(config.addressInput, { timeout: 10000 });
-    await page.fill(config.addressInput, address);
-    await page.click(config.searchButton);
+    // Search by address - try configured selector, then fallbacks
+    let addressInput = config.addressInput;
+    let searchButton = config.searchButton;
+    try {
+      await page.waitForSelector(config.addressInput, { timeout: 10000 });
+    } catch (e) {
+      // Fallback 1: try the other ctl pattern (ctl01 <-> ctl02)
+      const alt = config.addressInput.includes('ctl01_ctl01') ?
+        config.addressInput.replace('ctl01_ctl01', 'ctl02_ctl01') :
+        config.addressInput.replace('ctl02_ctl01', 'ctl01_ctl01');
+      const altBtn = config.searchButton.includes('ctl01_ctl01') ?
+        config.searchButton.replace('ctl01_ctl01', 'ctl02_ctl01') :
+        config.searchButton.replace('ctl02_ctl01', 'ctl01_ctl01');
+      try {
+        await page.waitForSelector(alt, { timeout: 5000 });
+        addressInput = alt;
+        searchButton = altBtn;
+      } catch (e2) {
+        // Fallback 2: try attribute-based selectors (works across all variants)
+        const genericInput = await page.$('input[id$="txtAddress"]');
+        const genericBtn = await page.$('a[id$="btnSearch"][searchintent="Address"], input[id$="btnSearch"], a[id$="btnSearch"]');
+        if (genericInput && genericBtn) {
+          addressInput = 'input[id$="txtAddress"]';
+          searchButton = 'a[id$="btnSearch"][searchintent="Address"], input[id$="btnSearch"], a[id$="btnSearch"]';
+        } else {
+          throw new Error('Could not find address search input');
+        }
+      }
+    }
+    await page.fill(addressInput, address);
+    await page.click(searchButton);
     await page.waitForTimeout(3000);
 
-    // Click on first search result to navigate to property details page
-    try {
-      // Look for the results table and click the first property link
-      const resultLink = await page.$('table.SearchResults a');
-      if (resultLink) {
-        await resultLink.click();
-        await page.waitForTimeout(3000);
+    // Click on first search result if we're still on the search page
+    // (skip if search already navigated directly to a property page)
+    if (!page.url().includes('KeyValue=')) {
+      try {
+        const resultLink = await page.$('table.SearchResults a') ||
+                            await page.$('.search-results a') ||
+                            await page.$('table a[href*="KeyValue"]') ||
+                            await page.$('table a[href*="PageTypeID=4"]');
+        if (resultLink) {
+          await resultLink.click();
+          await page.waitForTimeout(3000);
+        }
+      } catch (e) {
+        // May already be on details page if only one result
       }
-    } catch (e) {
-      // May already be on details page if only one result
+    }
+
+    // QPublic may land on summary page (PageTypeID=1) instead of detail page
+    // (PageTypeID=4). Navigate to Residential/detail tab for bedrooms/sqft data.
+    const currentUrl = page.url();
+    if (currentUrl.includes('PageTypeID=1') || currentUrl.includes('PageType=1')) {
+      try {
+        // Try clicking the Residential tab link to get to PageTypeID=4
+        const detailLink = await page.$('a[href*="PageTypeID=4"]') ||
+                            await page.$('a:has-text("Residential")');
+        if (detailLink) {
+          await detailLink.click();
+          await page.waitForTimeout(3000);
+        }
+      } catch (e) {
+        // Stay on current page if no detail tab found
+      }
     }
 
     // Extract data from results page
@@ -355,7 +648,7 @@ async function scrapeProperty(address, county = 'fulton') {
       let parser = null;
       try {
         // Fetch PDF as buffer to avoid worker issues
-        const response = await fetch(assessment2025PdfUrl);
+        const response = await fetchUrl(assessment2025PdfUrl);
         const arrayBuffer = await response.arrayBuffer();
         const pdfBuffer = Buffer.from(arrayBuffer);
 
@@ -424,6 +717,14 @@ async function scrapeProperty(address, county = 'fulton') {
       } catch (e) {
         console.error('Error scraping Cobb property tax:', e.message);
       }
+    } else if (COUNTY_TAX_URLS[county.toLowerCase()] && parcelNumber) {
+      try {
+        const taxUrl = COUNTY_TAX_URLS[county.toLowerCase()];
+        propertyTax2025 = await scrapeGenericPropertyTax(parcelNumber, browser, taxUrl);
+        taxRecordUrl = taxUrl;
+      } catch (e) {
+        console.error(`Error scraping ${county} property tax:`, e.message);
+      }
     }
 
     const result = {
@@ -448,6 +749,7 @@ async function scrapeProperty(address, county = 'fulton') {
     return null;
   } finally {
     await browser.close();
+    if (localProxy) localProxy.close();
   }
 }
 
