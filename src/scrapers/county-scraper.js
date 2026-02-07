@@ -1,5 +1,79 @@
 import { chromium } from 'playwright';
 import { PDFParse } from 'pdf-parse';
+import http from 'http';
+import { EnvHttpProxyAgent, setGlobalDispatcher, fetch as undiciFetch } from 'undici';
+
+// Configure fetch to use HTTP proxy from environment (for Node.js fetch calls)
+const _proxyEnv = process.env.HTTPS_PROXY || process.env.https_proxy || process.env.HTTP_PROXY || process.env.http_proxy;
+if (_proxyEnv) {
+  // Disable TLS verification for fetch through proxy (proxy may use self-signed certs)
+  process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+  setGlobalDispatcher(new EnvHttpProxyAgent());
+}
+
+// Use undici fetch for direct HTTP requests (respects EnvHttpProxyAgent)
+const fetchUrl = _proxyEnv ? undiciFetch : globalThis.fetch;
+
+// Create a local proxy server that forwards through an upstream authenticated proxy.
+// Chromium does not support proxy auth natively, so we bridge via a local unauthenticated
+// proxy that injects the Proxy-Authorization header on upstream CONNECT requests.
+function createLocalProxy() {
+  const upstreamUrl = process.env.HTTPS_PROXY || process.env.https_proxy || process.env.HTTP_PROXY || process.env.http_proxy;
+  if (!upstreamUrl) return Promise.resolve(null);
+
+  let parsed;
+  try { parsed = new URL(upstreamUrl); } catch (e) { return Promise.resolve(null); }
+  if (!parsed.username) return Promise.resolve(null);
+
+  const upstreamHost = parsed.hostname;
+  const upstreamPort = parseInt(parsed.port);
+  const proxyAuth = 'Basic ' + Buffer.from(
+    decodeURIComponent(parsed.username) + ':' + decodeURIComponent(parsed.password)
+  ).toString('base64');
+
+  const server = http.createServer((req, res) => {
+    const proxyReq = http.request({
+      hostname: upstreamHost,
+      port: upstreamPort,
+      path: req.url,
+      method: req.method,
+      headers: { ...req.headers, 'Proxy-Authorization': proxyAuth }
+    }, (proxyRes) => {
+      res.writeHead(proxyRes.statusCode, proxyRes.headers);
+      proxyRes.pipe(res);
+    });
+    proxyReq.on('error', () => res.end());
+    req.pipe(proxyReq);
+  });
+
+  server.on('connect', (req, clientSocket, head) => {
+    const connectReq = http.request({
+      hostname: upstreamHost,
+      port: upstreamPort,
+      method: 'CONNECT',
+      path: req.url,
+      headers: { 'Host': req.url, 'Proxy-Authorization': proxyAuth }
+    });
+    connectReq.on('connect', (res, socket) => {
+      if (res.statusCode === 200) {
+        clientSocket.write('HTTP/1.1 200 Connection Established\r\n\r\n');
+        socket.write(head);
+        socket.pipe(clientSocket);
+        clientSocket.pipe(socket);
+      } else {
+        clientSocket.end('HTTP/1.1 502 Bad Gateway\r\n\r\n');
+      }
+    });
+    connectReq.on('error', () => clientSocket.end('HTTP/1.1 502 Bad Gateway\r\n\r\n'));
+    connectReq.end();
+  });
+
+  return new Promise((resolve) => {
+    server.listen(0, '127.0.0.1', () => {
+      resolve({ port: server.address().port, close: () => server.close() });
+    });
+  });
+}
 
 // Scrape 2025 property tax from Gwinnett County Tax Commissioner PDF
 async function scrapeGwinnettPropertyTax(parcelNumber) {
@@ -10,7 +84,7 @@ async function scrapeGwinnettPropertyTax(parcelNumber) {
 
   let parser = null;
   try {
-    const response = await fetch(url);
+    const response = await fetchUrl(url);
     if (!response.ok) {
       return null;
     }
@@ -52,6 +126,7 @@ async function scrapeCobbPropertyTax(parcelNumber, browser) {
   const url = `https://www.cobbtaxpayments.org/#/WildfireSearch/${parcelNumber}`;
 
   const context = await browser.newContext({
+    ignoreHTTPSErrors: true,
     userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
     viewport: { width: 1280, height: 720 }
   });
@@ -138,6 +213,7 @@ async function scrapeFultonPropertyTax(parcelNumber, browser) {
   const url = `https://fultoncountytaxes.org/propertytax/details/${encodedParcel}/2025/`;
 
   const context = await browser.newContext({
+    ignoreHTTPSErrors: true,
     userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
     viewport: { width: 1280, height: 720 }
   });
@@ -191,6 +267,7 @@ const COUNTY_TAX_URLS = {
 // Attempts to search by parcel number and extract 2025 tax amount
 async function scrapeGenericPropertyTax(parcelNumber, browser, taxUrl) {
   const context = await browser.newContext({
+    ignoreHTTPSErrors: true,
     userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
     viewport: { width: 1280, height: 720 }
   });
@@ -318,12 +395,30 @@ async function scrapeProperty(address, county = 'fulton') {
     throw new Error(`Unknown county: ${county}. Supported: ${Object.keys(COUNTY_CONFIG).join(', ')}`);
   }
 
-  const browser = await chromium.launch({
+  // Start local proxy if an authenticated upstream proxy is configured
+  const localProxy = await createLocalProxy();
+
+  const launchOptions = {
     headless: false,
-    args: ['--disable-blink-features=AutomationControlled']
-  });
+    args: [
+      '--no-sandbox',
+      '--disable-setuid-sandbox',
+      '--disable-dev-shm-usage',
+      '--disable-gpu',
+      '--single-process',
+      '--no-zygote',
+      '--disable-features=VizDisplayCompositor',
+      '--disable-blink-features=AutomationControlled'
+    ]
+  };
+  if (localProxy) {
+    launchOptions.proxy = { server: `http://127.0.0.1:${localProxy.port}` };
+  }
+
+  const browser = await chromium.launch(launchOptions);
 
   const context = await browser.newContext({
+    ignoreHTTPSErrors: true,
     userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
     viewport: { width: 1280, height: 720 }
   });
@@ -335,7 +430,7 @@ async function scrapeProperty(address, county = 'fulton') {
   });
 
   try {
-    await page.goto(config.url, { waitUntil: 'domcontentloaded', timeout: 30000 });
+    await page.goto(config.url, { waitUntil: 'domcontentloaded', timeout: 60000 });
 
     await page.waitForTimeout(2000);
 
@@ -406,29 +501,31 @@ async function scrapeProperty(address, county = 'fulton') {
     await page.click(searchButton);
     await page.waitForTimeout(3000);
 
-    // Click on first search result to navigate to property details page
-    try {
-      // Look for the results table and click the first property link
-      // Try multiple selector patterns for QPublic and Beacon
-      const resultLink = await page.$('table.SearchResults a') ||
-                          await page.$('.search-results a') ||
-                          await page.$('table a[href*="KeyValue"]') ||
-                          await page.$('table a[href*="PageTypeID=4"]');
-      if (resultLink) {
-        await resultLink.click();
-        await page.waitForTimeout(3000);
+    // Click on first search result if we're still on the search page
+    // (skip if search already navigated directly to a property page)
+    if (!page.url().includes('KeyValue=')) {
+      try {
+        const resultLink = await page.$('table.SearchResults a') ||
+                            await page.$('.search-results a') ||
+                            await page.$('table a[href*="KeyValue"]') ||
+                            await page.$('table a[href*="PageTypeID=4"]');
+        if (resultLink) {
+          await resultLink.click();
+          await page.waitForTimeout(3000);
+        }
+      } catch (e) {
+        // May already be on details page if only one result
       }
-    } catch (e) {
-      // May already be on details page if only one result
     }
 
-    // QPublic search results may land on summary page (PageTypeID=1) instead of
-    // detail page (PageTypeID=4). The detail page has bedrooms/bathrooms/sqft.
-    // Navigate to the Residential/detail tab if we're on the summary page.
+    // QPublic may land on summary page (PageTypeID=1) instead of detail page
+    // (PageTypeID=4). Navigate to Residential/detail tab for bedrooms/sqft data.
     const currentUrl = page.url();
     if (currentUrl.includes('PageTypeID=1') || currentUrl.includes('PageType=1')) {
       try {
-        const detailLink = await page.$('a[href*="PageTypeID=4"]');
+        // Try clicking the Residential tab link to get to PageTypeID=4
+        const detailLink = await page.$('a[href*="PageTypeID=4"]') ||
+                            await page.$('a:has-text("Residential")');
         if (detailLink) {
           await detailLink.click();
           await page.waitForTimeout(3000);
@@ -546,7 +643,7 @@ async function scrapeProperty(address, county = 'fulton') {
       let parser = null;
       try {
         // Fetch PDF as buffer to avoid worker issues
-        const response = await fetch(assessment2025PdfUrl);
+        const response = await fetchUrl(assessment2025PdfUrl);
         const arrayBuffer = await response.arrayBuffer();
         const pdfBuffer = Buffer.from(arrayBuffer);
 
@@ -647,6 +744,7 @@ async function scrapeProperty(address, county = 'fulton') {
     return null;
   } finally {
     await browser.close();
+    if (localProxy) localProxy.close();
   }
 }
 

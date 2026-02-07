@@ -1,18 +1,16 @@
 import { parseAddressForScraping } from '../../src/scrapers/address-parser.js';
 import { scrapeProperty } from '../../src/scrapers/county-scraper.js';
 
-describe('Full Address Scraping', () => {
+const API_KEY = process.env.GOOGLE_MAPS_API_KEY;
+const describeIfApiKey = API_KEY ? describe : describe.skip;
+
+describeIfApiKey('Full Address Scraping', () => {
   const FULL_ADDRESS = '2517 Weycroft Cir NE, Dacula, GA 30019, USA';
-  const API_KEY = process.env.GOOGLE_MAPS_API_KEY;
 
   let parsedAddress;
   let result;
 
   beforeAll(async () => {
-    if (!API_KEY) {
-      throw new Error('GOOGLE_MAPS_API_KEY environment variable is required');
-    }
-
     // Step 1: Parse the full address to get county and clean street address
     parsedAddress = await parseAddressForScraping(FULL_ADDRESS, API_KEY);
 
