@@ -8,6 +8,11 @@ export async function resetProperties() {
   await pool.query('DELETE FROM properties');
 }
 
+// Test helper to reset scrape cache
+export async function resetScrapeCache() {
+  await pool.query('DELETE FROM scrape_cache');
+}
+
 // Get all properties for the authenticated user
 export async function getProperties(req, res) {
   try {
@@ -119,19 +124,40 @@ export async function getProperty(req, res) {
 // Create a new property
 export async function createProperty(req, res) {
   try {
-    const { address, city, state, zipCode, country, lat, lng } = req.body;
+    const { address, city, state, zipCode, country, lat, lng, cacheId } = req.body;
 
     if (!address) {
       return res.status(400).json({ error: 'Address is required' });
     }
 
+    // If cacheId provided, look up cached scrape data
+    let cachedData = null;
+    if (cacheId) {
+      try {
+        const cacheResult = await pool.query(
+          'SELECT * FROM scrape_cache WHERE id = $1 AND expires_at > NOW()',
+          [cacheId]
+        );
+        if (cacheResult.rows.length > 0) {
+          cachedData = cacheResult.rows[0];
+        }
+      } catch (cacheError) {
+        // Cache lookup failure is non-critical - continue without cache
+        console.error('Failed to lookup scrape cache:', cacheError);
+      }
+    }
+
     const propertyId = `prop_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
 
     const result = await pool.query(
-      `INSERT INTO properties (id, user_id, address, city, state, zip_code, country, lat, lng, created_at, updated_at)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, NOW(), NOW())
+      `INSERT INTO properties (id, user_id, address, city, state, zip_code, country, lat, lng,
+        bedrooms, bathrooms, sqft, homestead, parcel_number, qpublic_url, tax_record_url,
+        created_at, updated_at)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, NOW(), NOW())
        RETURNING id, user_id as "userId", address, city, state,
                  zip_code as "zipCode", country, lat, lng,
+                 bedrooms, bathrooms, sqft, homestead, parcel_number as "parcelNumber",
+                 qpublic_url as "qpublicUrl", tax_record_url as "taxRecordUrl",
                  created_at as "createdAt", updated_at as "updatedAt"`,
       [
         propertyId,
@@ -142,11 +168,49 @@ export async function createProperty(req, res) {
         zipCode || '',
         country || '',
         lat || null,
-        lng || null
+        lng || null,
+        cachedData?.bedrooms || null,
+        cachedData?.bathrooms || null,
+        cachedData?.sqft || null,
+        cachedData?.homestead ?? null,
+        cachedData?.parcel_number || null,
+        cachedData?.qpublic_url || null,
+        cachedData?.tax_record_url || null
       ]
     );
 
     const property = result.rows[0];
+
+    // Auto-create assessment if we have tax data from cache
+    if (cachedData?.property_tax_2025) {
+      try {
+        const taxValue = parseFloat(cachedData.property_tax_2025.replace(/,/g, ''));
+        const estimatedTax = cachedData.homestead === false
+          ? taxValue * 0.675
+          : taxValue;
+
+        const assessmentId = `assess_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+        await pool.query(
+          `INSERT INTO assessments (id, property_id, year, annual_tax,
+            estimated_annual_tax, status, created_at, updated_at)
+           VALUES ($1, $2, 2025, $3, $4, 'preparing', NOW(), NOW())`,
+          [assessmentId, propertyId, taxValue, estimatedTax]
+        );
+      } catch (assessmentError) {
+        // Assessment creation failure is non-critical
+        console.error('Failed to create assessment from cache:', assessmentError);
+      }
+    }
+
+    // Clean up the cache entry
+    if (cacheId) {
+      try {
+        await pool.query('DELETE FROM scrape_cache WHERE id = $1', [cacheId]);
+      } catch (cleanupError) {
+        // Cache cleanup failure is non-critical
+        console.error('Failed to clean up scrape cache:', cleanupError);
+      }
+    }
 
     // Send email notification (fire-and-forget)
     /* istanbul ignore next */
@@ -274,6 +338,33 @@ export async function scrapePreview(req, res) {
       return res.status(404).json({ error: 'Could not find property data' });
     }
 
+    // Cache the scrape results so we don't have to re-scrape when the user signs up
+    const cacheId = `cache_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    try {
+      await pool.query(
+        `INSERT INTO scrape_cache (id, address, county, bedrooms, bathrooms, sqft,
+          homestead, parcel_number, qpublic_url, property_tax_2025, tax_record_url,
+          created_at, expires_at)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, NOW(), NOW() + INTERVAL '24 hours')`,
+        [
+          cacheId,
+          parsed.streetAddress,
+          parsed.county,
+          propertyData.bedrooms,
+          propertyData.bathrooms,
+          propertyData.sqft,
+          propertyData.homesteadExemption,
+          propertyData.parcelNumber,
+          propertyData.qpublicUrl || null,
+          propertyData.propertyTax2025,
+          propertyData.taxRecordUrl || null
+        ]
+      );
+    } catch (cacheError) {
+      // Cache write failure is non-critical - log and continue
+      console.error('Failed to cache scrape results:', cacheError);
+    }
+
     res.json({
       address: parsed.streetAddress,
       county: parsed.county,
@@ -282,7 +373,8 @@ export async function scrapePreview(req, res) {
       sqft: propertyData.sqft,
       homesteadExemption: propertyData.homesteadExemption,
       propertyTax2025: propertyData.propertyTax2025,
-      parcelNumber: propertyData.parcelNumber
+      parcelNumber: propertyData.parcelNumber,
+      cacheId
     });
   } catch (error) {
     console.error('Error scraping property preview:', error);

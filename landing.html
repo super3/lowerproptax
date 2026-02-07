@@ -2081,7 +2081,8 @@
                         zipCode: selectedPlace?.parsedAddress?.zipCode || '',
                         country: selectedPlace?.parsedAddress?.country || '',
                         lat: selectedPlace?.location?.lat || null,
-                        lng: selectedPlace?.location?.lng || null
+                        lng: selectedPlace?.location?.lng || null,
+                        cacheId: data.cacheId || null
                     };
                     localStorage.setItem('pendingProperty', JSON.stringify(pendingProperty));
                 }
