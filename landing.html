@@ -36,8 +36,9 @@
     <style>
         /* Homepage-specific styles */
         html, body {
-            overflow-x: hidden;
+            overflow-x: clip;
             width: 100%;
+            max-width: 100vw;
         }
 
         /* Hero Section */
@@ -93,6 +94,8 @@
         /* Google Maps PlaceAutocompleteElement Styling */
         .address-preview-form gmp-place-autocomplete {
             width: 100%;
+            max-width: 100%;
+            box-sizing: border-box;
             color-scheme: light;
         }
 
@@ -1019,15 +1022,18 @@
                 grid-template-columns: 1fr;
                 gap: 40px;
                 max-width: 100%;
+                overflow-x: clip;
             }
 
             .hero-content {
                 text-align: center;
                 max-width: 100%;
+                overflow-wrap: break-word;
             }
 
             .hero-image {
                 max-width: 100%;
+                overflow: hidden;
             }
 
             .hero h1 {
@@ -1040,14 +1046,20 @@
 
             .address-preview-form {
                 max-width: 100%;
+                width: 100%;
             }
 
             .address-input-wrapper {
                 flex-direction: column;
+                width: 100%;
             }
 
-            .address-input-wrapper input {
-                width: 100%;
+            .address-input-wrapper input,
+            .address-input-wrapper gmp-place-autocomplete {
+                width: 100% !important;
+                max-width: 100% !important;
+                min-width: 0 !important;
+                box-sizing: border-box;
             }
 
             .address-input-wrapper .hero-cta {
@@ -1090,6 +1102,7 @@
             /* Feature sections mobile */
             .feature-section {
                 padding: 60px 5%;
+                overflow-x: clip;
             }
 
             .feature-block {
@@ -1112,6 +1125,7 @@
             /* Pricing mobile */
             .pricing-section {
                 padding: 60px 5%;
+                overflow-x: clip;
             }
 
             .pricing-section h2 {
@@ -1158,6 +1172,7 @@
             /* CTA mobile */
             .cta-section {
                 padding: 60px 5%;
+                overflow-x: clip;
             }
 
             .cta-section h2 {
@@ -1931,7 +1946,8 @@
 
                 // Style the autocomplete widget container
                 autocompleteWidget.style.flex = '1';
-                autocompleteWidget.style.minWidth = '200px';
+                autocompleteWidget.style.minWidth = '0';
+                autocompleteWidget.style.maxWidth = '100%';
 
                 // Listen for input changes to update comparison address in real-time
                 autocompleteWidget.addEventListener('input', (event) => {
