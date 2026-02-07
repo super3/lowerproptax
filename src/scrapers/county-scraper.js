@@ -422,6 +422,22 @@ async function scrapeProperty(address, county = 'fulton') {
       // May already be on details page if only one result
     }
 
+    // QPublic search results may land on summary page (PageTypeID=1) instead of
+    // detail page (PageTypeID=4). The detail page has bedrooms/bathrooms/sqft.
+    // Navigate to the Residential/detail tab if we're on the summary page.
+    const currentUrl = page.url();
+    if (currentUrl.includes('PageTypeID=1') || currentUrl.includes('PageType=1')) {
+      try {
+        const detailLink = await page.$('a[href*="PageTypeID=4"]');
+        if (detailLink) {
+          await detailLink.click();
+          await page.waitForTimeout(3000);
+        }
+      } catch (e) {
+        // Stay on current page if no detail tab found
+      }
+    }
+
     // Extract data from results page
     const text = await page.evaluate(() => document.body.innerText);
 
