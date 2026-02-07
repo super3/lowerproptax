@@ -175,6 +175,138 @@ async function scrapeFultonPropertyTax(parcelNumber, browser) {
   }
 }
 
+// Scrape 2025 property tax from DeKalb County Tax Commissioner website
+async function scrapeDeKalbPropertyTax(parcelNumber, browser) {
+  const url = 'https://publicaccess.dekalbtax.org/Search/Properties.aspx';
+
+  const context = await browser.newContext({
+    userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+    viewport: { width: 1280, height: 720 }
+  });
+
+  const page = await context.newPage();
+
+  try {
+    await page.goto(url, { waitUntil: 'load', timeout: 60000 });
+    await page.waitForTimeout(3000);
+
+    // Search by parcel number
+    try {
+      const searchInput = await page.waitForSelector('input[name*="ParcelID"], input[name*="parcel"], input[id*="ParcelID"], input[id*="txtParcel"]', { timeout: 10000 });
+      if (searchInput) {
+        await searchInput.fill(parcelNumber);
+      }
+
+      // Click search button
+      const searchBtn = await page.$('input[type="submit"][value*="Search"], button[type="submit"], input[id*="btnSearch"]');
+      if (searchBtn) {
+        await searchBtn.click();
+        await page.waitForTimeout(5000);
+      }
+    } catch (e) {
+      // Try alternative: direct URL navigation with parcel
+      const encodedParcel = encodeURIComponent(parcelNumber);
+      await page.goto(`https://publicaccess.dekalbtax.org/Datalets/Datalet.aspx?pin=${encodedParcel}`, { waitUntil: 'load', timeout: 30000 });
+      await page.waitForTimeout(3000);
+    }
+
+    // Click on the first result if on a search results page
+    try {
+      const resultLink = await page.$('a[href*="Datalet"], a[href*="pin="]');
+      if (resultLink) {
+        await resultLink.click();
+        await page.waitForTimeout(3000);
+      }
+    } catch (e) {
+      // May already be on details page
+    }
+
+    const text = await page.evaluate(() => document.body.innerText);
+
+    // Look for 2025 tax amount patterns
+    const taxMatch = text.match(/2025\s*(?:Tax|Total)[:\s]*\$?([\d,]+\.\d{2})/i) ||
+                     text.match(/Total\s*(?:Due|Tax|Billed)[:\s]*\$?([\d,]+\.\d{2})/i) ||
+                     text.match(/Net\s*Tax[:\s]*\$?([\d,]+\.\d{2})/i);
+
+    if (taxMatch) {
+      return taxMatch[1];
+    }
+
+    return null;
+  } catch (e) {
+    console.error('Error scraping DeKalb property tax:', e.message);
+    return null;
+  } finally {
+    await context.close();
+  }
+}
+
+// Scrape 2025 property tax from Clayton County public access website
+async function scrapeClaytonPropertyTax(parcelNumber, browser) {
+  const url = 'https://publicaccess.claytoncountyga.gov/Search/Properties.aspx';
+
+  const context = await browser.newContext({
+    userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+    viewport: { width: 1280, height: 720 }
+  });
+
+  const page = await context.newPage();
+
+  try {
+    await page.goto(url, { waitUntil: 'load', timeout: 60000 });
+    await page.waitForTimeout(3000);
+
+    // Search by parcel number
+    try {
+      const searchInput = await page.waitForSelector('input[name*="ParcelID"], input[name*="parcel"], input[id*="ParcelID"], input[id*="txtParcel"]', { timeout: 10000 });
+      if (searchInput) {
+        await searchInput.fill(parcelNumber);
+      }
+
+      // Click search button
+      const searchBtn = await page.$('input[type="submit"][value*="Search"], button[type="submit"], input[id*="btnSearch"]');
+      if (searchBtn) {
+        await searchBtn.click();
+        await page.waitForTimeout(5000);
+      }
+    } catch (e) {
+      // Try alternative: direct URL navigation with parcel
+      const encodedParcel = encodeURIComponent(parcelNumber);
+      await page.goto(`https://publicaccess.claytoncountyga.gov/Datalets/Datalet.aspx?pin=${encodedParcel}`, { waitUntil: 'load', timeout: 30000 });
+      await page.waitForTimeout(3000);
+    }
+
+    // Click on the first result if on a search results page
+    try {
+      const resultLink = await page.$('a[href*="Datalet"], a[href*="pin="]');
+      if (resultLink) {
+        await resultLink.click();
+        await page.waitForTimeout(3000);
+      }
+    } catch (e) {
+      // May already be on details page
+    }
+
+    const text = await page.evaluate(() => document.body.innerText);
+
+    // Look for 2025 tax amount patterns
+    const taxMatch = text.match(/2025\s*(?:Tax|Total)[:\s]*\$?([\d,]+\.\d{2})/i) ||
+                     text.match(/Total\s*(?:Due|Tax|Billed)[:\s]*\$?([\d,]+\.\d{2})/i) ||
+                     text.match(/Net\s*Tax[:\s]*\$?([\d,]+\.\d{2})/i);
+
+    if (taxMatch) {
+      return taxMatch[1];
+    }
+
+    return null;
+  } catch (e) {
+    console.error('Error scraping Clayton property tax:', e.message);
+    return null;
+  } finally {
+    await context.close();
+  }
+}
+
 const COUNTY_CONFIG = {
   fulton: {
     url: 'https://qpublic.schneidercorp.com/Application.aspx?AppID=936&LayerID=18251&PageTypeID=2&PageID=8154',
@@ -188,6 +320,16 @@ const COUNTY_CONFIG = {
   },
   cobb: {
     url: 'https://qpublic.schneidercorp.com/Application.aspx?AppID=1051&LayerID=23951&PageTypeID=2&PageID=9967',
+    addressInput: '#ctlBodyPane_ctl01_ctl01_txtAddress',
+    searchButton: '#ctlBodyPane_ctl01_ctl01_btnSearch'
+  },
+  dekalb: {
+    url: 'https://qpublic.schneidercorp.com/Application.aspx?AppID=994&LayerID=20256&PageTypeID=2&PageID=8822',
+    addressInput: '#ctlBodyPane_ctl01_ctl01_txtAddress',
+    searchButton: '#ctlBodyPane_ctl01_ctl01_btnSearch'
+  },
+  clayton: {
+    url: 'https://beacon.schneidercorp.com/Application.aspx?AppID=1234&LayerID=39180&PageTypeID=2&PageID=14578',
     addressInput: '#ctlBodyPane_ctl01_ctl01_txtAddress',
     searchButton: '#ctlBodyPane_ctl01_ctl01_btnSearch'
   }
@@ -220,19 +362,43 @@ async function scrapeProperty(address, county = 'fulton') {
 
     await page.waitForTimeout(2000);
 
-    // Accept Terms and Conditions modal
+    // Accept Terms and Conditions modal (QPublic and Beacon variants)
     try {
-      await page.waitForSelector('.modal', { timeout: 5000 });
-      await page.click('.modal a.btn-primary[data-dismiss="modal"]', { timeout: 5000 });
+      await page.waitForSelector('.modal, [aria-label="Terms and Conditions"]', { timeout: 5000 });
+      // Try QPublic-style modal first
+      const qpublicBtn = await page.$('.modal a.btn-primary[data-dismiss="modal"]');
+      if (qpublicBtn) {
+        await qpublicBtn.click();
+      } else {
+        // Try Beacon-style modal
+        const beaconBtn = await page.$('[aria-label="Terms and Conditions"] .button-1, [aria-label="Terms and Conditions"] button');
+        if (beaconBtn) {
+          await beaconBtn.click();
+        }
+      }
       await page.waitForTimeout(2000);
     } catch (e) {
       // Modal may not appear if already accepted
     }
 
-    // Search by address
-    await page.waitForSelector(config.addressInput, { timeout: 10000 });
-    await page.fill(config.addressInput, address);
-    await page.click(config.searchButton);
+    // Search by address - try configured selector, then fallback to alternative
+    let addressInput = config.addressInput;
+    let searchButton = config.searchButton;
+    try {
+      await page.waitForSelector(config.addressInput, { timeout: 10000 });
+    } catch (e) {
+      // Fallback: try the other ctl pattern (ctl01 <-> ctl02)
+      const alt = config.addressInput.includes('ctl01_ctl01') ?
+        config.addressInput.replace('ctl01_ctl01', 'ctl02_ctl01') :
+        config.addressInput.replace('ctl02_ctl01', 'ctl01_ctl01');
+      await page.waitForSelector(alt, { timeout: 10000 });
+      addressInput = alt;
+      searchButton = config.searchButton.includes('ctl01_ctl01') ?
+        config.searchButton.replace('ctl01_ctl01', 'ctl02_ctl01') :
+        config.searchButton.replace('ctl02_ctl01', 'ctl01_ctl01');
+    }
+    await page.fill(addressInput, address);
+    await page.click(searchButton);
     await page.waitForTimeout(3000);
 
     // Click on first search result to navigate to property details page
@@ -423,6 +589,20 @@ async function scrapeProperty(address, county = 'fulton') {
         }
       } catch (e) {
         console.error('Error scraping Cobb property tax:', e.message);
+      }
+    } else if (county.toLowerCase() === 'dekalb' && parcelNumber) {
+      try {
+        propertyTax2025 = await scrapeDeKalbPropertyTax(parcelNumber, browser);
+        taxRecordUrl = `https://publicaccess.dekalbtax.org/Search/Properties.aspx`;
+      } catch (e) {
+        console.error('Error scraping DeKalb property tax:', e.message);
+      }
+    } else if (county.toLowerCase() === 'clayton' && parcelNumber) {
+      try {
+        propertyTax2025 = await scrapeClaytonPropertyTax(parcelNumber, browser);
+        taxRecordUrl = `https://publicaccess.claytoncountyga.gov/Search/Properties.aspx`;
+      } catch (e) {
+        console.error('Error scraping Clayton property tax:', e.message);
       }
     }
 

@@ -15,7 +15,7 @@ jest.unstable_mockModule('../../src/services/emailService.js', () => ({
 
 // Mock the address parser
 const mockParseAddress = jest.fn();
-const MOCK_SUPPORTED_COUNTIES = ['fulton', 'gwinnett', 'cobb'];
+const MOCK_SUPPORTED_COUNTIES = ['fulton', 'gwinnett', 'cobb', 'dekalb', 'clayton'];
 jest.unstable_mockModule('../../src/scrapers/address-parser.js', () => ({
   parseAddress: mockParseAddress,
   SUPPORTED_COUNTIES: MOCK_SUPPORTED_COUNTIES
