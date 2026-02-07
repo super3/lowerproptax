@@ -1,7 +1,11 @@
 import { chromium } from 'playwright';
 import { PDFParse } from 'pdf-parse';
 import http from 'http';
+import os from 'os';
 import { EnvHttpProxyAgent, setGlobalDispatcher, fetch as undiciFetch } from 'undici';
+
+// Detect gVisor container runtime (kernel 4.4.0) which requires single-process Chromium
+const _isGVisor = os.release() === '4.4.0';
 
 // Configure fetch to use HTTP proxy from environment (for Node.js fetch calls)
 const _proxyEnv = process.env.HTTPS_PROXY || process.env.https_proxy || process.env.HTTP_PROXY || process.env.http_proxy;
@@ -405,8 +409,9 @@ async function scrapeProperty(address, county = 'fulton') {
       '--disable-setuid-sandbox',
       '--disable-dev-shm-usage',
       '--disable-gpu',
-      '--single-process',
-      '--no-zygote',
+      // gVisor requires single-process mode (renderer crashes otherwise),
+      // but standard Linux should use multi-process for browser.newContext() support
+      ...(_isGVisor ? ['--single-process', '--no-zygote'] : []),
       '--disable-features=VizDisplayCompositor',
       '--disable-blink-features=AutomationControlled'
     ]
