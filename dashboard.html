@@ -1140,6 +1140,7 @@
             try {
                 const pendingProperty = JSON.parse(pendingPropertyJson);
                 // Create the property with full data from homepage
+                // Pass cacheId so the backend can hydrate from the scrape cache
                 await addProperty({
                     address: pendingProperty.address,
                     city: pendingProperty.city || '',
@@ -1147,7 +1148,8 @@
                     zipCode: pendingProperty.zipCode || '',
                     country: pendingProperty.country || '',
                     lat: pendingProperty.lat || null,
-                    lng: pendingProperty.lng || null
+                    lng: pendingProperty.lng || null,
+                    cacheId: pendingProperty.cacheId || null
                 });
             } catch (error) {
                 console.error('Error creating pending property:', error);

@@ -121,7 +121,8 @@ describe('scrapePreview', () => {
     await propertyController.scrapePreview(req, res);
 
     expect(mockScrapeProperty).toHaveBeenCalledWith('123 Main St', 'fulton');
-    expect(res.json).toHaveBeenCalledWith({
+    const responseData = res.json.mock.calls[0][0];
+    expect(responseData).toMatchObject({
       address: '123 Main St',
       county: 'fulton',
       bedrooms: 3,
@@ -131,6 +132,8 @@ describe('scrapePreview', () => {
       propertyTax2025: '4,500.00',
       parcelNumber: '12345'
     });
+    expect(responseData.cacheId).toBeDefined();
+    expect(responseData.cacheId).toMatch(/^cache_/);
   });
 
   it('should return 500 when scraper throws an error', async () => {

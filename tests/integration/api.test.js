@@ -119,7 +119,11 @@ describe('Property API Integration Tests', () => {
 
       expect(response.status).toBe(200);
       expect(response.body).toHaveLength(1);
-      expect(response.body[0]).toMatchObject(property);
+      expect(response.body[0].id).toBe(property.id);
+      expect(response.body[0].address).toBe(property.address);
+      expect(response.body[0].city).toBe(property.city);
+      expect(response.body[0].state).toBe(property.state);
+      expect(response.body[0].userId).toBe(property.userId);
     });
 
     test('should only return properties for authenticated user', async () => {

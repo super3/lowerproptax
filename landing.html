@@ -35,8 +35,9 @@
     ></script>
     <style>
         /* Homepage-specific styles */
-        body {
+        html, body {
             overflow-x: hidden;
+            width: 100%;
         }
 
         /* Hero Section */
@@ -49,6 +50,7 @@
             align-items: center;
             max-width: 1400px;
             margin: 0 auto;
+            width: 100%;
         }
 
         .hero-content {
@@ -217,10 +219,12 @@
         .features {
             padding: 0;
             background: white;
+            max-width: 100%;
         }
 
         .feature-section {
             padding: 60px 7%;
+            max-width: 100%;
         }
 
         .feature-section:nth-child(odd) {
@@ -396,6 +400,7 @@
         .comparison-card .amount {
             font-size: 1.75rem;
             font-weight: 700;
+            word-break: break-word;
         }
 
         .comparison-card.before .amount {
@@ -421,6 +426,7 @@
             justify-content: space-between;
             align-items: center;
             gap: 1rem;
+            overflow: hidden;
         }
 
         .savings-info {
@@ -669,6 +675,7 @@
         .pricing-section {
             padding: 40px 7% 80px;
             background: #f8f9fa;
+            max-width: 100%;
         }
 
         .pricing-section h2 {
@@ -790,6 +797,7 @@
         .faq-section {
             padding: 60px 7%;
             background: white;
+            max-width: 100%;
         }
 
         .faq-section h2 {
@@ -871,6 +879,7 @@
             background: linear-gradient(135deg, #3171ef 0%, #1e56c7 100%);
             text-align: center;
             color: white;
+            max-width: 100%;
         }
 
         .cta-content {
@@ -1009,10 +1018,16 @@
                 padding: 60px 5%;
                 grid-template-columns: 1fr;
                 gap: 40px;
+                max-width: 100%;
             }
 
             .hero-content {
                 text-align: center;
+                max-width: 100%;
+            }
+
+            .hero-image {
+                max-width: 100%;
             }
 
             .hero h1 {
@@ -2081,7 +2096,8 @@
                         zipCode: selectedPlace?.parsedAddress?.zipCode || '',
                         country: selectedPlace?.parsedAddress?.country || '',
                         lat: selectedPlace?.location?.lat || null,
-                        lng: selectedPlace?.location?.lng || null
+                        lng: selectedPlace?.location?.lng || null,
+                        cacheId: data.cacheId || null
                     };
                     localStorage.setItem('pendingProperty', JSON.stringify(pendingProperty));
                 }
