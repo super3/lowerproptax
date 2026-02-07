@@ -340,39 +340,67 @@ async function scrapeProperty(address, county = 'fulton') {
     await page.waitForTimeout(2000);
 
     // Accept Terms and Conditions modal (QPublic and Beacon variants)
-    try {
-      await page.waitForSelector('.modal, [aria-label="Terms and Conditions"]', { timeout: 5000 });
-      // Try QPublic-style modal first
-      const qpublicBtn = await page.$('.modal a.btn-primary[data-dismiss="modal"]');
-      if (qpublicBtn) {
-        await qpublicBtn.click();
-      } else {
+    // Some counties show multiple modals (e.g., T&C + homestead notice)
+    for (let modalAttempt = 0; modalAttempt < 3; modalAttempt++) {
+      try {
+        await page.waitForSelector('.modal.in, .modal.show, [aria-label="Terms and Conditions"]', { timeout: 3000 });
+        // Try QPublic-style modal dismiss button
+        const qpublicBtn = await page.$('.modal a.btn-primary[data-dismiss="modal"], .modal button.btn-primary[data-dismiss="modal"]');
+        if (qpublicBtn) {
+          await qpublicBtn.click();
+          await page.waitForTimeout(1000);
+          continue;
+        }
         // Try Beacon-style modal
         const beaconBtn = await page.$('[aria-label="Terms and Conditions"] .button-1, [aria-label="Terms and Conditions"] button');
         if (beaconBtn) {
           await beaconBtn.click();
+          await page.waitForTimeout(1000);
+          continue;
         }
+        // Try any visible modal close/accept button
+        const genericBtn = await page.$('.modal.in .btn-primary, .modal.show .btn-primary, .modal .btn[data-dismiss="modal"]');
+        if (genericBtn) {
+          await genericBtn.click();
+          await page.waitForTimeout(1000);
+          continue;
+        }
+        break;
+      } catch (e) {
+        // No more modals
+        break;
       }
-      await page.waitForTimeout(2000);
-    } catch (e) {
-      // Modal may not appear if already accepted
     }
+    await page.waitForTimeout(1000);
 
-    // Search by address - try configured selector, then fallback to alternative
+    // Search by address - try configured selector, then fallbacks
     let addressInput = config.addressInput;
     let searchButton = config.searchButton;
     try {
       await page.waitForSelector(config.addressInput, { timeout: 10000 });
     } catch (e) {
-      // Fallback: try the other ctl pattern (ctl01 <-> ctl02)
+      // Fallback 1: try the other ctl pattern (ctl01 <-> ctl02)
       const alt = config.addressInput.includes('ctl01_ctl01') ?
         config.addressInput.replace('ctl01_ctl01', 'ctl02_ctl01') :
         config.addressInput.replace('ctl02_ctl01', 'ctl01_ctl01');
-      await page.waitForSelector(alt, { timeout: 10000 });
-      addressInput = alt;
-      searchButton = config.searchButton.includes('ctl01_ctl01') ?
+      const altBtn = config.searchButton.includes('ctl01_ctl01') ?
         config.searchButton.replace('ctl01_ctl01', 'ctl02_ctl01') :
         config.searchButton.replace('ctl02_ctl01', 'ctl01_ctl01');
+      try {
+        await page.waitForSelector(alt, { timeout: 5000 });
+        addressInput = alt;
+        searchButton = altBtn;
+      } catch (e2) {
+        // Fallback 2: try attribute-based selectors (works across all variants)
+        const genericInput = await page.$('input[id$="txtAddress"]');
+        const genericBtn = await page.$('a[id$="btnSearch"][searchintent="Address"], input[id$="btnSearch"], a[id$="btnSearch"]');
+        if (genericInput && genericBtn) {
+          addressInput = 'input[id$="txtAddress"]';
+          searchButton = 'a[id$="btnSearch"][searchintent="Address"], input[id$="btnSearch"], a[id$="btnSearch"]';
+        } else {
+          throw new Error('Could not find address search input');
+        }
+      }
     }
     await page.fill(addressInput, address);
     await page.click(searchButton);
@@ -381,7 +409,11 @@ async function scrapeProperty(address, county = 'fulton') {
     // Click on first search result to navigate to property details page
     try {
       // Look for the results table and click the first property link
-      const resultLink = await page.$('table.SearchResults a');
+      // Try multiple selector patterns for QPublic and Beacon
+      const resultLink = await page.$('table.SearchResults a') ||
+                          await page.$('.search-results a') ||
+                          await page.$('table a[href*="KeyValue"]') ||
+                          await page.$('table a[href*="PageTypeID=4"]');
       if (resultLink) {
         await resultLink.click();
         await page.waitForTimeout(3000);

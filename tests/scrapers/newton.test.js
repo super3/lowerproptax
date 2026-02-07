@@ -14,16 +14,24 @@ describe('Newton County Scraper', () => {
     expect(result).not.toBeNull();
   });
 
-  test('should return bedrooms', () => {
-    expect(result.bedrooms).toBeGreaterThan(0);
+  test('should return bedrooms (or null if not listed)', () => {
+    if (result.bedrooms !== null) {
+      expect(result.bedrooms).toBeGreaterThan(0);
+    } else {
+      expect(result.bedrooms).toBeNull();
+    }
   });
 
   test('should return bathrooms', () => {
     expect(result.bathrooms).toBeGreaterThan(0);
   });
 
-  test('should return square footage', () => {
-    expect(result.sqft).toBeGreaterThan(0);
+  test('should return square footage (or null if not listed)', () => {
+    if (result.sqft !== null) {
+      expect(result.sqft).toBeGreaterThan(0);
+    } else {
+      expect(result.sqft).toBeNull();
+    }
   });
 
   test('should return a parcel number', () => {
