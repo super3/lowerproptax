@@ -80,7 +80,7 @@
 
         /* Admin form uses 4-column grid */
         .property-data {
-            grid-template-columns: repeat(4, 1fr);
+            grid-template-columns: repeat(4, minmax(0, 1fr));
         }
 
         .data-card input {
@@ -150,7 +150,7 @@
 
         @media (max-width: 768px) {
             .property-data {
-                grid-template-columns: 1fr;
+                grid-template-columns: minmax(0, 1fr);
             }
         }
     </style>

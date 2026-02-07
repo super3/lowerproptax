@@ -46,7 +46,7 @@
             padding: 80px 7% 60px;
             background: white;
             display: grid;
-            grid-template-columns: 1fr 1fr;
+            grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
             gap: 60px;
             align-items: center;
             max-width: 1400px;
@@ -240,7 +240,7 @@
 
         .feature-block {
             display: grid;
-            grid-template-columns: 1fr 1fr;
+            grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
             gap: 80px;
             max-width: 1200px;
             margin: 0 auto;
@@ -369,7 +369,7 @@
 
         .comparison-cards {
             display: grid;
-            grid-template-columns: 1fr 1fr;
+            grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
             gap: 1rem;
             margin-bottom: 1.5rem;
         }
@@ -511,7 +511,7 @@
 
         .financial-summary {
             display: grid;
-            grid-template-columns: repeat(2, 1fr);
+            grid-template-columns: repeat(2, minmax(0, 1fr));
             gap: 0.75rem;
             margin-bottom: 1rem;
         }
@@ -701,7 +701,7 @@
 
         .pricing-steps {
             display: grid;
-            grid-template-columns: 1fr 1fr;
+            grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
         }
 
         .pricing-step {
@@ -1019,7 +1019,7 @@
 
             .hero {
                 padding: 60px 5%;
-                grid-template-columns: 1fr;
+                grid-template-columns: minmax(0, 1fr);
                 gap: 40px;
                 max-width: 100%;
                 overflow-x: clip;
@@ -1077,7 +1077,7 @@
             }
 
             .comparison-cards {
-                grid-template-columns: 1fr;
+                grid-template-columns: minmax(0, 1fr);
                 gap: 0.75rem;
             }
 
@@ -1106,7 +1106,7 @@
             }
 
             .feature-block {
-                grid-template-columns: 1fr;
+                grid-template-columns: minmax(0, 1fr);
                 gap: 40px;
             }
 
@@ -1134,7 +1134,7 @@
             }
 
             .pricing-steps {
-                grid-template-columns: 1fr;
+                grid-template-columns: minmax(0, 1fr);
             }
 
             .pricing-step {
@@ -1195,7 +1195,7 @@
             }
 
             .financial-summary {
-                grid-template-columns: 1fr;
+                grid-template-columns: minmax(0, 1fr);
             }
 
             .transaction-item {
@@ -1510,7 +1510,7 @@
                         <div style="font-size: 3rem; font-weight: 700; color: #16a34a; margin-bottom: 0.25rem;">$1,588.91</div>
                         <div style="font-size: 0.9rem; color: #666;">Average annual savings</div>
                     </div>
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                    <div style="display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 1rem;">
                         <div style="background: white; border-radius: 12px; padding: 1.5rem; text-align: center; box-shadow: 0 4px 20px rgba(0,0,0,0.08);">
                             <div style="font-size: 2rem; font-weight: 700; color: #3171ef; margin-bottom: 0.25rem;">Easy</div>
                             <div style="font-size: 0.85rem; color: #666;">To check</div>
