@@ -264,7 +264,8 @@ const COUNTY_TAX_URLS = {
   dougherty: 'https://doughertycountyga.governmentwindow.com/',
   muscogee: 'https://publicaccess.columbusga.gov/',
   carroll: 'https://carrollcountygatax.com/',
-  hall: 'https://hallcountytax.org/pay-bill/'
+  hall: 'https://hallcountytax.org/pay-bill/',
+  bartow: 'https://bartowcountyga.governmentwindow.com/tax.html'
 };
 
 // Generic tax scraper for counties with public access portals
@@ -388,6 +389,11 @@ const COUNTY_CONFIG = {
   },
   hall: {
     url: 'https://qpublic.schneidercorp.com/Application.aspx?App=HallCountyGA&Layer=Parcels&PageType=Search',
+    addressInput: '#ctlBodyPane_ctl01_ctl01_txtAddress',
+    searchButton: '#ctlBodyPane_ctl01_ctl01_btnSearch'
+  },
+  bartow: {
+    url: 'https://qpublic.schneidercorp.com/Application.aspx?App=BartowCountyGA&Layer=Parcels&PageType=Search',
     addressInput: '#ctlBodyPane_ctl01_ctl01_txtAddress',
     searchButton: '#ctlBodyPane_ctl01_ctl01_btnSearch'
   }

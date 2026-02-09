@@ -6,7 +6,7 @@
 
 const SUPPORTED_COUNTIES = [
   'fulton', 'gwinnett', 'cobb', 'dekalb', 'clayton',
-  'paulding', 'newton', 'dougherty', 'muscogee', 'carroll', 'hall'
+  'paulding', 'newton', 'dougherty', 'muscogee', 'carroll', 'hall', 'bartow'
 ];
 
 /**
