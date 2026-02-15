@@ -1,4 +1,5 @@
 import { jest } from '@jest/globals';
+import { EventEmitter } from 'events';
 import express from 'express';
 import http from 'http';
 import request from 'supertest';
@@ -43,7 +44,7 @@ jest.unstable_mockModule('../src/scrapers/county-scraper.js', () => ({
 // Import after mocking
 const adminRoutes = await import('../src/routes/adminRoutes.js');
 const propertyRoutes = await import('../src/routes/propertyRoutes.js');
-const { emitEvent, getClientCount } = await import('../src/services/sseManager.js');
+const { addClient, emitEvent, getClientCount } = await import('../src/services/sseManager.js');
 
 const VALID_API_KEY = 'test-sse-api-key';
 
@@ -284,6 +285,35 @@ describe('SSE Event Stream', () => {
       expect(response.body).toEqual(
         expect.objectContaining({ id: 'prop1', address: '123 Main St' })
       );
+
+      delete global.fetch;
+    });
+
+    test('should allow PUT /api/admin/properties/:id with API key and handle missing id in response', async () => {
+      // This tests the updatedProperty.id || id fallback branch in adminController
+      mockQuery
+        .mockResolvedValueOnce({
+          rows: [{
+            // No 'id' field — forces the || id fallback in emitEvent call
+            address: '123 Main St', updated_at: '2026-02-15T13:00:00.000Z'
+          }]
+        })
+        .mockResolvedValueOnce({
+          rows: [{ year: 2025 }]
+        })
+        .mockResolvedValueOnce({
+          rows: [{
+            id: 'assess_prop1_2025', status: 'preparing',
+            annual_tax: 5000, estimated_annual_tax: 3375
+          }]
+        });
+
+      const response = await request(app)
+        .put('/api/admin/properties/prop1')
+        .set('x-api-key', VALID_API_KEY)
+        .send({ bedrooms: 3 });
+
+      expect(response.status).toBe(200);
     });
 
     test('should allow PUT /api/admin/properties/:id with API key', async () => {
@@ -312,6 +342,49 @@ describe('SSE Event Stream', () => {
         .send({ bedrooms: 3, bathrooms: 2, sqft: 1500 });
 
       expect(response.status).toBe(200);
+    });
+  });
+
+  describe('sseManager unit tests', () => {
+    test('getClientCount should return the number of connected clients', () => {
+      const mockReq = new EventEmitter();
+      const mockRes = {
+        writeHead: jest.fn(),
+        write: jest.fn()
+      };
+
+      const initialCount = getClientCount();
+      addClient(mockReq, mockRes);
+      expect(getClientCount()).toBe(initialCount + 1);
+
+      // Cleanup: simulate client disconnect
+      mockReq.emit('close');
+      expect(getClientCount()).toBe(initialCount);
+    });
+
+    test('should send keepalive comment every 30 seconds', () => {
+      jest.useFakeTimers();
+
+      const mockReq = new EventEmitter();
+      const mockRes = {
+        writeHead: jest.fn(),
+        write: jest.fn()
+      };
+
+      addClient(mockReq, mockRes);
+
+      // Initial write is the connected comment
+      expect(mockRes.write).toHaveBeenCalledWith(': connected\n\n');
+      expect(mockRes.write).toHaveBeenCalledTimes(1);
+
+      // Advance 30 seconds — keepalive should fire
+      jest.advanceTimersByTime(30000);
+      expect(mockRes.write).toHaveBeenCalledWith(': keepalive\n\n');
+      expect(mockRes.write).toHaveBeenCalledTimes(2);
+
+      // Cleanup
+      mockReq.emit('close');
+      jest.useRealTimers();
     });
   });
 });
