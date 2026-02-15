@@ -208,6 +208,15 @@
             background: #15803d;
         }
 
+        /* Inline Clerk Auth Container */
+        .clerk-auth-container {
+            margin-top: 1rem;
+        }
+
+        .clerk-auth-container.hidden {
+            display: none;
+        }
+
         .hero-image {
             width: 100%;
         }
@@ -1455,6 +1464,7 @@
                     <button type="submit" class="hero-cta" id="check-btn">Check My Property</button>
                 </div>
                 <div id="preview-result" class="preview-result hidden"></div>
+                <div id="clerk-auth-container" class="clerk-auth-container hidden"></div>
             </form>
         </div>
         <div class="hero-image">
@@ -1849,6 +1859,7 @@
         const previewForm = document.getElementById('address-preview-form');
         const previewInput = document.getElementById('preview-address');
         const previewResult = document.getElementById('preview-result');
+        const clerkAuthContainer = document.getElementById('clerk-auth-container');
         const checkBtn = document.getElementById('check-btn');
 
         // Comparison card elements
@@ -2141,8 +2152,84 @@
                 return;
             }
 
-            // Fetch property data (this now handles everything)
-            fetchPropertyData(address);
+            // Unmount any existing Clerk component
+            try {
+                window.Clerk.unmountSignIn(clerkAuthContainer);
+            } catch (e) {
+                // Ignore if nothing was mounted
+            }
+            clerkAuthContainer.classList.add('hidden');
+            clerkAuthContainer.innerHTML = '';
+
+            // Check if we have a selected place with state info
+            if (!selectedPlace) {
+                previewResult.className = 'preview-result error';
+                previewResult.innerHTML = `
+                    <div class="result-title">Please select an address</div>
+                    <div>Choose an address from the dropdown suggestions.</div>
+                `;
+                previewResult.classList.remove('hidden');
+                return;
+            }
+
+            const state = selectedPlace.parsedAddress?.state || '';
+
+            if (state === 'Georgia' || state === 'GA') {
+                // Store pending property in localStorage
+                const pendingProperty = {
+                    address: address,
+                    city: selectedPlace.parsedAddress?.city || '',
+                    state: state,
+                    zipCode: selectedPlace.parsedAddress?.zipCode || '',
+                    country: selectedPlace.parsedAddress?.country || '',
+                    lat: selectedPlace.location?.lat || null,
+                    lng: selectedPlace.location?.lng || null
+                };
+                localStorage.setItem('pendingProperty', JSON.stringify(pendingProperty));
+
+                // Show success result
+                previewResult.className = 'preview-result success';
+                previewResult.innerHTML = `
+                    <div class="result-title">We can help!</div>
+                    <div>Average annual savings: <strong>$1,588.91</strong></div>
+                `;
+                previewResult.classList.remove('hidden');
+
+                // If user is already signed in, redirect to dashboard
+                if (clerkLoaded && window.Clerk.user) {
+                    window.location.href = '/dashboard.html';
+                    return;
+                }
+
+                // Mount inline Clerk sign-in
+                clerkAuthContainer.classList.remove('hidden');
+                if (clerkLoaded) {
+                    window.Clerk.mountSignIn(clerkAuthContainer, {
+                        routing: 'hash',
+                        fallbackRedirectUrl: '/dashboard.html',
+                    });
+                } else {
+                    clerkAuthContainer.innerHTML = '<p>Loading sign-in...</p>';
+                    const waitForClerk = setInterval(() => {
+                        if (clerkLoaded) {
+                            clearInterval(waitForClerk);
+                            clerkAuthContainer.innerHTML = '';
+                            window.Clerk.mountSignIn(clerkAuthContainer, {
+                                routing: 'hash',
+                                fallbackRedirectUrl: '/dashboard.html',
+                            });
+                        }
+                    }, 500);
+                }
+            } else {
+                // Not in Georgia
+                previewResult.className = 'preview-result error';
+                previewResult.innerHTML = `
+                    <div class="result-title">We don't serve your area yet</div>
+                    <div>We currently serve properties in Georgia. We're expanding soon!</div>
+                `;
+                previewResult.classList.remove('hidden');
+            }
         });
 
         // Handle sign up after successful preview
