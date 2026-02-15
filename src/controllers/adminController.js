@@ -2,6 +2,7 @@ import pool from '../db/connection.js';
 import { sendAssessmentReadyNotification } from '../services/emailService.js';
 import { parseAddressForScraping } from '../scrapers/address-parser.js';
 import { scrapeProperty } from '../scrapers/county-scraper.js';
+import { emitEvent } from '../services/sseManager.js';
 
 // Default report year - set to 2025 since 2026 bills aren't out yet
 const DEFAULT_REPORT_YEAR = 2025;
@@ -254,6 +255,15 @@ export async function updatePropertyDetails(req, res) {
       ...propertyResult.rows[0],
       currentAssessment: assessmentResult.rows[0]
     };
+
+    // Emit SSE event for real-time notifications
+    const updatedProperty = propertyResult.rows[0];
+    emitEvent('property-updated', {
+      id: updatedProperty.id || id,
+      address: updatedProperty.address,
+      status: assessmentResult.rows[0]?.status || status,
+      updatedAt: updatedProperty.updated_at
+    });
 
     // Send email notification if status was set to 'ready'
     if (status === 'ready') {

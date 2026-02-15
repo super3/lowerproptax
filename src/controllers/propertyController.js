@@ -2,6 +2,7 @@ import pool from '../db/connection.js';
 import { sendNewPropertyNotification } from '../services/emailService.js';
 import { parseAddress, SUPPORTED_COUNTIES } from '../scrapers/address-parser.js';
 import { scrapeProperty } from '../scrapers/county-scraper.js';
+import { emitEvent } from '../services/sseManager.js';
 
 // Test helper to reset storage
 export async function resetProperties() {
@@ -215,6 +216,16 @@ export async function createProperty(req, res) {
     // Send email notification (fire-and-forget)
     /* istanbul ignore next */
     sendNewPropertyNotification(property, req.user.email).catch(() => {});
+
+    // Emit SSE event for real-time notifications
+    emitEvent('new-property', {
+      id: property.id,
+      address: property.address,
+      city: property.city,
+      state: property.state,
+      zipCode: property.zipCode,
+      createdAt: property.createdAt
+    });
 
     res.status(201).json(property);
   } catch (error) {
