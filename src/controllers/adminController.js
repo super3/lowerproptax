@@ -1,7 +1,5 @@
 import pool from '../db/connection.js';
 import { sendAssessmentReadyNotification } from '../services/emailService.js';
-import { parseAddressForScraping } from '../scrapers/address-parser.js';
-import { scrapeProperty } from '../scrapers/county-scraper.js';
 import { emitEvent } from '../services/sseManager.js';
 
 // Default report year - set to 2025 since 2026 bills aren't out yet
@@ -285,73 +283,5 @@ export async function updatePropertyDetails(req, res) {
   } catch (error) {
     console.error('Error updating property details:', error);
     res.status(500).json({ error: 'Failed to update property details' });
-  }
-}
-
-// Pull property data from county website
-export async function pullPropertyData(req, res) {
-  try {
-    const { id } = req.params;
-
-    // Get property address
-    const query = `
-      SELECT address, city, state, zip_code
-      FROM properties
-      WHERE id = $1
-    `;
-
-    const result = await pool.query(query, [id]);
-
-    if (result.rows.length === 0) {
-      return res.status(404).json({ error: 'Property not found' });
-    }
-
-    const property = result.rows[0];
-
-    // Build full address
-    const fullAddress = `${property.address}, ${property.city}, ${property.state}, ${property.zip_code}`;
-
-    // Parse address to get county and clean street address
-    const apiKey = process.env.GOOGLE_MAPS_API_KEY;
-    if (!apiKey) {
-      return res.status(500).json({ error: 'Google Maps API key not configured' });
-    }
-
-    let parsed;
-    try {
-      parsed = await parseAddressForScraping(fullAddress, apiKey);
-    } catch (parseError) {
-      return res.status(400).json({
-        error: 'Address not in supported county',
-        message: parseError.message
-      });
-    }
-
-    // Scrape property data from county website
-    const scraperResult = await scrapeProperty(parsed.streetAddress, parsed.county);
-
-    if (!scraperResult) {
-      return res.status(400).json({
-        error: 'Failed to scrape property data',
-        message: 'Could not find property on county website'
-      });
-    }
-
-    // Return scraped data (not saved to database)
-    res.json({
-      bedrooms: scraperResult.bedrooms,
-      bathrooms: scraperResult.bathrooms,
-      sqft: scraperResult.sqft,
-      homesteadExemption: scraperResult.homesteadExemption,
-      qpublicUrl: scraperResult.qpublicUrl,
-      parcelNumber: scraperResult.parcelNumber,
-      propertyTax2025: scraperResult.propertyTax2025,
-      taxRecordUrl: scraperResult.taxRecordUrl,
-      county: parsed.county,
-      streetAddress: parsed.streetAddress
-    });
-  } catch (error) {
-    console.error('Error pulling property data:', error);
-    res.status(500).json({ error: 'Failed to pull property data' });
   }
 }

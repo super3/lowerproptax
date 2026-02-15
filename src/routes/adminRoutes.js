@@ -17,6 +17,5 @@ router.get('/admin/pending-properties', requireAuthOrApiKey, adminController.get
 router.get('/admin/completed-properties', requireAuthOrApiKey, adminController.getCompletedProperties);
 router.get('/admin/properties/:id', requireAuthOrApiKey, adminController.getPropertyDetails);
 router.put('/admin/properties/:id', requireAuthOrApiKey, adminController.updatePropertyDetails);
-router.post('/admin/properties/:id/pull', requireAuth, requireAdmin, adminController.pullPropertyData);
 
 export default router;

@@ -30,17 +30,6 @@ jest.unstable_mockModule('../src/services/emailService.js', () => ({
   sendAssessmentReadyNotification: jest.fn().mockResolvedValue(undefined)
 }));
 
-// Mock scrapers
-jest.unstable_mockModule('../src/scrapers/address-parser.js', () => ({
-  parseAddress: jest.fn(),
-  parseAddressForScraping: jest.fn(),
-  SUPPORTED_COUNTIES: ['fulton', 'dekalb']
-}));
-
-jest.unstable_mockModule('../src/scrapers/county-scraper.js', () => ({
-  scrapeProperty: jest.fn()
-}));
-
 // Import after mocking
 const adminRoutes = await import('../src/routes/adminRoutes.js');
 const propertyRoutes = await import('../src/routes/propertyRoutes.js');
