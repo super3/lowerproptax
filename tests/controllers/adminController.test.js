@@ -14,18 +14,6 @@ jest.unstable_mockModule('../../src/services/emailService.js', () => ({
   sendAssessmentReadyNotification: mockSendAssessmentReadyNotification
 }));
 
-// Mock the address parser
-const mockParseAddressForScraping = jest.fn();
-jest.unstable_mockModule('../../src/scrapers/address-parser.js', () => ({
-  parseAddressForScraping: mockParseAddressForScraping
-}));
-
-// Mock the county scraper
-const mockScrapeProperty = jest.fn();
-jest.unstable_mockModule('../../src/scrapers/county-scraper.js', () => ({
-  scrapeProperty: mockScrapeProperty
-}));
-
 // Import the controller after mocking
 const adminController = await import('../../src/controllers/adminController.js');
 
@@ -44,8 +32,6 @@ describe('Admin Controller', () => {
     };
     mockQuery.mockClear();
     mockSendAssessmentReadyNotification.mockClear();
-    mockParseAddressForScraping.mockClear();
-    mockScrapeProperty.mockClear();
   });
 
   describe('getPendingProperties', () => {
@@ -1039,147 +1025,4 @@ describe('Admin Controller', () => {
     });
   });
 
-  describe('pullPropertyData', () => {
-    const originalEnv = process.env.GOOGLE_MAPS_API_KEY;
-
-    beforeEach(() => {
-      process.env.GOOGLE_MAPS_API_KEY = 'test_api_key';
-    });
-
-    afterEach(() => {
-      if (originalEnv) {
-        process.env.GOOGLE_MAPS_API_KEY = originalEnv;
-      } else {
-        delete process.env.GOOGLE_MAPS_API_KEY;
-      }
-    });
-
-    it('should pull property data from county website', async () => {
-      req.params.id = 'prop1';
-
-      const mockProperty = {
-        address: '123 Main St',
-        city: 'Atlanta',
-        state: 'GA',
-        zip_code: '30301'
-      };
-
-      mockQuery.mockResolvedValue({ rows: [mockProperty] });
-
-      mockParseAddressForScraping.mockResolvedValue({
-        streetAddress: '123 Main St',
-        county: 'fulton'
-      });
-
-      mockScrapeProperty.mockResolvedValue({
-        bedrooms: 3,
-        bathrooms: 2.5,
-        sqft: 1800,
-        homesteadExemption: true,
-        qpublicUrl: 'https://qpublic.schneidercorp.com/property/123',
-        parcelNumber: '17 0034  LL3967',
-        propertyTax2025: '15,262.32',
-        taxRecordUrl: 'https://fultoncountytaxes.org/propertytax/details/17%200034%20%20LL3967/2025/'
-      });
-
-      await adminController.pullPropertyData(req, res);
-
-      expect(mockQuery).toHaveBeenCalledWith(
-        expect.stringContaining('SELECT address'),
-        ['prop1']
-      );
-      expect(mockParseAddressForScraping).toHaveBeenCalledWith(
-        '123 Main St, Atlanta, GA, 30301',
-        'test_api_key'
-      );
-      expect(mockScrapeProperty).toHaveBeenCalledWith('123 Main St', 'fulton');
-      expect(res.json).toHaveBeenCalledWith({
-        bedrooms: 3,
-        bathrooms: 2.5,
-        sqft: 1800,
-        homesteadExemption: true,
-        qpublicUrl: 'https://qpublic.schneidercorp.com/property/123',
-        parcelNumber: '17 0034  LL3967',
-        propertyTax2025: '15,262.32',
-        taxRecordUrl: 'https://fultoncountytaxes.org/propertytax/details/17%200034%20%20LL3967/2025/',
-        county: 'fulton',
-        streetAddress: '123 Main St'
-      });
-    });
-
-    it('should return 404 if property not found', async () => {
-      req.params.id = 'nonexistent';
-      mockQuery.mockResolvedValue({ rows: [] });
-
-      await adminController.pullPropertyData(req, res);
-
-      expect(res.status).toHaveBeenCalledWith(404);
-      expect(res.json).toHaveBeenCalledWith({ error: 'Property not found' });
-    });
-
-    it('should return 500 if API key not configured', async () => {
-      delete process.env.GOOGLE_MAPS_API_KEY;
-
-      req.params.id = 'prop1';
-      mockQuery.mockResolvedValue({
-        rows: [{ address: '123 Main St', city: 'Atlanta', state: 'GA', zip_code: '30301' }]
-      });
-
-      await adminController.pullPropertyData(req, res);
-
-      expect(res.status).toHaveBeenCalledWith(500);
-      expect(res.json).toHaveBeenCalledWith({ error: 'Google Maps API key not configured' });
-    });
-
-    it('should return 400 if address not in supported county', async () => {
-      req.params.id = 'prop1';
-      mockQuery.mockResolvedValue({
-        rows: [{ address: '123 Main St', city: 'Miami', state: 'FL', zip_code: '33101' }]
-      });
-
-      mockParseAddressForScraping.mockRejectedValue(
-        new Error('Address is in miami-dade county. Only these Georgia counties are supported: fulton, gwinnett, cobb')
-      );
-
-      await adminController.pullPropertyData(req, res);
-
-      expect(res.status).toHaveBeenCalledWith(400);
-      expect(res.json).toHaveBeenCalledWith({
-        error: 'Address not in supported county',
-        message: 'Address is in miami-dade county. Only these Georgia counties are supported: fulton, gwinnett, cobb'
-      });
-    });
-
-    it('should return 400 if scraper fails to find property', async () => {
-      req.params.id = 'prop1';
-      mockQuery.mockResolvedValue({
-        rows: [{ address: '999 Fake St', city: 'Atlanta', state: 'GA', zip_code: '30301' }]
-      });
-
-      mockParseAddressForScraping.mockResolvedValue({
-        streetAddress: '999 Fake St',
-        county: 'fulton'
-      });
-
-      mockScrapeProperty.mockResolvedValue(null);
-
-      await adminController.pullPropertyData(req, res);
-
-      expect(res.status).toHaveBeenCalledWith(400);
-      expect(res.json).toHaveBeenCalledWith({
-        error: 'Failed to scrape property data',
-        message: 'Could not find property on county website'
-      });
-    });
-
-    it('should handle database errors', async () => {
-      req.params.id = 'prop1';
-      mockQuery.mockRejectedValue(new Error('Database error'));
-
-      await adminController.pullPropertyData(req, res);
-
-      expect(res.status).toHaveBeenCalledWith(500);
-      expect(res.json).toHaveBeenCalledWith({ error: 'Failed to pull property data' });
-    });
-  });
 });

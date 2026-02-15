@@ -5,8 +5,7 @@ export default {
   globalSetup: './tests/setup.js',
   collectCoverageFrom: [
     'src/**/*.js',
-    '!src/index.js',
-    '!src/scrapers/**/*.js'
+    '!src/index.js'
   ],
   coverageDirectory: 'coverage',
   coverageReporters: ['text', 'lcov', 'html'],

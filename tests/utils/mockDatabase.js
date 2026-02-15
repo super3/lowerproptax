@@ -1,7 +1,6 @@
 // Mock in-memory database for testing when PostgreSQL is not available
 const mockData = new Map();
 const mockAssessments = new Map();
-const mockScrapeCache = new Map();
 
 // Helper to add an assessment to a property for testing
 export function addMockAssessment(propertyId, assessment) {
@@ -13,77 +12,11 @@ export function clearMockAssessments() {
   mockAssessments.clear();
 }
 
-// Helper to add a scrape cache entry for testing
-export function addMockScrapeCache(id, data) {
-  mockScrapeCache.set(id, {
-    id,
-    ...data,
-    created_at: data.created_at || new Date().toISOString(),
-    expires_at: data.expires_at || new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString()
-  });
-}
-
-// Helper to clear scrape cache
-export function clearMockScrapeCache() {
-  mockScrapeCache.clear();
-}
-
-// Helper to get scrape cache contents (for test assertions)
-export function getMockScrapeCache() {
-  return mockScrapeCache;
-}
-
 export function createMockPool() {
   return {
     query: async (sql, params) => {
       // Parse SQL to determine operation
       const sqlUpper = sql.trim().toUpperCase();
-
-      // DELETE FROM scrape_cache (reset)
-      if (sqlUpper.startsWith('DELETE FROM SCRAPE_CACHE') && !params) {
-        mockScrapeCache.clear();
-        return { rows: [], rowCount: 0 };
-      }
-
-      // DELETE FROM scrape_cache WHERE id = $1
-      if (sqlUpper.startsWith('DELETE FROM SCRAPE_CACHE WHERE')) {
-        const id = params[0];
-        const deleted = mockScrapeCache.delete(id);
-        return { rows: [], rowCount: deleted ? 1 : 0 };
-      }
-
-      // INSERT INTO scrape_cache
-      if (sqlUpper.startsWith('INSERT INTO SCRAPE_CACHE')) {
-        const [id, address, county, bedrooms, bathrooms, sqft,
-          homestead, parcel_number, qpublic_url, property_tax_2025, tax_record_url] = params;
-        const entry = {
-          id,
-          address,
-          county,
-          bedrooms,
-          bathrooms,
-          sqft,
-          homestead,
-          parcel_number,
-          qpublic_url,
-          property_tax_2025,
-          tax_record_url,
-          created_at: new Date().toISOString(),
-          expires_at: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString()
-        };
-        mockScrapeCache.set(id, entry);
-        return { rows: [entry], rowCount: 1 };
-      }
-
-      // SELECT * FROM scrape_cache WHERE id = $1 AND expires_at > NOW()
-      if (sqlUpper.includes('FROM SCRAPE_CACHE WHERE')) {
-        const id = params[0];
-        const entry = mockScrapeCache.get(id);
-        if (entry && new Date(entry.expires_at) > new Date()) {
-          return { rows: [entry], rowCount: 1 };
-        }
-        return { rows: [], rowCount: 0 };
-      }
 
       // DELETE FROM properties (reset)
       if (sqlUpper.startsWith('DELETE FROM PROPERTIES') && !params) {
