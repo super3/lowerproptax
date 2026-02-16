@@ -122,7 +122,7 @@
 
         /* Address Preview Form */
         .address-preview-form {
-            max-width: 500px;
+            max-width: 100%;
         }
 
         .address-input-wrapper {
@@ -172,20 +172,95 @@
         }
 
         .preview-result.success {
-            background: #e8f5e9;
-            border: 1px solid #a5d6a7;
-            color: #2e7d32;
+            background: white;
+            border: 1px solid #e5e5e5;
+            border-radius: 12px;
+            padding: 1.75rem 1.5rem;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            color: #1a1a1a;
         }
 
         .preview-result.error {
+            background: white;
+            border: 1px solid #e5e5e5;
+            border-radius: 12px;
+            padding: 1.75rem 1.5rem;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            color: #1a1a1a;
+        }
+
+        .result-check-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: #dcfce7;
+            color: #16a34a;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 0.75rem;
+        }
+
+        .result-error-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
             background: #fef2f2;
-            border: 1px solid #fecaca;
             color: #dc2626;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 0.75rem;
+            font-size: 1.25rem;
+            font-weight: 700;
         }
 
         .preview-result .result-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: 0.25rem;
+        }
+
+        .preview-result.error .result-title {
+            color: #dc2626;
+        }
+
+        .preview-result .result-subtitle {
+            font-size: 0.875rem;
+            color: #666;
+            line-height: 1.5;
+        }
+
+        .result-savings-label {
+            font-size: 0.8rem;
+            color: #666;
+            margin-top: 0.75rem;
+            margin-bottom: 0.125rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
             font-weight: 600;
-            margin-bottom: 0.5rem;
+        }
+
+        .result-savings-amount {
+            font-size: 2.25rem;
+            font-weight: 700;
+            color: #16a34a;
+            line-height: 1.2;
+        }
+
+        .auth-divider {
+            border-top: 1px solid #e5e5e5;
+            margin: 1.25rem 0;
+        }
+
+        .auth-section-label {
+            font-size: 0.875rem;
+            color: #555;
+            font-weight: 500;
+            text-align: center;
+            margin-bottom: 0.75rem;
         }
 
         .preview-result .result-action {
@@ -208,13 +283,47 @@
             background: #15803d;
         }
 
-        /* Inline Clerk Auth Container */
+        /* Inline Clerk Auth Container - hidden, Clerk is now mounted inside result card */
         .clerk-auth-container {
-            margin-top: 1rem;
+            display: none;
         }
 
-        .clerk-auth-container.hidden {
+        /* Checked address bar */
+        .checked-address-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.6rem 1rem;
+            background: #f8f9fa;
+            border: 1px solid #e5e5e5;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            color: #333;
+            gap: 0.75rem;
+        }
+
+        .checked-address-bar.hidden {
             display: none;
+        }
+
+        .checked-address-text {
+            flex: 1;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            font-weight: 500;
+        }
+
+        .checked-address-bar a {
+            color: #3171ef;
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.8rem;
+            flex-shrink: 0;
+        }
+
+        .checked-address-bar a:hover {
+            text-decoration: underline;
         }
 
         .hero-image {
@@ -1231,6 +1340,10 @@
                 text-align: center;
             }
 
+            .result-savings-amount {
+                font-size: 1.75rem;
+            }
+
             .comparison-card .amount {
                 font-size: 1.25rem;
             }
@@ -1463,8 +1576,12 @@
                     <input type="text" id="preview-address" placeholder="Enter your property address" autocomplete="off" required>
                     <button type="submit" class="hero-cta" id="check-btn">Check My Property</button>
                 </div>
+                <div id="checked-address-bar" class="checked-address-bar hidden">
+                    <span class="checked-address-text" id="checked-address-text"></span>
+                    <a href="#" id="change-address-link">Change</a>
+                </div>
                 <div id="preview-result" class="preview-result hidden"></div>
-                <div id="clerk-auth-container" class="clerk-auth-container hidden"></div>
+                <div id="clerk-auth-container" class="clerk-auth-container"></div>
             </form>
         </div>
         <div class="hero-image">
@@ -1861,6 +1978,11 @@
         const previewResult = document.getElementById('preview-result');
         const clerkAuthContainer = document.getElementById('clerk-auth-container');
         const checkBtn = document.getElementById('check-btn');
+        const checkedAddressBar = document.getElementById('checked-address-bar');
+        const checkedAddressText = document.getElementById('checked-address-text');
+        const changeAddressLink = document.getElementById('change-address-link');
+        const addressInputWrapper = document.querySelector('.address-input-wrapper');
+        let currentClerkMountEl = null;
 
         // Comparison card elements
         const comparisonAddress = document.getElementById('comparison-address');
@@ -2103,8 +2225,9 @@
                         const countyName = countyMatch ? countyMatch[1].charAt(0).toUpperCase() + countyMatch[1].slice(1) : 'your';
                         previewResult.className = 'preview-result error';
                         previewResult.innerHTML = `
+                            <div class="result-error-icon">\u2715</div>
                             <div class="result-title">We don't support ${countyName} County yet</div>
-                            <div>We currently serve Fulton, Gwinnett, and Cobb counties in Georgia. We're expanding soon!</div>
+                            <div class="result-subtitle">We currently serve Fulton, Gwinnett, and Cobb counties in Georgia. We're expanding soon!</div>
                         `;
                         previewResult.classList.remove('hidden');
                         resetComparisonCard();
@@ -2133,8 +2256,9 @@
                 console.error('Error fetching property data:', error);
                 previewResult.className = 'preview-result error';
                 previewResult.innerHTML = `
+                    <div class="result-error-icon">\u2715</div>
                     <div class="result-title">Unable to analyze property</div>
-                    <div>${error.message}</div>
+                    <div class="result-subtitle">${error.message}</div>
                 `;
                 previewResult.classList.remove('hidden');
                 resetComparisonCard();
@@ -2153,24 +2277,31 @@
             }
 
             // Unmount any existing Clerk component
-            try {
-                window.Clerk.unmountSignIn(clerkAuthContainer);
-            } catch (e) {
-                // Ignore if nothing was mounted
+            if (currentClerkMountEl) {
+                try {
+                    window.Clerk.unmountSignIn(currentClerkMountEl);
+                } catch (e) {
+                    // Ignore if nothing was mounted
+                }
+                currentClerkMountEl = null;
             }
-            clerkAuthContainer.classList.add('hidden');
-            clerkAuthContainer.innerHTML = '';
 
             // Check if we have a selected place with state info
             if (!selectedPlace) {
                 previewResult.className = 'preview-result error';
                 previewResult.innerHTML = `
+                    <div class="result-error-icon">\u2715</div>
                     <div class="result-title">Please select an address</div>
-                    <div>Choose an address from the dropdown suggestions.</div>
+                    <div class="result-subtitle">Choose an address from the dropdown suggestions.</div>
                 `;
                 previewResult.classList.remove('hidden');
                 return;
             }
+
+            // Hide address input, show compact checked-address bar
+            addressInputWrapper.style.display = 'none';
+            checkedAddressText.textContent = address;
+            checkedAddressBar.classList.remove('hidden');
 
             const state = selectedPlace.parsedAddress?.state || '';
 
@@ -2187,34 +2318,42 @@
                 };
                 localStorage.setItem('pendingProperty', JSON.stringify(pendingProperty));
 
-                // Show success result
-                previewResult.className = 'preview-result success';
-                previewResult.innerHTML = `
-                    <div class="result-title">We can help!</div>
-                    <div>Average annual savings: <strong>$1,588.91</strong></div>
-                `;
-                previewResult.classList.remove('hidden');
-
                 // If user is already signed in, redirect to dashboard
                 if (clerkLoaded && window.Clerk.user) {
                     window.location.href = '/dashboard.html';
                     return;
                 }
 
-                // Mount inline Clerk sign-in
-                clerkAuthContainer.classList.remove('hidden');
+                // Show success result with inline Clerk sign-in as one cohesive card
+                previewResult.className = 'preview-result success';
+                previewResult.innerHTML = `
+                    <div class="result-check-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                    </div>
+                    <div class="result-title">We can help!</div>
+                    <div class="result-savings-label">Average annual savings</div>
+                    <div class="result-savings-amount">$1,588.91</div>
+                    <div class="auth-divider"></div>
+                    <div class="auth-section-label">Sign in to see your savings report</div>
+                    <div id="clerk-mount-inline"></div>
+                `;
+                previewResult.classList.remove('hidden');
+
+                // Mount inline Clerk sign-in inside the result card
+                const mountEl = document.getElementById('clerk-mount-inline');
+                currentClerkMountEl = mountEl;
                 if (clerkLoaded) {
-                    window.Clerk.mountSignIn(clerkAuthContainer, {
+                    window.Clerk.mountSignIn(mountEl, {
                         routing: 'hash',
                         fallbackRedirectUrl: '/dashboard.html',
                     });
                 } else {
-                    clerkAuthContainer.innerHTML = '<p>Loading sign-in...</p>';
+                    mountEl.innerHTML = '<p style="text-align:center;color:#666;font-size:0.875rem;">Loading sign-in...</p>';
                     const waitForClerk = setInterval(() => {
                         if (clerkLoaded) {
                             clearInterval(waitForClerk);
-                            clerkAuthContainer.innerHTML = '';
-                            window.Clerk.mountSignIn(clerkAuthContainer, {
+                            mountEl.innerHTML = '';
+                            window.Clerk.mountSignIn(mountEl, {
                                 routing: 'hash',
                                 fallbackRedirectUrl: '/dashboard.html',
                             });
@@ -2225,11 +2364,29 @@
                 // Not in Georgia
                 previewResult.className = 'preview-result error';
                 previewResult.innerHTML = `
+                    <div class="result-error-icon">\u2715</div>
                     <div class="result-title">We don't serve your area yet</div>
-                    <div>We currently serve properties in Georgia. We're expanding soon!</div>
+                    <div class="result-subtitle">We currently serve properties in Georgia. We're expanding soon!</div>
                 `;
                 previewResult.classList.remove('hidden');
             }
+        });
+
+        // Change address handler - reset form to initial state
+        changeAddressLink.addEventListener('click', function(e) {
+            e.preventDefault();
+            // Unmount Clerk if mounted
+            if (currentClerkMountEl) {
+                try { window.Clerk.unmountSignIn(currentClerkMountEl); } catch(ex) {}
+                currentClerkMountEl = null;
+            }
+            // Show address input, hide checked bar and results
+            addressInputWrapper.style.display = '';
+            checkedAddressBar.classList.add('hidden');
+            previewResult.classList.add('hidden');
+            previewResult.innerHTML = '';
+            resetComparisonCard();
+            selectedPlace = null;
         });
 
         // Handle sign up after successful preview
