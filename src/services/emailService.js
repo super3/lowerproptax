@@ -94,3 +94,44 @@ Questions? Reply to this email and we'll be happy to help.
     console.error('Failed to send assessment ready notification:', error.message);
   }
 }
+
+export async function sendReportPurchasedNotification(recipient) {
+  if (!resend) {
+    console.log('Email service not configured (RESEND_API_KEY missing)');
+    return;
+  }
+
+  const { address, email, report_url, recipient_name } = recipient;
+  const firstName = recipient_name.split(' ')[0];
+
+  const emailContent = `Hi ${firstName},
+
+Thank you for purchasing your Property Tax Savings Report!
+
+Property: ${address}
+${report_url ? `\nYour report is ready. You can download it here:\n${report_url}\n` : '\nYour report is being finalized and will be sent to you shortly.\n'}
+The report includes:
+- Which exemptions you qualify for
+- How much you'll save each year
+- Step-by-step filing instructions
+
+The filing deadline is April 1st, so be sure to file soon. If you have any questions, reply to this email or call us at (470) 312-3330.
+
+Thanks,
+Shawn Wilkinson
+LowerPropTax
+`;
+
+  try {
+    await resend.emails.send({
+      from: 'LowerPropTax <help@lowerproptax.com>',
+      to: email,
+      bcc: 'help@lowerproptax.com',
+      subject: `Your Property Tax Savings Report - ${address}`,
+      text: emailContent
+    });
+    console.log(`Report purchased notification sent to ${email}`);
+  } catch (error) {
+    console.error('Failed to send report purchased notification:', error.message);
+  }
+}
