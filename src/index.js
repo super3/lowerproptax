@@ -2,7 +2,6 @@ import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import { clerkMiddleware } from '@clerk/express';
-import propertyRoutes from './routes/propertyRoutes.js';
 import adminRoutes from './routes/adminRoutes.js';
 import mailRoutes from './routes/mailRoutes.js';
 import campaignRoutes from './routes/campaignRoutes.js';
@@ -41,7 +40,6 @@ app.get('/health', (req, res) => {
 });
 
 // API routes
-app.use('/api', propertyRoutes);
 app.use('/api', adminRoutes);
 app.use('/api', mailRoutes);
 app.use('/api', campaignRoutes);

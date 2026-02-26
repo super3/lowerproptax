@@ -181,7 +181,7 @@
 <body class="bg-gray">
     <!-- Navigation -->
     <nav>
-        <a href="index.html" class="logo-link"><div class="logo">🏡 LowerPropTax</div></a>
+        <a href="/" class="logo-link"><div class="logo">🏡 LowerPropTax</div></a>
         <div class="nav-right">
             <ul class="nav-links">
                 <li><a href="admin.html">Assessments</a></li>
@@ -512,7 +512,7 @@
 
                 await window.Clerk.load();
                 if (!window.Clerk.user) {
-                    window.location.href = '/index.html';
+                    window.location.href = '//';
                     return;
                 }
 
@@ -524,7 +524,7 @@
                 await loadCampaign();
             } catch (error) {
                 console.error('Error initializing:', error);
-                if (!isDevelopment) window.location.href = '/index.html';
+                if (!isDevelopment) window.location.href = '//';
             }
         }
 
