@@ -255,6 +255,90 @@ describe('Campaign Controller', () => {
     });
   });
 
+  describe('addRecipient (edge cases)', () => {
+    it('should auto-generate short code from address', async () => {
+      req.params.id = 'camp_1';
+      req.body = {
+        recipientName: 'Test',
+        address: '6774 Encore Blvd'
+      };
+
+      mockQuery
+        .mockResolvedValueOnce({ rows: [{ id: 'camp_1' }] })
+        .mockResolvedValueOnce({ rows: [{ id: 'mail_1', shortCode: '6774e' }] });
+
+      await campaignController.addRecipient(req, res);
+
+      // Verify the generated short code was passed (3rd parameter in INSERT)
+      const insertCall = mockQuery.mock.calls[1];
+      expect(insertCall[1][2]).toBe('6774e');
+      expect(res.status).toHaveBeenCalledWith(201);
+    });
+
+    it('should generate short code from single-word address', async () => {
+      req.params.id = 'camp_1';
+      req.body = {
+        recipientName: 'Test',
+        address: '100'
+      };
+
+      mockQuery
+        .mockResolvedValueOnce({ rows: [{ id: 'camp_1' }] })
+        .mockResolvedValueOnce({ rows: [{ id: 'mail_1', shortCode: '100' }] });
+
+      await campaignController.addRecipient(req, res);
+
+      // With only a number, street char is empty string
+      const insertCall = mockQuery.mock.calls[1];
+      expect(insertCall[1][2]).toBe('100');
+      expect(res.status).toHaveBeenCalledWith(201);
+    });
+
+    it('should generate short code from whitespace-only address', async () => {
+      req.params.id = 'camp_1';
+      req.body = {
+        recipientName: 'Test',
+        address: '   '
+      };
+
+      mockQuery
+        .mockResolvedValueOnce({ rows: [{ id: 'camp_1' }] })
+        .mockResolvedValueOnce({ rows: [{ id: 'mail_1', shortCode: '' }] });
+
+      await campaignController.addRecipient(req, res);
+
+      // With empty trimmed address, parts[0] and parts[1] are both empty/undefined
+      const insertCall = mockQuery.mock.calls[1];
+      expect(insertCall[1][2]).toBe('');
+      expect(res.status).toHaveBeenCalledWith(201);
+    });
+
+    it('should handle null comparables and reportUrl', async () => {
+      req.params.id = 'camp_1';
+      req.body = {
+        recipientName: 'Test',
+        address: '123 Main St',
+        sqft: null,
+        annualTax: null,
+        estimatedSavings: null,
+        comparables: null,
+        reportUrl: null
+      };
+
+      mockQuery
+        .mockResolvedValueOnce({ rows: [{ id: 'camp_1' }] })
+        .mockResolvedValueOnce({ rows: [{ id: 'mail_1' }] });
+
+      await campaignController.addRecipient(req, res);
+
+      // Verify null values are passed correctly
+      const insertCall = mockQuery.mock.calls[1];
+      expect(insertCall[1][11]).toBeNull(); // comparables
+      expect(insertCall[1][12]).toBeNull(); // reportUrl
+      expect(res.status).toHaveBeenCalledWith(201);
+    });
+  });
+
   describe('updateRecipient', () => {
     it('should update a recipient', async () => {
       req.params.recipientId = 'mail_1';
@@ -274,6 +358,64 @@ describe('Campaign Controller', () => {
 
       await campaignController.updateRecipient(req, res);
 
+      expect(res.json).toHaveBeenCalledWith(mockUpdated);
+    });
+
+    it('should handle explicit zero values for sqft, annualTax, and estimatedSavings', async () => {
+      req.params.recipientId = 'mail_1';
+      req.body = { sqft: 0, annualTax: 0, estimatedSavings: 0 };
+
+      const mockUpdated = {
+        id: 'mail_1',
+        shortCode: '6774e',
+        sqft: 0,
+        annualTax: '0.00',
+        estimatedSavings: '0.00',
+        paymentStatus: 'unpaid',
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      };
+
+      mockQuery.mockResolvedValue({ rows: [mockUpdated] });
+
+      await campaignController.updateRecipient(req, res);
+
+      // Verify 0 values are passed through (not converted to null)
+      const updateCall = mockQuery.mock.calls[0];
+      expect(updateCall[1][5]).toBe(0);  // sqft
+      expect(updateCall[1][6]).toBe(0);  // annualTax
+      expect(updateCall[1][7]).toBe(0);  // estimatedSavings
+      expect(res.json).toHaveBeenCalledWith(mockUpdated);
+    });
+
+    it('should handle undefined sqft, annualTax, and estimatedSavings', async () => {
+      req.params.recipientId = 'mail_1';
+      req.body = { recipientName: 'Updated Name' };
+
+      const mockUpdated = { id: 'mail_1', recipientName: 'Updated Name' };
+      mockQuery.mockResolvedValue({ rows: [mockUpdated] });
+
+      await campaignController.updateRecipient(req, res);
+
+      // Verify undefined values become null
+      const updateCall = mockQuery.mock.calls[0];
+      expect(updateCall[1][5]).toBeNull();  // sqft
+      expect(updateCall[1][6]).toBeNull();  // annualTax
+      expect(updateCall[1][7]).toBeNull();  // estimatedSavings
+      expect(res.json).toHaveBeenCalledWith(mockUpdated);
+    });
+
+    it('should handle comparables JSON serialization in update', async () => {
+      req.params.recipientId = 'mail_1';
+      req.body = { comparables: [{ address: '123 Test', sqft: 1800 }] };
+
+      const mockUpdated = { id: 'mail_1' };
+      mockQuery.mockResolvedValue({ rows: [mockUpdated] });
+
+      await campaignController.updateRecipient(req, res);
+
+      const updateCall = mockQuery.mock.calls[0];
+      expect(updateCall[1][8]).toBe('[{"address":"123 Test","sqft":1800}]');
       expect(res.json).toHaveBeenCalledWith(mockUpdated);
     });
 

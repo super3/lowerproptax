@@ -312,5 +312,86 @@ describe('Mail Controller', () => {
       expect(res.status).toHaveBeenCalledWith(500);
       expect(res.json).toHaveBeenCalledWith({ error: 'Webhook processing failed' });
     });
+
+    it('should skip processing when checkout.session.completed has no short_code in metadata', async () => {
+      const mockEvent = {
+        type: 'checkout.session.completed',
+        data: {
+          object: {
+            metadata: {},
+            customer_email: 'buyer@example.com'
+          }
+        }
+      };
+
+      req.body = Buffer.from(JSON.stringify(mockEvent));
+      req.headers = { 'stripe-signature': 'sig_test' };
+
+      mockConstructWebhookEvent.mockReturnValue(mockEvent);
+
+      await mailController.handleWebhook(req, res);
+
+      expect(res.json).toHaveBeenCalledWith({ received: true });
+      // Should not have called any DB queries
+      expect(mockQuery).not.toHaveBeenCalled();
+    });
+
+    it('should not send email when recipient has no email', async () => {
+      const mockEvent = {
+        type: 'checkout.session.completed',
+        data: {
+          object: {
+            metadata: { short_code: '6774e' },
+            customer_email: null
+          }
+        }
+      };
+
+      req.body = Buffer.from(JSON.stringify(mockEvent));
+      req.headers = { 'stripe-signature': 'sig_test' };
+
+      mockConstructWebhookEvent.mockReturnValue(mockEvent);
+      mockQuery
+        .mockResolvedValueOnce({ rows: [] })  // UPDATE payment_status
+        .mockResolvedValueOnce({              // SELECT recipient
+          rows: [{
+            id: 'mail_1',
+            recipient_name: 'Test User',
+            address: '123 Main St',
+            email: null,
+            report_url: null
+          }]
+        });
+
+      await mailController.handleWebhook(req, res);
+
+      expect(res.json).toHaveBeenCalledWith({ received: true });
+      expect(mockSendReportPurchasedNotification).not.toHaveBeenCalled();
+    });
+
+    it('should handle checkout.session.completed when recipient not found in DB', async () => {
+      const mockEvent = {
+        type: 'checkout.session.completed',
+        data: {
+          object: {
+            metadata: { short_code: 'deleted' },
+            customer_email: 'buyer@example.com'
+          }
+        }
+      };
+
+      req.body = Buffer.from(JSON.stringify(mockEvent));
+      req.headers = { 'stripe-signature': 'sig_test' };
+
+      mockConstructWebhookEvent.mockReturnValue(mockEvent);
+      mockQuery
+        .mockResolvedValueOnce({ rows: [] })  // UPDATE payment_status
+        .mockResolvedValueOnce({ rows: [] }); // SELECT recipient (not found)
+
+      await mailController.handleWebhook(req, res);
+
+      expect(res.json).toHaveBeenCalledWith({ received: true });
+      expect(mockSendReportPurchasedNotification).not.toHaveBeenCalled();
+    });
   });
 });
