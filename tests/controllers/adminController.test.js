@@ -8,12 +8,6 @@ jest.unstable_mockModule('../../src/db/connection.js', () => ({
   }
 }));
 
-// Mock the email service
-const mockSendReferralVisitNotification = jest.fn().mockResolvedValue();
-jest.unstable_mockModule('../../src/services/emailService.js', () => ({
-  sendReferralVisitNotification: mockSendReferralVisitNotification
-}));
-
 // Mock xlsx
 const mockXLSXRead = jest.fn();
 const mockSheetToJson = jest.fn();
@@ -41,7 +35,6 @@ describe('Admin Controller', () => {
       status: jest.fn().mockReturnThis()
     };
     mockQuery.mockClear();
-    mockSendReferralVisitNotification.mockClear();
     mockXLSXRead.mockClear();
     mockSheetToJson.mockClear();
     jest.spyOn(console, 'error').mockImplementation(() => {});
@@ -354,6 +347,7 @@ describe('Admin Controller', () => {
 
     it('should return 400 if spreadsheet is empty', async () => {
       req.file = { buffer: Buffer.from('test') };
+      req.body = {};
       mockXLSXRead.mockReturnValue({ SheetNames: ['Sheet1'], Sheets: { Sheet1: {} } });
       mockSheetToJson.mockReturnValue([]);
 
@@ -362,8 +356,9 @@ describe('Admin Controller', () => {
       expect(res.json).toHaveBeenCalledWith({ error: 'Spreadsheet is empty' });
     });
 
-    it('should import properties from XLSX', async () => {
+    it('should import properties from XLSX into a campaign', async () => {
       req.file = { buffer: Buffer.from('test') };
+      req.body = { campaignName: 'Test Campaign' };
 
       const rows = [
         {
@@ -374,9 +369,7 @@ describe('Admin Controller', () => {
           'Owner': 'Christopher Porcelli',
           'Sqft': '2016',
           'Tax': '9331.51',
-          'Estimated Tax': '7461.30',
-          'Homestead': 'false',
-          'Parcel': 'ABC123',
+          'Estimated Savings': '1870.21',
           'Comp 1 Address': '6765 Prelude Dr',
           'Comp 1 Sqft': '1900',
           'Comp 1 Tax': '7658.91'
@@ -386,25 +379,29 @@ describe('Admin Controller', () => {
       mockXLSXRead.mockReturnValue({ SheetNames: ['Sheet1'], Sheets: { Sheet1: {} } });
       mockSheetToJson.mockReturnValue(rows);
 
-      // Mock: check referral code, insert property, insert assessment, insert comp
+      // Mock: create campaign, check short code, insert recipient
       mockQuery
-        .mockResolvedValueOnce({ rows: [] })         // referral code check
-        .mockResolvedValueOnce({ rows: [] })         // insert property
-        .mockResolvedValueOnce({ rows: [] })         // insert assessment
-        .mockResolvedValueOnce({ rows: [] });        // insert comp
+        .mockResolvedValueOnce({ rows: [] })         // create campaign
+        .mockResolvedValueOnce({ rows: [] })         // short code check
+        .mockResolvedValueOnce({ rows: [] });        // insert recipient
 
       await adminController.uploadMailedProperties(req, res);
 
       expect(res.json).toHaveBeenCalledWith(expect.objectContaining({
         imported: 1,
-        skipped: 0
+        skipped: 0,
+        campaignId: expect.stringContaining('camp_')
       }));
     });
 
     it('should skip rows with no address', async () => {
       req.file = { buffer: Buffer.from('test') };
+      req.body = {};
       mockXLSXRead.mockReturnValue({ SheetNames: ['Sheet1'], Sheets: { Sheet1: {} } });
       mockSheetToJson.mockReturnValue([{ 'City': 'Atlanta' }]);
+
+      // create campaign
+      mockQuery.mockResolvedValueOnce({ rows: [] });
 
       await adminController.uploadMailedProperties(req, res);
 
@@ -415,13 +412,16 @@ describe('Admin Controller', () => {
       }));
     });
 
-    it('should skip rows with duplicate referral codes', async () => {
+    it('should skip rows with duplicate short codes', async () => {
       req.file = { buffer: Buffer.from('test') };
+      req.body = {};
       mockXLSXRead.mockReturnValue({ SheetNames: ['Sheet1'], Sheets: { Sheet1: {} } });
       mockSheetToJson.mockReturnValue([{ 'Address': '6774 Encore Blvd' }]);
 
-      // Referral code already exists
-      mockQuery.mockResolvedValueOnce({ rows: [{ id: 'existing' }] });
+      // create campaign, then short code already exists
+      mockQuery
+        .mockResolvedValueOnce({ rows: [] })
+        .mockResolvedValueOnce({ rows: [{ id: 'existing' }] });
 
       await adminController.uploadMailedProperties(req, res);
 
@@ -434,11 +434,13 @@ describe('Admin Controller', () => {
 
     it('should handle row-level errors gracefully', async () => {
       req.file = { buffer: Buffer.from('test') };
+      req.body = {};
       mockXLSXRead.mockReturnValue({ SheetNames: ['Sheet1'], Sheets: { Sheet1: {} } });
       mockSheetToJson.mockReturnValue([{ 'Address': '123 Main St' }]);
 
-      // Referral code check passes, but insert fails
+      // create campaign, short code check passes, insert fails
       mockQuery
+        .mockResolvedValueOnce({ rows: [] })
         .mockResolvedValueOnce({ rows: [] })
         .mockRejectedValueOnce(new Error('insert failed'));
 
@@ -453,6 +455,7 @@ describe('Admin Controller', () => {
 
     it('should handle top-level errors', async () => {
       req.file = { buffer: Buffer.from('test') };
+      req.body = {};
       mockXLSXRead.mockImplementation(() => { throw new Error('bad file'); });
 
       await adminController.uploadMailedProperties(req, res);
@@ -460,66 +463,88 @@ describe('Admin Controller', () => {
       expect(res.json).toHaveBeenCalledWith({ error: 'Failed to process upload' });
     });
 
-    it('should use custom referral code from spreadsheet', async () => {
+    it('should use custom short code from spreadsheet', async () => {
       req.file = { buffer: Buffer.from('test') };
+      req.body = {};
       mockXLSXRead.mockReturnValue({ SheetNames: ['Sheet1'], Sheets: { Sheet1: {} } });
-      mockSheetToJson.mockReturnValue([{ 'Address': '123 Main St', 'Referral Code': 'custom1' }]);
+      mockSheetToJson.mockReturnValue([{ 'Address': '123 Main St', 'Short Code': 'custom1' }]);
 
+      // create campaign, short code check, insert
       mockQuery
+        .mockResolvedValueOnce({ rows: [] })
         .mockResolvedValueOnce({ rows: [] })
         .mockResolvedValueOnce({ rows: [] });
 
       await adminController.uploadMailedProperties(req, res);
 
-      // Verify the referral code used in the insert
-      const insertCall = mockQuery.mock.calls[1];
+      // Verify the short code used in the insert (3rd call, 3rd param)
+      const insertCall = mockQuery.mock.calls[2];
       expect(insertCall[1]).toContain('custom1');
     });
 
-    it('should import property without tax data (no assessment created)', async () => {
+    it('should import property without comparables', async () => {
       req.file = { buffer: Buffer.from('test') };
+      req.body = {};
       mockXLSXRead.mockReturnValue({ SheetNames: ['Sheet1'], Sheets: { Sheet1: {} } });
-      mockSheetToJson.mockReturnValue([{ 'Address': '999 No Tax St', 'Owner': 'Test' }]);
+      mockSheetToJson.mockReturnValue([{ 'Address': '999 No Comp St', 'Owner': 'Test' }]);
 
+      // create campaign, short code check, insert recipient
       mockQuery
-        .mockResolvedValueOnce({ rows: [] })  // referral code check
-        .mockResolvedValueOnce({ rows: [] }); // insert property (no assessment insert)
+        .mockResolvedValueOnce({ rows: [] })
+        .mockResolvedValueOnce({ rows: [] })
+        .mockResolvedValueOnce({ rows: [] });
 
       await adminController.uploadMailedProperties(req, res);
 
       expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ imported: 1 }));
-      // Only 2 queries: referral check + insert property (no assessment)
-      expect(mockQuery).toHaveBeenCalledTimes(2);
     });
 
-    it('should handle homestead variations (true, Yes, yes)', async () => {
+    it('should use default campaign name when not provided', async () => {
       req.file = { buffer: Buffer.from('test') };
+      req.body = {};
       mockXLSXRead.mockReturnValue({ SheetNames: ['Sheet1'], Sheets: { Sheet1: {} } });
-      mockSheetToJson.mockReturnValue([
-        { 'Address': '1 A St', 'Homestead': true },
-        { 'Address': '2 B St', 'Homestead': 'Yes' },
-        { 'Address': '3 C St', 'Homestead': 'yes' },
-        { 'Address': '4 D St', 'Homestead': 'true' }
-      ]);
+      mockSheetToJson.mockReturnValue([{ 'Address': '100 Test St' }]);
 
-      // Each row: referral check + insert property
-      for (let i = 0; i < 4; i++) {
-        mockQuery
-          .mockResolvedValueOnce({ rows: [] })  // referral check
-          .mockResolvedValueOnce({ rows: [] }); // insert
-      }
+      // create campaign, short code check, insert
+      mockQuery
+        .mockResolvedValueOnce({ rows: [] })
+        .mockResolvedValueOnce({ rows: [] })
+        .mockResolvedValueOnce({ rows: [] });
 
       await adminController.uploadMailedProperties(req, res);
 
-      expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ imported: 4 }));
+      // Verify campaign was created with default name
+      const createCampaignCall = mockQuery.mock.calls[0];
+      expect(createCampaignCall[1][1]).toContain('Upload');
     });
 
-    it('should generate fallback referral code for non-standard addresses', async () => {
+    it('should use Referral Code column as fallback for Short Code', async () => {
       req.file = { buffer: Buffer.from('test') };
+      req.body = {};
+      mockXLSXRead.mockReturnValue({ SheetNames: ['Sheet1'], Sheets: { Sheet1: {} } });
+      mockSheetToJson.mockReturnValue([{ 'Address': '123 Main St', 'Referral Code': 'ref1' }]);
+
+      // create campaign, short code check, insert
+      mockQuery
+        .mockResolvedValueOnce({ rows: [] })
+        .mockResolvedValueOnce({ rows: [] })
+        .mockResolvedValueOnce({ rows: [] });
+
+      await adminController.uploadMailedProperties(req, res);
+
+      const insertCall = mockQuery.mock.calls[2];
+      expect(insertCall[1]).toContain('ref1');
+    });
+
+    it('should generate short code from address with non-standard format', async () => {
+      req.file = { buffer: Buffer.from('test') };
+      req.body = {};
       mockXLSXRead.mockReturnValue({ SheetNames: ['Sheet1'], Sheets: { Sheet1: {} } });
       mockSheetToJson.mockReturnValue([{ 'Address': 'Unit A Building X' }]);
 
+      // create campaign, short code check, insert
       mockQuery
+        .mockResolvedValueOnce({ rows: [] })
         .mockResolvedValueOnce({ rows: [] })
         .mockResolvedValueOnce({ rows: [] });
 
@@ -532,8 +557,8 @@ describe('Admin Controller', () => {
   describe('getMailedProperties', () => {
     it('should return mailed properties with stats', async () => {
       const mockProperties = [
-        { id: 'p1', address: '123 Main St', visit_count: '3', annual_tax: '5000', estimated_annual_tax: '4000' },
-        { id: 'p2', address: '456 Elm St', visit_count: '0', annual_tax: '3000', estimated_annual_tax: '3000' }
+        { id: 'p1', address: '123 Main St', page_views: '3', annual_tax: '5000' },
+        { id: 'p2', address: '456 Elm St', page_views: '0', annual_tax: '3000' }
       ];
 
       mockQuery.mockResolvedValue({ rows: mockProperties });
@@ -568,155 +593,6 @@ describe('Admin Controller', () => {
 
       expect(res.status).toHaveBeenCalledWith(500);
       expect(res.json).toHaveBeenCalledWith({ error: 'Failed to fetch mailed properties' });
-    });
-  });
-
-  describe('trackReferralVisit', () => {
-    it('should track visit and return property data', async () => {
-      req.params.code = '6774e';
-      req.headers['x-forwarded-for'] = '192.168.1.1';
-      req.headers['user-agent'] = 'Mozilla/5.0';
-
-      const mockProperty = {
-        id: 'prop1',
-        address: '6774 Encore Blvd',
-        city: 'Atlanta',
-        state: 'GA',
-        zip_code: '30328',
-        owner_name: 'Christopher Porcelli',
-        sqft: 2016,
-        annual_tax: '9331.51',
-        estimated_annual_tax: '7461.30',
-        comparables: [{ address: '6765 Prelude Dr', sqft: 1900, property_tax: 7658.91 }]
-      };
-
-      mockQuery
-        .mockResolvedValueOnce({ rows: [mockProperty] })   // find property
-        .mockResolvedValueOnce({ rows: [] })                // insert visit
-        .mockResolvedValueOnce({ rows: [{ count: '5' }] }); // count visits
-
-      await adminController.trackReferralVisit(req, res);
-
-      expect(res.json).toHaveBeenCalledWith(expect.objectContaining({
-        address: '6774 Encore Blvd',
-        ownerName: 'Christopher Porcelli',
-        annualTax: 9331.51,
-        estimatedSavings: 1870.21,
-        referralCode: '6774e'
-      }));
-
-      expect(mockSendReferralVisitNotification).toHaveBeenCalledWith(
-        mockProperty,
-        expect.objectContaining({
-          ip_address: '192.168.1.1',
-          visit_count: 5
-        })
-      );
-    });
-
-    it('should return 404 if property not found', async () => {
-      req.params.code = 'nonexistent';
-      mockQuery.mockResolvedValue({ rows: [] });
-
-      await adminController.trackReferralVisit(req, res);
-
-      expect(res.status).toHaveBeenCalledWith(404);
-      expect(res.json).toHaveBeenCalledWith({ error: 'Property not found' });
-    });
-
-    it('should handle zero or negative savings', async () => {
-      req.params.code = 'test1';
-
-      mockQuery
-        .mockResolvedValueOnce({ rows: [{
-          id: 'prop1', address: '123 Main St', annual_tax: '3000', estimated_annual_tax: '4000',
-          comparables: null
-        }] })
-        .mockResolvedValueOnce({ rows: [] })
-        .mockResolvedValueOnce({ rows: [{ count: '1' }] });
-
-      await adminController.trackReferralVisit(req, res);
-
-      expect(res.json).toHaveBeenCalledWith(expect.objectContaining({
-        estimatedSavings: 0,
-        comparables: []
-      }));
-    });
-
-    it('should handle missing tax data', async () => {
-      req.params.code = 'test2';
-
-      mockQuery
-        .mockResolvedValueOnce({ rows: [{
-          id: 'prop1', address: '123 Main St', annual_tax: null, estimated_annual_tax: null,
-          comparables: null
-        }] })
-        .mockResolvedValueOnce({ rows: [] })
-        .mockResolvedValueOnce({ rows: [{ count: '1' }] });
-
-      await adminController.trackReferralVisit(req, res);
-
-      expect(res.json).toHaveBeenCalledWith(expect.objectContaining({
-        annualTax: 0,
-        estimatedSavings: 0
-      }));
-    });
-
-    it('should use socket remoteAddress when x-forwarded-for is not present', async () => {
-      req.params.code = 'test3';
-      delete req.headers['x-forwarded-for'];
-
-      mockQuery
-        .mockResolvedValueOnce({ rows: [{ id: 'prop1', address: '123 Main St', annual_tax: null, estimated_annual_tax: null, comparables: null }] })
-        .mockResolvedValueOnce({ rows: [] })
-        .mockResolvedValueOnce({ rows: [{ count: '1' }] });
-
-      await adminController.trackReferralVisit(req, res);
-
-      // Check the insert call used remoteAddress
-      const insertCall = mockQuery.mock.calls[1];
-      expect(insertCall[1][2]).toBe('127.0.0.1');
-    });
-
-    it('should use empty string when no IP source available', async () => {
-      req.params.code = 'test3b';
-      delete req.headers['x-forwarded-for'];
-      delete req.socket;
-
-      mockQuery
-        .mockResolvedValueOnce({ rows: [{ id: 'prop1', address: '123 Main St', annual_tax: null, estimated_annual_tax: null, comparables: null }] })
-        .mockResolvedValueOnce({ rows: [] })
-        .mockResolvedValueOnce({ rows: [{ count: '1' }] });
-
-      await adminController.trackReferralVisit(req, res);
-
-      const insertCall = mockQuery.mock.calls[1];
-      expect(insertCall[1][2]).toBe('');
-    });
-
-    it('should handle database errors', async () => {
-      req.params.code = 'test4';
-      mockQuery.mockRejectedValue(new Error('Database error'));
-
-      await adminController.trackReferralVisit(req, res);
-
-      expect(res.status).toHaveBeenCalledWith(500);
-      expect(res.json).toHaveBeenCalledWith({ error: 'Failed to load property' });
-    });
-
-    it('should handle email notification failure gracefully', async () => {
-      req.params.code = 'test5';
-      mockSendReferralVisitNotification.mockRejectedValue(new Error('email failed'));
-
-      mockQuery
-        .mockResolvedValueOnce({ rows: [{ id: 'prop1', address: '123 Main St', annual_tax: null, estimated_annual_tax: null, comparables: null }] })
-        .mockResolvedValueOnce({ rows: [] })
-        .mockResolvedValueOnce({ rows: [{ count: '1' }] });
-
-      await adminController.trackReferralVisit(req, res);
-
-      // Should still return successfully
-      expect(res.json).toHaveBeenCalled();
     });
   });
 });

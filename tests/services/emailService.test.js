@@ -10,6 +10,7 @@ jest.unstable_mockModule('resend', () => ({
 
 describe('Email Service', () => {
   let sendReferralVisitNotification;
+  let sendReportPurchasedNotification;
   let consoleSpy;
 
   beforeEach(() => {
@@ -28,6 +29,7 @@ describe('Email Service', () => {
       jest.resetModules();
       const emailService = await import('../../src/services/emailService.js');
       sendReferralVisitNotification = emailService.sendReferralVisitNotification;
+      sendReportPurchasedNotification = emailService.sendReportPurchasedNotification;
     });
 
     afterEach(() => {
@@ -37,10 +39,10 @@ describe('Email Service', () => {
     it('should send referral visit notification with all details', async () => {
       mockSend.mockResolvedValueOnce({ id: 'email_123' });
 
-      const property = {
+      const recipient = {
         address: '6774 Encore Blvd',
-        referral_code: '6774e',
-        owner_name: 'Christopher Porcelli'
+        short_code: '6774e',
+        recipient_name: 'Christopher Porcelli'
       };
 
       const visitInfo = {
@@ -50,7 +52,7 @@ describe('Email Service', () => {
         visit_count: 3
       };
 
-      await sendReferralVisitNotification(property, visitInfo);
+      await sendReferralVisitNotification(recipient, visitInfo);
 
       expect(mockSend).toHaveBeenCalledWith({
         from: 'LowerPropTax <help@lowerproptax.com>',
@@ -60,7 +62,7 @@ describe('Email Service', () => {
       });
       expect(mockSend).toHaveBeenCalledWith(
         expect.objectContaining({
-          text: expect.stringContaining('Referral Code: 6774e')
+          text: expect.stringContaining('Short Code: 6774e')
         })
       );
       expect(mockSend).toHaveBeenCalledWith(
@@ -74,9 +76,9 @@ describe('Email Service', () => {
     it('should handle missing optional fields gracefully', async () => {
       mockSend.mockResolvedValueOnce({ id: 'email_456' });
 
-      const property = {
+      const recipient = {
         address: '123 Main St',
-        referral_code: '123m'
+        short_code: '123m'
       };
 
       const visitInfo = {
@@ -84,7 +86,7 @@ describe('Email Service', () => {
         visit_count: 1
       };
 
-      await sendReferralVisitNotification(property, visitInfo);
+      await sendReferralVisitNotification(recipient, visitInfo);
 
       expect(mockSend).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -107,10 +109,10 @@ describe('Email Service', () => {
       const errorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
       mockSend.mockRejectedValueOnce(new Error('SMTP connection failed'));
 
-      const property = {
+      const recipient = {
         address: '123 Main St',
-        referral_code: '123m',
-        owner_name: 'Test User'
+        short_code: '123m',
+        recipient_name: 'Test User'
       };
 
       const visitInfo = {
@@ -120,9 +122,70 @@ describe('Email Service', () => {
         visit_count: 1
       };
 
-      await sendReferralVisitNotification(property, visitInfo);
+      await sendReferralVisitNotification(recipient, visitInfo);
 
       expect(errorSpy).toHaveBeenCalledWith('Failed to send referral visit notification:', 'SMTP connection failed');
+    });
+
+    it('should send report purchased notification', async () => {
+      mockSend.mockResolvedValueOnce({ id: 'email_789' });
+
+      const recipient = {
+        recipient_name: 'Christopher Porcelli',
+        address: '6774 Encore Blvd',
+        email: 'buyer@example.com'
+      };
+
+      await sendReportPurchasedNotification(recipient);
+
+      expect(mockSend).toHaveBeenCalledWith({
+        from: 'LowerPropTax <help@lowerproptax.com>',
+        to: 'help@lowerproptax.com',
+        subject: 'Report Purchased - 6774 Encore Blvd',
+        text: expect.stringContaining('Owner: Christopher Porcelli')
+      });
+      expect(mockSend).toHaveBeenCalledWith(
+        expect.objectContaining({
+          text: expect.stringContaining('Email: buyer@example.com')
+        })
+      );
+      expect(consoleSpy).toHaveBeenCalledWith('Report purchased notification sent for 6774 Encore Blvd');
+    });
+
+    it('should handle missing optional fields in report purchased notification', async () => {
+      mockSend.mockResolvedValueOnce({ id: 'email_790' });
+
+      const recipient = {
+        address: '123 Main St'
+      };
+
+      await sendReportPurchasedNotification(recipient);
+
+      expect(mockSend).toHaveBeenCalledWith(
+        expect.objectContaining({
+          text: expect.stringContaining('Owner: Unknown')
+        })
+      );
+      expect(mockSend).toHaveBeenCalledWith(
+        expect.objectContaining({
+          text: expect.stringContaining('Email: Not provided')
+        })
+      );
+    });
+
+    it('should handle report purchased notification errors gracefully', async () => {
+      const errorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+      mockSend.mockRejectedValueOnce(new Error('SMTP failed'));
+
+      const recipient = {
+        recipient_name: 'Test',
+        address: '123 Main St',
+        email: 'test@example.com'
+      };
+
+      await sendReportPurchasedNotification(recipient);
+
+      expect(errorSpy).toHaveBeenCalledWith('Failed to send report purchased notification:', 'SMTP failed');
     });
   });
 
@@ -132,12 +195,13 @@ describe('Email Service', () => {
       jest.resetModules();
       const emailService = await import('../../src/services/emailService.js');
       sendReferralVisitNotification = emailService.sendReferralVisitNotification;
+      sendReportPurchasedNotification = emailService.sendReportPurchasedNotification;
     });
 
     it('should log message and return early for referral visit notification', async () => {
-      const property = {
+      const recipient = {
         address: '123 Main St',
-        referral_code: '123m'
+        short_code: '123m'
       };
 
       const visitInfo = {
@@ -145,7 +209,20 @@ describe('Email Service', () => {
         visit_count: 1
       };
 
-      await sendReferralVisitNotification(property, visitInfo);
+      await sendReferralVisitNotification(recipient, visitInfo);
+
+      expect(consoleSpy).toHaveBeenCalledWith('Email service not configured (RESEND_API_KEY missing)');
+      expect(mockSend).not.toHaveBeenCalled();
+    });
+
+    it('should log message and return early for report purchased notification', async () => {
+      const recipient = {
+        recipient_name: 'Test',
+        address: '123 Main St',
+        email: 'test@example.com'
+      };
+
+      await sendReportPurchasedNotification(recipient);
 
       expect(consoleSpy).toHaveBeenCalledWith('Email service not configured (RESEND_API_KEY missing)');
       expect(mockSend).not.toHaveBeenCalled();

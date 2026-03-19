@@ -32,6 +32,7 @@
     "node-pg-migrate": "^8.0.3",
     "pg": "^8.16.3",
     "resend": "^6.5.2",
+    "stripe": "^20.4.1",
     "xlsx": "^0.18.5"
   },
   "devDependencies": {

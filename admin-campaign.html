@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LowerPropTax - Campaign Details</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🏡</text></svg>">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <!-- Clerk.js -->
+    <script
+        async
+        crossorigin="anonymous"
+        data-clerk-publishable-key="pk_live_Y2xlcmsubG93ZXJwcm9wdGF4LmNvbSQ"
+        src="https://cdn.jsdelivr.net/npm/@clerk/clerk-js@5/dist/clerk.browser.js"
+        type="text/javascript"
+    ></script>
+    <style>
+        .campaign-title {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: #1a1a1a;
+            margin-bottom: 0.25rem;
+        }
+
+        .campaign-meta {
+            font-size: 0.9rem;
+            color: #666;
+            margin-bottom: 1.5rem;
+        }
+
+        .stats-row {
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            margin-bottom: 2rem;
+        }
+
+        /* Add recipient form */
+        .add-form {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            margin-bottom: 2rem;
+        }
+
+        .add-form h3 {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 0.75rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .form-grid.wide {
+            grid-template-columns: 1fr;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.35rem;
+        }
+
+        .form-group label {
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .form-group input, .form-group textarea {
+            padding: 0.5rem 0.65rem;
+            border: 1px solid #e5e5e5;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-family: 'Inter', Arial, sans-serif;
+        }
+
+        .form-group input:focus, .form-group textarea:focus {
+            outline: none;
+            border-color: #3171ef;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 60px;
+        }
+
+        .btn-add-recipient {
+            background: #3171ef;
+            color: white;
+            padding: 0.6rem 1.5rem;
+            border-radius: 6px;
+            border: none;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: 'Inter', Arial, sans-serif;
+        }
+
+        .btn-add-recipient:hover {
+            background: #2560d9;
+        }
+
+        /* Recipients table */
+        .status-paid {
+            background: #e8f5e9;
+            color: #27ae60;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .status-unpaid {
+            background: #f5f5f5;
+            color: #999;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .link-cell {
+            font-size: 0.8rem;
+        }
+
+        .link-cell a {
+            color: #3171ef;
+            text-decoration: none;
+        }
+
+        .link-cell a:hover {
+            text-decoration: underline;
+        }
+
+        .views-cell {
+            font-size: 0.85rem;
+            color: #666;
+        }
+
+        .btn-copy {
+            background: #f0f4ff;
+            color: #3171ef;
+            border: none;
+            padding: 0.3rem 0.6rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.75rem;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+
+        .btn-copy:hover {
+            background: #e0e7ff;
+        }
+
+        .savings-value {
+            color: #27ae60;
+            font-weight: 600;
+        }
+
+        @media (max-width: 768px) {
+            .stats-row {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray">
+    <!-- Navigation -->
+    <nav>
+        <a href="/" class="logo-link"><div class="logo">🏡 LowerPropTax</div></a>
+        <div class="nav-right">
+            <ul class="nav-links">
+                <li><a href="admin.html">Assessments</a></li>
+                <li><a href="admin-campaigns.html" style="color: #3171ef;">Campaigns</a></li>
+            </ul>
+            <div class="user-info">
+                <span class="user-name" id="user-name">Loading...</span>
+                <div id="user-button"></div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container">
+        <a href="admin-campaigns.html" class="back-link">← Back to Campaigns</a>
+
+        <div id="loading" class="loading">Loading campaign details...</div>
+
+        <div id="campaign-content" class="hidden">
+            <!-- Campaign Header -->
+            <div class="dashboard-mockup">
+                <div class="campaign-title" id="campaign-name">Campaign</div>
+                <div class="campaign-meta" id="campaign-meta"></div>
+
+                <div class="stats-row">
+                    <div class="stat-card">
+                        <label>Recipients</label>
+                        <div class="value" id="stat-recipients">0</div>
+                    </div>
+                    <div class="stat-card">
+                        <label>Page Views</label>
+                        <div class="value" id="stat-views">0</div>
+                    </div>
+                    <div class="stat-card">
+                        <label>Purchased</label>
+                        <div class="value" id="stat-paid">0</div>
+                    </div>
+                    <div class="stat-card">
+                        <label>Conversion Rate</label>
+                        <div class="value" id="stat-conversion">0%</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Add Recipient Form -->
+            <div class="add-form">
+                <h3>Add Recipient</h3>
+                <form id="add-recipient-form">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Recipient Name *</label>
+                            <input type="text" id="r-name" placeholder="Christopher & Heather Porcelli" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Address *</label>
+                            <input type="text" id="r-address" placeholder="6774 Encore Blvd" required>
+                        </div>
+                        <div class="form-group">
+                            <label>City</label>
+                            <input type="text" id="r-city" placeholder="Atlanta">
+                        </div>
+                        <div class="form-group">
+                            <label>Zip Code</label>
+                            <input type="text" id="r-zip" placeholder="30328">
+                        </div>
+                    </div>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Sq Ft</label>
+                            <input type="number" id="r-sqft" placeholder="2016">
+                        </div>
+                        <div class="form-group">
+                            <label>Annual Tax ($)</label>
+                            <input type="number" id="r-tax" step="0.01" placeholder="9331.51">
+                        </div>
+                        <div class="form-group">
+                            <label>Estimated Savings ($)</label>
+                            <input type="number" id="r-savings" step="0.01" placeholder="1870.21">
+                        </div>
+                        <div class="form-group">
+                            <label>Short Code</label>
+                            <input type="text" id="r-code" placeholder="auto-generated">
+                        </div>
+                    </div>
+                    <div class="form-grid wide">
+                        <div class="form-group">
+                            <label>Comparables (JSON array)</label>
+                            <textarea id="r-comps" placeholder='[{"address": "6765 Prelude Dr", "sqft": 1900, "annualTax": 7658.91}]'></textarea>
+                        </div>
+                    </div>
+                    <div class="form-grid wide">
+                        <div class="form-group">
+                            <label>Report URL</label>
+                            <input type="url" id="r-report" placeholder="https://...">
+                        </div>
+                    </div>
+                    <div style="margin-top: 0.75rem;">
+                        <button type="submit" class="btn-add-recipient">Add Recipient</button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Recipients Table -->
+            <div class="dashboard-mockup">
+                <div class="mockup-header">
+                    <h2>Recipients</h2>
+                </div>
+                <div class="properties-table">
+                    <div class="empty-state hidden" id="recipients-empty">
+                        <h3>No recipients yet</h3>
+                        <p>Add recipients above to start building your campaign.</p>
+                    </div>
+                    <table id="recipients-table" class="hidden">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Address</th>
+                                <th>Savings</th>
+                                <th>Status</th>
+                                <th>Views</th>
+                                <th>Link</th>
+                            </tr>
+                        </thead>
+                        <tbody id="recipients-tbody">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'https://lowerproptax.up.railway.app/api';
+        const APP_URL = 'https://lowerproptax.com';
+        const isDevelopment = window.location.protocol === 'file:' || window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+
+        let campaignId = null;
+        let campaignData = null;
+
+        function getCampaignId() {
+            const params = new URLSearchParams(window.location.search);
+            return params.get('id');
+        }
+
+        async function getToken() {
+            if (isDevelopment) return 'dev-token';
+            return await window.Clerk.session.getToken();
+        }
+
+        function formatCurrency(amount) {
+            const num = parseFloat(amount);
+            if (isNaN(num)) return '--';
+            return '$' + num.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        }
+
+        async function loadCampaign() {
+            campaignId = getCampaignId();
+            if (!campaignId) {
+                alert('No campaign ID provided');
+                window.location.href = 'admin-campaigns.html';
+                return;
+            }
+
+            try {
+                const token = await getToken();
+                const response = await fetch(`${API_BASE}/admin/campaigns/${campaignId}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (!response.ok) throw new Error('Failed to load campaign');
+
+                campaignData = await response.json();
+                displayCampaign();
+            } catch (error) {
+                console.error('Error loading campaign:', error);
+                document.getElementById('loading').textContent = 'Failed to load campaign.';
+            }
+        }
+
+        function displayCampaign() {
+            document.getElementById('loading').classList.add('hidden');
+            document.getElementById('campaign-content').classList.remove('hidden');
+
+            const c = campaignData;
+            document.getElementById('campaign-name').textContent = c.name;
+
+            const meta = [];
+            if (c.county) meta.push(c.county + ' County');
+            if (c.state) meta.push(c.state);
+            if (c.deadline) meta.push('Deadline: ' + new Date(c.deadline + 'T00:00:00').toLocaleDateString());
+            document.getElementById('campaign-meta').textContent = meta.join(' · ');
+
+            const recipients = c.recipients || [];
+            const paidCount = recipients.filter(r => r.paymentStatus === 'paid').length;
+            const totalViews = recipients.reduce((sum, r) => sum + (r.pageViews || 0), 0);
+
+            document.getElementById('stat-recipients').textContent = recipients.length;
+            document.getElementById('stat-views').textContent = totalViews;
+            document.getElementById('stat-paid').textContent = paidCount;
+            document.getElementById('stat-conversion').textContent =
+                recipients.length > 0 ? Math.round((paidCount / recipients.length) * 100) + '%' : '0%';
+
+            displayRecipients(recipients);
+        }
+
+        function displayRecipients(recipients) {
+            const table = document.getElementById('recipients-table');
+            const empty = document.getElementById('recipients-empty');
+            const tbody = document.getElementById('recipients-tbody');
+
+            if (recipients.length === 0) {
+                empty.classList.remove('hidden');
+                table.classList.add('hidden');
+                return;
+            }
+
+            empty.classList.add('hidden');
+            table.classList.remove('hidden');
+            tbody.innerHTML = '';
+
+            recipients.forEach(r => {
+                const row = document.createElement('tr');
+                const isPaid = r.paymentStatus === 'paid';
+                const link = `${APP_URL}/r/${r.shortCode}`;
+
+                row.innerHTML = `
+                    <td><strong>${r.recipientName}</strong></td>
+                    <td>${r.address}</td>
+                    <td class="savings-value">${formatCurrency(r.estimatedSavings)}</td>
+                    <td><span class="${isPaid ? 'status-paid' : 'status-unpaid'}">${isPaid ? 'Paid' : 'Unpaid'}</span></td>
+                    <td class="views-cell">${r.pageViews || 0}</td>
+                    <td class="link-cell">
+                        <a href="${link}" target="_blank">/r/${r.shortCode}</a>
+                        <button class="btn-copy" onclick="copyLink('${link}', this)" title="Copy link">Copy</button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        function copyLink(text, btn) {
+            navigator.clipboard.writeText(text).then(() => {
+                const original = btn.textContent;
+                btn.textContent = 'Copied!';
+                setTimeout(() => { btn.textContent = original; }, 1500);
+            });
+        }
+
+        async function addRecipient(event) {
+            event.preventDefault();
+
+            const name = document.getElementById('r-name').value.trim();
+            const address = document.getElementById('r-address').value.trim();
+            const city = document.getElementById('r-city').value.trim();
+            const zip = document.getElementById('r-zip').value.trim();
+            const sqft = document.getElementById('r-sqft').value;
+            const tax = document.getElementById('r-tax').value;
+            const savings = document.getElementById('r-savings').value;
+            const code = document.getElementById('r-code').value.trim();
+            const compsText = document.getElementById('r-comps').value.trim();
+            const reportUrl = document.getElementById('r-report').value.trim();
+
+            if (!name || !address) {
+                alert('Name and address are required.');
+                return;
+            }
+
+            let comparables = null;
+            if (compsText) {
+                try {
+                    comparables = JSON.parse(compsText);
+                } catch (e) {
+                    alert('Invalid JSON for comparables. Please check the format.');
+                    return;
+                }
+            }
+
+            try {
+                const token = await getToken();
+                const response = await fetch(`${API_BASE}/admin/campaigns/${campaignId}/recipients`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        recipientName: name,
+                        address,
+                        city,
+                        state: campaignData.state || 'GA',
+                        zipCode: zip,
+                        sqft: sqft ? parseInt(sqft) : null,
+                        annualTax: tax ? parseFloat(tax) : null,
+                        estimatedSavings: savings ? parseFloat(savings) : null,
+                        shortCode: code || undefined,
+                        comparables,
+                        reportUrl: reportUrl || null
+                    })
+                });
+
+                if (!response.ok) {
+                    const data = await response.json();
+                    throw new Error(data.error || 'Failed to add recipient');
+                }
+
+                // Clear form
+                document.getElementById('add-recipient-form').reset();
+
+                // Reload campaign
+                await loadCampaign();
+            } catch (error) {
+                console.error('Error adding recipient:', error);
+                alert(error.message || 'Failed to add recipient.');
+            }
+        }
+
+        document.getElementById('add-recipient-form').addEventListener('submit', addRecipient);
+
+        // Initialize Clerk
+        async function initClerk() {
+            try {
+                if (isDevelopment) {
+                    document.getElementById('user-name').textContent = 'Developer';
+                    document.getElementById('user-button').innerHTML = '<span style="color: #666;">Dev Mode</span>';
+                    await loadCampaign();
+                    return;
+                }
+
+                await window.Clerk.load();
+                if (!window.Clerk.user) {
+                    window.location.href = '/';
+                    return;
+                }
+
+                const user = window.Clerk.user;
+                document.getElementById('user-name').textContent =
+                    user.firstName || user.username || user.emailAddresses[0]?.emailAddress || 'User';
+                window.Clerk.mountUserButton(document.getElementById('user-button'));
+
+                await loadCampaign();
+            } catch (error) {
+                console.error('Error initializing:', error);
+                if (!isDevelopment) window.location.href = '/';
+            }
+        }
+
+        window.addEventListener('load', async () => {
+            if (window.Clerk) await initClerk();
+            else document.addEventListener('clerk:loaded', initClerk);
+        });
+    </script>
+</body>
+</html>

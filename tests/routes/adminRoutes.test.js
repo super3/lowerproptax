@@ -10,6 +10,12 @@ jest.unstable_mockModule('../../src/db/connection.js', () => ({
   }
 }));
 
+// Mock xlsx (needed by adminController)
+jest.unstable_mockModule('xlsx', () => ({
+  read: jest.fn(),
+  utils: { sheet_to_json: jest.fn() }
+}));
+
 // Mock Clerk SDK
 const mockGetUser = jest.fn();
 const mockGetSession = jest.fn();

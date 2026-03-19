@@ -16,7 +16,4 @@ router.put('/admin/properties/:id', requireAuthOrApiKey, adminController.updateP
 router.post('/admin/upload-mailed-properties', requireAuthOrApiKey, upload.single('file'), adminController.uploadMailedProperties);
 router.get('/admin/mailed-properties', requireAuthOrApiKey, adminController.getMailedProperties);
 
-// Public referral route (no auth required)
-router.get('/referral/:code', adminController.trackReferralVisit);
-
 export default router;

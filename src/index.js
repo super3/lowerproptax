@@ -3,6 +3,9 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import { clerkMiddleware } from '@clerk/express';
 import adminRoutes from './routes/adminRoutes.js';
+import campaignRoutes from './routes/campaignRoutes.js';
+import mailRoutes from './routes/mailRoutes.js';
+import { handleWebhook } from './controllers/mailController.js';
 import { initDatabase } from './db/init.js';
 
 // Load environment variables
@@ -23,6 +26,9 @@ const corsOptions = {
 // Middleware
 app.use(cors(corsOptions));
 
+// Stripe webhook needs raw body - must be before express.json()
+app.post('/api/webhooks/stripe', express.raw({ type: 'application/json' }), handleWebhook);
+
 app.use(express.json());
 
 // Clerk middleware for authentication
@@ -35,11 +41,18 @@ app.get('/health', (req, res) => {
 
 // Referral landing page - serves static HTML, data loaded via API
 app.get('/r/:code', (req, res) => {
-  res.sendFile('referral.html', { root: '.' });
+  res.sendFile('report.html', { root: '.' });
+});
+
+// Success page after payment
+app.get('/r/:code/success', (req, res) => {
+  res.sendFile('report-success.html', { root: '.' });
 });
 
 // API routes
 app.use('/api', adminRoutes);
+app.use('/api', campaignRoutes);
+app.use('/api', mailRoutes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {

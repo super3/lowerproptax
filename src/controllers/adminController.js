@@ -1,5 +1,4 @@
 import pool from '../db/connection.js';
-import { sendReferralVisitNotification } from '../services/emailService.js';
 import * as XLSX from 'xlsx';
 
 // Default report year - set to 2025 since 2026 bills aren't out yet
@@ -261,19 +260,15 @@ export async function updatePropertyDetails(req, res) {
   }
 }
 
-// Generate a short referral code from address
-function generateReferralCode(address) {
-  // Take first numbers + first letter of street name, lowercase
-  // e.g., "6774 Encore Blvd" -> "6774e"
-  const match = address.match(/^(\d+)\s+(\w)/);
-  if (match) {
-    return (match[1] + match[2]).toLowerCase();
-  }
-  // Fallback: random hex
-  return Math.random().toString(36).substring(2, 8);
+// Generate a short code from address (e.g. "6774 Encore Blvd" → "6774e")
+function generateShortCode(address) {
+  const parts = address.trim().split(/\s+/);
+  const number = parts[0] || '';
+  const street = (parts[1] || '').toLowerCase();
+  return `${number}${street.charAt(0)}`;
 }
 
-// Upload XLSX with mailed properties
+// Upload XLSX with mailed properties into a campaign
 export async function uploadMailedProperties(req, res) {
   try {
     if (!req.file) {
@@ -289,6 +284,16 @@ export async function uploadMailedProperties(req, res) {
       return res.status(400).json({ error: 'Spreadsheet is empty' });
     }
 
+    // Create a campaign for this upload
+    const campaignName = req.body.campaignName || `Upload ${new Date().toISOString().split('T')[0]}`;
+    const campaignId = `camp_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
+
+    await pool.query(
+      `INSERT INTO campaigns (id, name, county, state, created_at, updated_at)
+       VALUES ($1, $2, $3, $4, NOW(), NOW())`,
+      [campaignId, campaignName, req.body.county || null, req.body.state || 'GA']
+    );
+
     const results = { imported: 0, skipped: 0, errors: [] };
 
     for (const row of rows) {
@@ -298,11 +303,10 @@ export async function uploadMailedProperties(req, res) {
         const city = row['City'] || row['city'] || '';
         const state = row['State'] || row['state'] || 'GA';
         const zipCode = row['Zip'] || row['zip'] || row['Zip Code'] || row['zip_code'] || '';
-        const ownerName = row['Owner'] || row['owner'] || row['Owner Name'] || row['owner_name'] || row['Name'] || row['name'] || '';
+        const recipientName = row['Owner'] || row['owner'] || row['Owner Name'] || row['owner_name'] || row['Name'] || row['name'] || '';
         const sqft = parseInt(row['Sqft'] || row['sqft'] || row['SqFt'] || row['Square Feet'] || row['square_feet'] || 0) || null;
         const annualTax = parseFloat(row['Tax'] || row['tax'] || row['Property Tax'] || row['property_tax'] || row['Annual Tax'] || row['annual_tax'] || row['2025 Property Tax'] || 0) || null;
-        const homestead = row['Homestead'] || row['homestead'];
-        const parcelNumber = row['Parcel'] || row['parcel'] || row['Parcel Number'] || row['parcel_number'] || '';
+        const estimatedSavings = parseFloat(row['Estimated Savings'] || row['estimated_savings'] || row['Savings'] || row['savings'] || 0) || null;
 
         // Comparable properties (up to 3)
         const comps = [];
@@ -315,53 +319,35 @@ export async function uploadMailedProperties(req, res) {
           }
         }
 
-        // Estimated tax (after exemptions)
-        const estimatedTax = parseFloat(row['Estimated Tax'] || row['estimated_tax'] || row['Estimated Annual Tax'] || row['estimated_annual_tax'] || 0) || null;
-
         if (!address) {
           results.errors.push(`Row skipped: no address found`);
           results.skipped++;
           continue;
         }
 
-        // Generate referral code
-        let referralCode = (row['Referral Code'] || row['referral_code'] || '').toString().trim();
-        if (!referralCode) {
-          referralCode = generateReferralCode(address);
+        // Generate short code
+        let shortCode = (row['Short Code'] || row['short_code'] || row['Referral Code'] || row['referral_code'] || '').toString().trim();
+        if (!shortCode) {
+          shortCode = generateShortCode(address);
         }
 
-        // Check if referral code already exists
-        const existing = await pool.query('SELECT id FROM properties WHERE referral_code = $1', [referralCode]);
+        // Check if short code already exists
+        const existing = await pool.query('SELECT id FROM mail_recipients WHERE short_code = $1', [shortCode]);
         if (existing.rows.length > 0) {
-          results.errors.push(`${address}: referral code "${referralCode}" already exists, skipped`);
+          results.errors.push(`${address}: short code "${shortCode}" already exists, skipped`);
           results.skipped++;
           continue;
         }
 
-        const propertyId = `prop_mail_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
+        const recipientId = `mail_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
 
-        // Insert property
+        // Insert mail recipient
         await pool.query(`
-          INSERT INTO properties (id, address, city, state, zip_code, sqft, homestead, parcel_number, owner_name, referral_code, mailed_at, source, created_at, updated_at)
-          VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, NOW(), 'direct_mail', NOW(), NOW())
-        `, [propertyId, address, city, state, zipCode, sqft, homestead === true || homestead === 'true' || homestead === 'Yes' || homestead === 'yes' ? true : false, parcelNumber, ownerName, referralCode]);
-
-        // Insert assessment if tax data provided
-        if (annualTax) {
-          const assessmentId = `assess_${propertyId}_${DEFAULT_REPORT_YEAR}`;
-          await pool.query(`
-            INSERT INTO assessments (id, property_id, year, annual_tax, estimated_annual_tax, status, created_at, updated_at)
-            VALUES ($1, $2, $3, $4, $5, 'mailed', NOW(), NOW())
-          `, [assessmentId, propertyId, DEFAULT_REPORT_YEAR, annualTax, estimatedTax]);
-        }
-
-        // Insert comparable properties
-        for (const comp of comps) {
-          await pool.query(`
-            INSERT INTO comparable_properties (property_id, address, sqft, property_tax)
-            VALUES ($1, $2, $3, $4)
-          `, [propertyId, comp.address, comp.sqft, comp.tax]);
-        }
+          INSERT INTO mail_recipients (id, campaign_id, short_code, recipient_name, address, city, state, zip_code,
+            sqft, annual_tax, estimated_savings, comparables, created_at, updated_at)
+          VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, NOW(), NOW())
+        `, [recipientId, campaignId, shortCode, recipientName, address, city, state, zipCode,
+            sqft, annualTax, estimatedSavings, comps.length > 0 ? JSON.stringify(comps) : null]);
 
         results.imported++;
       } catch (rowError) {
@@ -372,6 +358,7 @@ export async function uploadMailedProperties(req, res) {
 
     res.json({
       message: `Import complete: ${results.imported} imported, ${results.skipped} skipped`,
+      campaignId,
       ...results
     });
   } catch (error) {
@@ -380,38 +367,36 @@ export async function uploadMailedProperties(req, res) {
   }
 }
 
-// Get all mailed properties
+// Get all mailed properties (across all campaigns)
 export async function getMailedProperties(req, res) {
   try {
     const query = `
       SELECT
-        p.id,
-        p.address,
-        p.city,
-        p.state,
-        p.zip_code,
-        p.owner_name,
-        p.referral_code,
-        p.sqft,
-        p.mailed_at,
-        p.created_at,
-        a.annual_tax,
-        a.estimated_annual_tax,
-        a.status,
-        (SELECT COUNT(*) FROM referral_visits rv WHERE rv.property_id = p.id) as visit_count,
-        (SELECT MAX(visited_at) FROM referral_visits rv WHERE rv.property_id = p.id) as last_visited
-      FROM properties p
-      LEFT JOIN assessments a ON p.id = a.property_id
-        AND a.year = (SELECT MAX(year) FROM assessments WHERE property_id = p.id)
-      WHERE p.source = 'direct_mail'
-      ORDER BY p.mailed_at DESC NULLS LAST, p.created_at DESC
+        mr.id,
+        mr.address,
+        mr.city,
+        mr.state,
+        mr.zip_code,
+        mr.recipient_name,
+        mr.short_code,
+        mr.sqft,
+        mr.annual_tax,
+        mr.estimated_savings,
+        mr.payment_status,
+        mr.page_views,
+        mr.last_viewed_at,
+        mr.created_at,
+        c.name as campaign_name
+      FROM mail_recipients mr
+      JOIN campaigns c ON mr.campaign_id = c.id
+      ORDER BY mr.created_at DESC
     `;
 
     const result = await pool.query(query);
 
     // Calculate stats
     const totalMailed = result.rows.length;
-    const totalVisited = result.rows.filter(r => parseInt(r.visit_count) > 0).length;
+    const totalVisited = result.rows.filter(r => parseInt(r.page_views) > 0).length;
 
     res.json({
       properties: result.rows,
@@ -424,75 +409,5 @@ export async function getMailedProperties(req, res) {
   } catch (error) {
     console.error('Error fetching mailed properties:', error);
     res.status(500).json({ error: 'Failed to fetch mailed properties' });
-  }
-}
-
-// Track referral visit and send notification
-export async function trackReferralVisit(req, res) {
-  try {
-    const { code } = req.params;
-
-    // Find property by referral code
-    const propertyResult = await pool.query(`
-      SELECT p.*, a.annual_tax, a.estimated_annual_tax,
-        (SELECT json_agg(json_build_object('address', cp.address, 'sqft', cp.sqft, 'property_tax', cp.property_tax))
-         FROM comparable_properties cp WHERE cp.property_id = p.id) as comparables
-      FROM properties p
-      LEFT JOIN assessments a ON p.id = a.property_id
-        AND a.year = (SELECT MAX(year) FROM assessments WHERE property_id = p.id)
-      WHERE p.referral_code = $1
-    `, [code]);
-
-    if (propertyResult.rows.length === 0) {
-      return res.status(404).json({ error: 'Property not found' });
-    }
-
-    const property = propertyResult.rows[0];
-
-    // Record the visit
-    const ipAddress = req.headers['x-forwarded-for'] || req.socket?.remoteAddress || '';
-    const userAgent = req.headers['user-agent'] || '';
-
-    await pool.query(`
-      INSERT INTO referral_visits (property_id, referral_code, ip_address, user_agent)
-      VALUES ($1, $2, $3, $4)
-    `, [property.id, code, ipAddress, userAgent]);
-
-    // Get visit count
-    const countResult = await pool.query(
-      'SELECT COUNT(*) as count FROM referral_visits WHERE property_id = $1',
-      [property.id]
-    );
-    const visitCount = parseInt(countResult.rows[0].count);
-
-    // Send email notification (fire and forget)
-    sendReferralVisitNotification(property, {
-      ip_address: ipAddress,
-      user_agent: userAgent,
-      visited_at: new Date().toISOString(),
-      visit_count: visitCount
-    }).catch(() => {});
-
-    // Calculate savings
-    const annualTax = parseFloat(property.annual_tax) || 0;
-    const estimatedTax = parseFloat(property.estimated_annual_tax) || 0;
-    const savings = annualTax - estimatedTax;
-
-    // Return property data for the landing page
-    res.json({
-      address: property.address,
-      city: property.city,
-      state: property.state,
-      zipCode: property.zip_code,
-      ownerName: property.owner_name,
-      sqft: property.sqft,
-      annualTax: annualTax,
-      estimatedSavings: savings > 0 ? savings : 0,
-      comparables: property.comparables || [],
-      referralCode: code
-    });
-  } catch (error) {
-    console.error('Error tracking referral visit:', error);
-    res.status(500).json({ error: 'Failed to load property' });
   }
 }
