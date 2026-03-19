@@ -2,7 +2,6 @@ import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import { clerkMiddleware } from '@clerk/express';
-import propertyRoutes from './routes/propertyRoutes.js';
 import adminRoutes from './routes/adminRoutes.js';
 import { initDatabase } from './db/init.js';
 
@@ -40,7 +39,6 @@ app.get('/r/:code', (req, res) => {
 });
 
 // API routes
-app.use('/api', propertyRoutes);
 app.use('/api', adminRoutes);
 
 // Error handling middleware

@@ -27,8 +27,6 @@ jest.unstable_mockModule('@clerk/express', () => ({
 }));
 
 // Import routes after mocking
-const authModule = await import('../../src/middleware/auth.js');
-const adminAuthModule = await import('../../src/middleware/adminAuth.js');
 const adminRoutes = await import('../../src/routes/adminRoutes.js');
 
 describe('Admin Routes', () => {

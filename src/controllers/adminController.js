@@ -1,6 +1,5 @@
 import pool from '../db/connection.js';
-import { sendAssessmentReadyNotification, sendReferralVisitNotification } from '../services/emailService.js';
-import { emitEvent } from '../services/sseManager.js';
+import { sendReferralVisitNotification } from '../services/emailService.js';
 import * as XLSX from 'xlsx';
 
 // Default report year - set to 2025 since 2026 bills aren't out yet
@@ -254,31 +253,6 @@ export async function updatePropertyDetails(req, res) {
       ...propertyResult.rows[0],
       currentAssessment: assessmentResult.rows[0]
     };
-
-    // Emit SSE event for real-time notifications
-    const updatedProperty = propertyResult.rows[0];
-    emitEvent('property-updated', {
-      id: updatedProperty.id || id,
-      address: updatedProperty.address,
-      status: assessmentResult.rows[0]?.status || status,
-      updatedAt: updatedProperty.updated_at
-    });
-
-    // Send email notification if status was set to 'ready'
-    if (status === 'ready') {
-      const property = propertyResult.rows[0];
-      const assessment = {
-        annualTax: assessmentResult.rows[0].annual_tax,
-        estimatedAnnualTax: assessmentResult.rows[0].estimated_annual_tax
-      };
-
-      // Fetch user email from Clerk and send notification
-      const userEmail = await fetchUserEmailFromClerk(property.user_id);
-      if (userEmail) {
-        /* istanbul ignore next */
-        sendAssessmentReadyNotification(property, assessment, userEmail).catch(() => {});
-      }
-    }
 
     res.json(response);
   } catch (error) {
