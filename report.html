@@ -510,10 +510,40 @@
             return `${months[d.getMonth()]} ${day}${suffix}`;
         }
 
+        // Sample data for demo/preview mode
+        const DEMO_DATA = {
+            shortCode: 'demo',
+            recipientName: 'Christopher & Heather Porcelli',
+            address: '6774 Encore Blvd',
+            city: 'Sandy Springs',
+            state: 'GA',
+            zipCode: '30328',
+            sqft: 2016,
+            annualTax: 9331.51,
+            estimatedSavings: 1870.21,
+            comparables: [
+                { address: '6765 Prelude Dr', sqft: 1900, annualTax: 7658.91 },
+                { address: '6781 Cadence Blvd', sqft: 2100, annualTax: 7492.30 },
+                { address: '6790 Overture Way', sqft: 1950, annualTax: 7810.44 }
+            ],
+            paymentStatus: 'unpaid',
+            reportUrl: null,
+            campaignName: 'Aria Feb 2026',
+            county: 'Fulton',
+            deadline: '2026-04-01'
+        };
+
         async function loadReport() {
             const code = getShortCode();
             if (!code) {
                 showError();
+                return;
+            }
+
+            // Demo mode — render sample data without API call
+            if (code === 'demo') {
+                recipientData = DEMO_DATA;
+                displayReport();
                 return;
             }
 
