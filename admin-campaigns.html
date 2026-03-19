@@ -357,7 +357,7 @@
 
                 await window.Clerk.load();
                 if (!window.Clerk.user) {
-                    window.location.href = '//';
+                    window.location.href = '/';
                     return;
                 }
 
@@ -369,7 +369,7 @@
                 await loadCampaigns();
             } catch (error) {
                 console.error('Error initializing:', error);
-                if (!isDevelopment) window.location.href = '//';
+                if (!isDevelopment) window.location.href = '/';
             }
         }
 

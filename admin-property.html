@@ -473,7 +473,7 @@
 
                 // Check if user is signed in
                 if (!window.Clerk.user) {
-                    window.location.href = '//';
+                    window.location.href = '/';
                     return;
                 }
 
@@ -491,7 +491,7 @@
             } catch (error) {
                 console.error('Error initializing:', error);
                 if (!isDevelopment) {
-                    window.location.href = '//';
+                    window.location.href = '/';
                 }
             }
         }
