@@ -27,7 +27,8 @@ jest.unstable_mockModule('@clerk/express', () => ({
 // Mock email service
 jest.unstable_mockModule('../src/services/emailService.js', () => ({
   sendNewPropertyNotification: jest.fn().mockResolvedValue(undefined),
-  sendAssessmentReadyNotification: jest.fn().mockResolvedValue(undefined)
+  sendAssessmentReadyNotification: jest.fn().mockResolvedValue(undefined),
+  sendReferralVisitNotification: jest.fn().mockResolvedValue(undefined)
 }));
 
 // Import after mocking

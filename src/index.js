@@ -34,6 +34,11 @@ app.get('/health', (req, res) => {
   res.json({ status: 'ok', message: 'LowerPropTax server is running' });
 });
 
+// Referral landing page - serves static HTML, data loaded via API
+app.get('/r/:code', (req, res) => {
+  res.sendFile('referral.html', { root: '.' });
+});
+
 // API routes
 app.use('/api', propertyRoutes);
 app.use('/api', adminRoutes);

@@ -10,8 +10,16 @@ jest.unstable_mockModule('../../src/db/connection.js', () => ({
 
 // Mock the email service
 const mockSendAssessmentReadyNotification = jest.fn();
+const mockSendReferralVisitNotification = jest.fn();
 jest.unstable_mockModule('../../src/services/emailService.js', () => ({
-  sendAssessmentReadyNotification: mockSendAssessmentReadyNotification
+  sendAssessmentReadyNotification: mockSendAssessmentReadyNotification,
+  sendReferralVisitNotification: mockSendReferralVisitNotification
+}));
+
+// Mock xlsx
+jest.unstable_mockModule('xlsx', () => ({
+  read: jest.fn(),
+  utils: { sheet_to_json: jest.fn() }
 }));
 
 // Import the controller after mocking

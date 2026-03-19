@@ -101,6 +101,125 @@
         .stats-row {
             margin-bottom: 2rem;
         }
+
+        /* Tab Navigation */
+        .tab-nav {
+            display: flex;
+            gap: 0;
+            margin-bottom: 1.5rem;
+            border-bottom: 2px solid #e5e5e5;
+        }
+
+        .tab-btn {
+            padding: 0.75rem 1.5rem;
+            background: transparent;
+            border: none;
+            border-bottom: 2px solid transparent;
+            margin-bottom: -2px;
+            cursor: pointer;
+            font-size: 0.95rem;
+            font-weight: 500;
+            color: #666;
+            transition: all 0.2s;
+        }
+
+        .tab-btn:hover {
+            color: #1a1a1a;
+        }
+
+        .tab-btn.active {
+            color: #1a1a1a;
+            border-bottom-color: #1a1a1a;
+            font-weight: 600;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Upload Section */
+        .upload-section {
+            background: #f8f9fa;
+            border: 1px solid #e5e5e5;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .upload-section h3 {
+            margin-bottom: 0.5rem;
+        }
+
+        .upload-row {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .upload-row input[type="file"] {
+            flex: 1;
+        }
+
+        .btn-upload {
+            padding: 0.5rem 1.5rem;
+            background: #1a1a1a;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: background 0.2s;
+        }
+
+        .btn-upload:hover:not(:disabled) {
+            background: #333;
+        }
+
+        .btn-upload:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        .upload-status {
+            margin-top: 1rem;
+            padding: 0.75rem 1rem;
+            border-radius: 6px;
+            font-size: 0.9rem;
+        }
+
+        .upload-status.success {
+            background: #e8f5e9;
+            color: #27ae60;
+        }
+
+        .upload-status.error {
+            background: #fee;
+            color: #c41e3a;
+        }
+
+        .visit-badge {
+            background: #e8f5e9;
+            color: #27ae60;
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-weight: 600;
+            font-size: 0.85rem;
+        }
+
+        .visit-badge.none {
+            background: #f5f5f5;
+            color: #999;
+        }
+
+        .referral-link {
+            font-family: monospace;
+            font-size: 0.85rem;
+            color: #1a1a1a;
+        }
     </style>
 </head>
 <body class="bg-gray">
@@ -117,41 +236,110 @@
 
     <!-- Main Content -->
     <div class="container">
-        <!-- Assessments Section -->
-        <div class="dashboard-mockup">
-            <div class="mockup-header">
-                <h2>Assessments</h2>
-            </div>
+        <!-- Tab Navigation -->
+        <div class="tab-nav">
+            <button class="tab-btn active" data-tab="assessments">Assessments</button>
+            <button class="tab-btn" data-tab="direct-mail">Direct Mail</button>
+        </div>
 
-            <div class="stats-row">
-                <div class="stat-card">
-                    <label>Total Pending</label>
-                    <div class="value" id="total-pending">0</div>
+        <!-- Assessments Tab -->
+        <div class="tab-content active" id="tab-assessments">
+            <div class="dashboard-mockup">
+                <div class="mockup-header">
+                    <h2>Assessments</h2>
                 </div>
-                <div class="stat-card">
-                    <label>Total Completed</label>
-                    <div class="value" id="total-completed">0</div>
+
+                <div class="stats-row">
+                    <div class="stat-card">
+                        <label>Total Pending</label>
+                        <div class="value" id="total-pending">0</div>
+                    </div>
+                    <div class="stat-card">
+                        <label>Total Completed</label>
+                        <div class="value" id="total-completed">0</div>
+                    </div>
+                </div>
+
+                <div class="properties-table">
+                    <div class="loading" id="loading">Loading assessments...</div>
+                    <div class="empty-state hidden" id="empty-state">
+                        <h3>No assessments yet</h3>
+                        <p>Assessments will appear here as properties are added.</p>
+                    </div>
+                    <table id="properties-table" class="hidden">
+                        <thead>
+                            <tr>
+                                <th>Address</th>
+                                <th>Status</th>
+                                <th>Time Elapsed</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="properties-tbody">
+                        </tbody>
+                    </table>
                 </div>
             </div>
+        </div>
 
-            <div class="properties-table">
-                <div class="loading" id="loading">Loading assessments...</div>
-                <div class="empty-state hidden" id="empty-state">
-                    <h3>No assessments yet</h3>
-                    <p>Assessments will appear here as properties are added.</p>
+        <!-- Direct Mail Tab -->
+        <div class="tab-content" id="tab-direct-mail">
+            <div class="dashboard-mockup">
+                <div class="mockup-header">
+                    <h2>Direct Mail</h2>
                 </div>
-                <table id="properties-table" class="hidden">
-                    <thead>
-                        <tr>
-                            <th>Address</th>
-                            <th>Status</th>
-                            <th>Time Elapsed</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
-                    <tbody id="properties-tbody">
-                    </tbody>
-                </table>
+
+                <!-- Upload Section -->
+                <div class="upload-section">
+                    <h3>Upload Mailed Properties</h3>
+                    <p style="color: #666; font-size: 0.9rem; margin-bottom: 1rem;">
+                        Upload an XLSX file with columns: Address, City, State, Zip, Owner, Sqft, Tax, Estimated Tax, Homestead, Comp 1 Address, Comp 1 Sqft, Comp 1 Tax, etc.
+                    </p>
+                    <div class="upload-row">
+                        <input type="file" id="xlsx-file" accept=".xlsx,.xls" />
+                        <button class="btn-upload" id="btn-upload" disabled>Upload</button>
+                    </div>
+                    <div class="upload-status hidden" id="upload-status"></div>
+                </div>
+
+                <!-- Stats -->
+                <div class="stats-row">
+                    <div class="stat-card">
+                        <label>Total Mailed</label>
+                        <div class="value" id="total-mailed">0</div>
+                    </div>
+                    <div class="stat-card">
+                        <label>Total Visited</label>
+                        <div class="value" id="total-visited">0</div>
+                    </div>
+                    <div class="stat-card">
+                        <label>Visit Rate</label>
+                        <div class="value" id="visit-rate">0%</div>
+                    </div>
+                </div>
+
+                <!-- Mailed Properties Table -->
+                <div class="properties-table">
+                    <div class="loading" id="mail-loading">Loading mailed properties...</div>
+                    <div class="empty-state hidden" id="mail-empty-state">
+                        <h3>No mailed properties yet</h3>
+                        <p>Upload an XLSX file above to import mailed properties.</p>
+                    </div>
+                    <table id="mail-table" class="hidden">
+                        <thead>
+                            <tr>
+                                <th>Owner</th>
+                                <th>Address</th>
+                                <th>Savings</th>
+                                <th>Referral Link</th>
+                                <th>Visits</th>
+                                <th>Last Visit</th>
+                            </tr>
+                        </thead>
+                        <tbody id="mail-tbody">
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>
@@ -381,6 +569,145 @@
                 if (!isDevelopment) {
                     window.location.href = '/index.html';
                 }
+            }
+        }
+
+        // Tab switching
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                btn.classList.add('active');
+                document.getElementById(`tab-${btn.dataset.tab}`).classList.add('active');
+
+                // Load mailed properties when switching to that tab
+                if (btn.dataset.tab === 'direct-mail' && !mailedPropertiesLoaded) {
+                    loadMailedProperties();
+                }
+            });
+        });
+
+        // File upload handling
+        let mailedPropertiesLoaded = false;
+
+        document.getElementById('xlsx-file').addEventListener('change', (e) => {
+            document.getElementById('btn-upload').disabled = !e.target.files.length;
+        });
+
+        document.getElementById('btn-upload').addEventListener('click', async () => {
+            const fileInput = document.getElementById('xlsx-file');
+            const file = fileInput.files[0];
+            if (!file) return;
+
+            const btn = document.getElementById('btn-upload');
+            const statusDiv = document.getElementById('upload-status');
+            btn.disabled = true;
+            btn.textContent = 'Uploading...';
+            statusDiv.classList.add('hidden');
+
+            try {
+                const token = isDevelopment ? null : await window.Clerk.session.getToken();
+                const formData = new FormData();
+                formData.append('file', file);
+
+                const headers = {};
+                if (token) headers['Authorization'] = `Bearer ${token}`;
+
+                const response = await fetch(`${API_BASE}/admin/upload-mailed-properties`, {
+                    method: 'POST',
+                    headers,
+                    body: formData
+                });
+
+                const result = await response.json();
+
+                statusDiv.classList.remove('hidden', 'success', 'error');
+                if (response.ok) {
+                    statusDiv.classList.add('success');
+                    statusDiv.textContent = result.message;
+                    if (result.errors && result.errors.length > 0) {
+                        statusDiv.textContent += ' | Warnings: ' + result.errors.slice(0, 3).join('; ');
+                    }
+                    // Reload mailed properties
+                    mailedPropertiesLoaded = false;
+                    loadMailedProperties();
+                } else {
+                    statusDiv.classList.add('error');
+                    statusDiv.textContent = result.error || 'Upload failed';
+                }
+            } catch (error) {
+                const statusDiv = document.getElementById('upload-status');
+                statusDiv.classList.remove('hidden');
+                statusDiv.classList.add('error');
+                statusDiv.textContent = 'Upload failed: ' + error.message;
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Upload';
+                fileInput.value = '';
+            }
+        });
+
+        // Load mailed properties
+        async function loadMailedProperties() {
+            try {
+                const token = isDevelopment ? null : await window.Clerk.session.getToken();
+                const headers = {};
+                if (token) headers['Authorization'] = `Bearer ${token}`;
+
+                const response = await fetch(`${API_BASE}/admin/mailed-properties`, { headers });
+
+                if (!response.ok) throw new Error('Failed to load');
+
+                const data = await response.json();
+                mailedPropertiesLoaded = true;
+
+                // Update stats
+                document.getElementById('total-mailed').textContent = data.stats.totalMailed;
+                document.getElementById('total-visited').textContent = data.stats.totalVisited;
+                document.getElementById('visit-rate').textContent = data.stats.visitRate + '%';
+
+                // Update table
+                const loading = document.getElementById('mail-loading');
+                const emptyState = document.getElementById('mail-empty-state');
+                const table = document.getElementById('mail-table');
+                const tbody = document.getElementById('mail-tbody');
+
+                loading.classList.add('hidden');
+
+                if (data.properties.length === 0) {
+                    emptyState.classList.remove('hidden');
+                    table.classList.add('hidden');
+                    return;
+                }
+
+                emptyState.classList.add('hidden');
+                table.classList.remove('hidden');
+                tbody.innerHTML = '';
+
+                data.properties.forEach(prop => {
+                    const row = document.createElement('tr');
+                    const visits = parseInt(prop.visit_count) || 0;
+                    const savings = (parseFloat(prop.annual_tax) || 0) - (parseFloat(prop.estimated_annual_tax) || 0);
+                    const savingsStr = savings > 0
+                        ? '$' + savings.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+                        : '—';
+                    const lastVisit = prop.last_visited
+                        ? new Date(prop.last_visited).toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' })
+                        : '—';
+
+                    row.innerHTML = `
+                        <td>${prop.owner_name || '—'}</td>
+                        <td class="property-address">${prop.address}</td>
+                        <td>${savingsStr}</td>
+                        <td><span class="referral-link">/r/${prop.referral_code}</span></td>
+                        <td><span class="visit-badge ${visits === 0 ? 'none' : ''}">${visits}</span></td>
+                        <td>${lastVisit}</td>
+                    `;
+                    tbody.appendChild(row);
+                });
+            } catch (error) {
+                console.error('Error loading mailed properties:', error);
+                document.getElementById('mail-loading').textContent = 'Failed to load mailed properties.';
             }
         }
 
