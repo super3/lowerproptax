@@ -1,7 +1,12 @@
 import express from 'express';
 import cors from 'cors';
+import path from 'path';
+import { fileURLToPath } from 'url';
 import dotenv from 'dotenv';
 import { clerkMiddleware } from '@clerk/express';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const ROOT_DIR = path.resolve(__dirname, '..');
 import adminRoutes from './routes/adminRoutes.js';
 import campaignRoutes from './routes/campaignRoutes.js';
 import mailRoutes from './routes/mailRoutes.js';
@@ -35,7 +40,7 @@ app.use(express.json());
 app.use(clerkMiddleware());
 
 // Serve static files (HTML, CSS, JS) from project root
-app.use(express.static('.', { extensions: ['html'] }));
+app.use(express.static(ROOT_DIR, { extensions: ['html'] }));
 
 // Health check endpoint
 app.get('/health', (req, res) => {
@@ -44,12 +49,12 @@ app.get('/health', (req, res) => {
 
 // Referral landing page - serves static HTML, data loaded via API
 app.get('/r/:code', (req, res) => {
-  res.sendFile('report.html', { root: '.' });
+  res.sendFile('report.html', { root: ROOT_DIR });
 });
 
 // Success page after payment
 app.get('/r/:code/success', (req, res) => {
-  res.sendFile('report-success.html', { root: '.' });
+  res.sendFile('report-success.html', { root: ROOT_DIR });
 });
 
 // API routes
