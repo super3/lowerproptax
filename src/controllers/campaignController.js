@@ -1,11 +1,11 @@
 import pool from '../db/connection.js';
 
-// Generate a short code from an address (e.g. "6774 Encore Blvd" → "6774e")
+// Generate a short code from an address (e.g. "6774 Encore Blvd" → "6774enc")
 function generateShortCode(address) {
   const parts = address.trim().split(/\s+/);
   const number = parts[0] || '';
   const street = (parts[1] || '').toLowerCase();
-  return `${number}${street.charAt(0)}`;
+  return `${number}${street.substring(0, 3)}`;
 }
 
 // List all campaigns

@@ -271,7 +271,7 @@ describe('Campaign Controller', () => {
 
       // Verify the generated short code was passed (3rd parameter in INSERT)
       const insertCall = mockQuery.mock.calls[1];
-      expect(insertCall[1][2]).toBe('6774e');
+      expect(insertCall[1][2]).toBe('6774enc');
       expect(res.status).toHaveBeenCalledWith(201);
     });
 
@@ -288,7 +288,7 @@ describe('Campaign Controller', () => {
 
       await campaignController.addRecipient(req, res);
 
-      // With only a number, street char is empty string
+      // With only a number, street substring is empty string
       const insertCall = mockQuery.mock.calls[1];
       expect(insertCall[1][2]).toBe('100');
       expect(res.status).toHaveBeenCalledWith(201);
