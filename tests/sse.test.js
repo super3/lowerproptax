@@ -26,13 +26,11 @@ jest.unstable_mockModule('@clerk/express', () => ({
 
 // Mock email service
 jest.unstable_mockModule('../src/services/emailService.js', () => ({
-  sendNewPropertyNotification: jest.fn().mockResolvedValue(undefined),
   sendAssessmentReadyNotification: jest.fn().mockResolvedValue(undefined)
 }));
 
 // Import after mocking
 const adminRoutes = await import('../src/routes/adminRoutes.js');
-const propertyRoutes = await import('../src/routes/propertyRoutes.js');
 const { addClient, emitEvent, getClientCount } = await import('../src/services/sseManager.js');
 
 const VALID_API_KEY = 'test-sse-api-key';
@@ -45,7 +43,6 @@ describe('SSE Event Stream', () => {
     app = express();
     app.use(express.json());
     app.use('/api', adminRoutes.default);
-    app.use('/api', propertyRoutes.default);
     mockQuery.mockClear();
     mockGetUser.mockClear();
     mockVerifyToken.mockClear();

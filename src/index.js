@@ -2,8 +2,10 @@ import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import { clerkMiddleware } from '@clerk/express';
-import propertyRoutes from './routes/propertyRoutes.js';
 import adminRoutes from './routes/adminRoutes.js';
+import mailRoutes from './routes/mailRoutes.js';
+import campaignRoutes from './routes/campaignRoutes.js';
+import { handleWebhook } from './controllers/mailController.js';
 import { initDatabase } from './db/init.js';
 
 // Load environment variables
@@ -24,6 +26,9 @@ const corsOptions = {
 // Middleware
 app.use(cors(corsOptions));
 
+// Stripe webhook needs raw body for signature verification (must be before express.json)
+app.post('/api/webhooks/stripe', express.raw({ type: 'application/json' }), handleWebhook);
+
 app.use(express.json());
 
 // Clerk middleware for authentication
@@ -35,8 +40,9 @@ app.get('/health', (req, res) => {
 });
 
 // API routes
-app.use('/api', propertyRoutes);
 app.use('/api', adminRoutes);
+app.use('/api', mailRoutes);
+app.use('/api', campaignRoutes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {
