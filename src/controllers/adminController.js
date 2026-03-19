@@ -263,8 +263,8 @@ export async function updatePropertyDetails(req, res) {
 // Generate a short code from address (e.g. "6774 Encore Blvd" → "6774e")
 function generateShortCode(address) {
   const parts = address.trim().split(/\s+/);
-  const number = parts[0] || '';
-  const street = (parts[1] || '').toLowerCase();
+  const number = parts[0];
+  const street = parts.length > 1 ? parts[1].toLowerCase() : '';
   return `${number}${street.charAt(0)}`;
 }
 

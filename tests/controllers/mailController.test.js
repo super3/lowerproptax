@@ -136,6 +136,35 @@ describe('Mail Controller', () => {
       );
     });
 
+    it('should default to visit count 1 when update returns no rows', async () => {
+      req.params.code = '6774e';
+
+      const mockRecipient = {
+        id: 'mail_1',
+        shortCode: '6774e',
+        recipientName: 'Test User',
+        address: '123 Main St',
+        city: null, state: null, zipCode: null,
+        sqft: null, annualTax: null, estimatedSavings: null,
+        comparables: null,
+        paymentStatus: 'unpaid',
+        reportUrl: null,
+        campaignName: 'Test', county: null, deadline: null
+      };
+
+      mockQuery
+        .mockResolvedValueOnce({ rows: [mockRecipient] })
+        .mockResolvedValueOnce({ rows: [] }); // UPDATE returns no rows
+
+      await mailController.getRecipientByCode(req, res);
+
+      expect(mockSendReferralVisitNotification).toHaveBeenCalledWith(
+        expect.any(Object),
+        expect.objectContaining({ visit_count: 1 })
+      );
+      expect(res.json).toHaveBeenCalled();
+    });
+
     it('should return 404 for invalid short code', async () => {
       req.params.code = 'invalid';
       mockQuery.mockResolvedValue({ rows: [] });

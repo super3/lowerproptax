@@ -552,6 +552,26 @@ describe('Admin Controller', () => {
 
       expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ imported: 1 }));
     });
+
+    it('should generate short code from single-word address', async () => {
+      req.file = { buffer: Buffer.from('test') };
+      req.body = {};
+      mockXLSXRead.mockReturnValue({ SheetNames: ['Sheet1'], Sheets: { Sheet1: {} } });
+      mockSheetToJson.mockReturnValue([{ 'Address': 'Warehouse' }]);
+
+      // create campaign, short code check, insert
+      mockQuery
+        .mockResolvedValueOnce({ rows: [] })
+        .mockResolvedValueOnce({ rows: [] })
+        .mockResolvedValueOnce({ rows: [] });
+
+      await adminController.uploadMailedProperties(req, res);
+
+      // Short code should be "Warehouse" with no street char
+      const insertCall = mockQuery.mock.calls[2];
+      expect(insertCall[1][2]).toBe('Warehouse');
+      expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ imported: 1 }));
+    });
   });
 
   describe('getMailedProperties', () => {
