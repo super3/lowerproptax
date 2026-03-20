@@ -44,7 +44,12 @@ app.use(clerkMiddleware());
 
 // Health check endpoint
 app.get('/health', (req, res) => {
-  res.json({ status: 'ok', message: 'LowerPropTax server is running' });
+  res.json({ status: 'ok', message: 'LowerPropTax server is running', rootDir: ROOT_DIR });
+});
+
+// Homepage
+app.get('/', (req, res) => {
+  res.sendFile('index.html', { root: ROOT_DIR });
 });
 
 // Referral landing page - serves static HTML, data loaded via API
