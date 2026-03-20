@@ -68,8 +68,8 @@ app.use('/api', adminRoutes);
 app.use('/api', campaignRoutes);
 app.use('/api', mailRoutes);
 
-// Catch-all: serve index.html for any unmatched non-API routes
-app.get('*', (req, res) => {
+// Catch-all: serve index.html for any unmatched non-API routes (Express 5 syntax)
+app.get('{*path}', (req, res) => {
   res.sendFile('index.html', { root: PUBLIC_DIR });
 });
 
