@@ -1,0 +1,690 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=AW-17894024709"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-TEFR1PWB8Q');
+      gtag('config', 'AW-17894024709');
+    </script>
+    <!-- Microsoft Clarity -->
+    <script type="text/javascript">
+      (function(c,l,a,r,i,t,y){
+        c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+        t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+        y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+      })(window, document, "clarity", "script", "v7totve23z");
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LowerPropTax - Your Property Tax Savings Report</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🏡</text></svg>">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        body {
+            padding-top: 0;
+            background: #f8f9fa;
+        }
+
+        .report-nav {
+            background: white;
+            padding: 0 7%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #e5e5e5;
+            height: 60px;
+        }
+
+        .report-nav .logo-link {
+            font-size: 1.25rem;
+        }
+
+        .report-nav .nav-contact {
+            font-size: 0.85rem;
+            color: #666;
+        }
+
+        .report-nav .nav-contact a {
+            color: #3171ef;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        /* Hero / Savings Banner */
+        .savings-hero {
+            background: linear-gradient(135deg, #1a5c2e 0%, #27ae60 100%);
+            color: white;
+            padding: 3rem 7%;
+            text-align: center;
+        }
+
+        .savings-hero .label {
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            opacity: 0.85;
+            margin-bottom: 0.5rem;
+        }
+
+        .savings-amount {
+            font-size: 3.5rem;
+            font-weight: 800;
+            margin: 0.25rem 0;
+            line-height: 1.1;
+        }
+
+        .savings-hero .subtitle {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            margin-top: 0.5rem;
+        }
+
+        /* Main content */
+        .report-content {
+            max-width: 720px;
+            margin: 0 auto;
+            padding: 2rem 1.5rem 4rem;
+        }
+
+        .report-card {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            margin-bottom: 1.5rem;
+        }
+
+        .report-card h2 {
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: #1a1a1a;
+            margin-bottom: 1.25rem;
+        }
+
+        /* Property address card */
+        .property-intro {
+            font-size: 0.95rem;
+            color: #555;
+            line-height: 1.7;
+        }
+
+        .property-intro strong {
+            color: #1a1a1a;
+        }
+
+        /* Comparison table */
+        .comp-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .comp-table th {
+            text-align: left;
+            padding: 0.75rem 1rem;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #666;
+            border-bottom: 2px solid #e5e5e5;
+        }
+
+        .comp-table td {
+            padding: 0.85rem 1rem;
+            border-bottom: 1px solid #f0f0f0;
+            font-size: 0.95rem;
+        }
+
+        .comp-table tr.highlight {
+            background: #fff8e1;
+        }
+
+        .comp-table tr.highlight td {
+            font-weight: 600;
+            color: #1a1a1a;
+        }
+
+        .comp-table .you-badge {
+            display: inline-block;
+            background: #e67e22;
+            color: white;
+            font-size: 0.65rem;
+            padding: 0.15rem 0.4rem;
+            border-radius: 3px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-left: 0.5rem;
+            vertical-align: middle;
+        }
+
+        /* How it works */
+        .steps {
+            display: flex;
+            flex-direction: column;
+            gap: 1.25rem;
+        }
+
+        .step {
+            display: flex;
+            gap: 1rem;
+            align-items: flex-start;
+        }
+
+        .step-number {
+            flex-shrink: 0;
+            width: 36px;
+            height: 36px;
+            background: #3171ef;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.9rem;
+        }
+
+        .step-text h3 {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 0.2rem;
+        }
+
+        .step-text p {
+            font-size: 0.9rem;
+            color: #666;
+            line-height: 1.5;
+        }
+
+        /* CTA section */
+        .cta-section {
+            text-align: center;
+            padding: 2.5rem 2rem;
+        }
+
+        .cta-section .price {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: #1a1a1a;
+            margin-bottom: 0.25rem;
+        }
+
+        .cta-section .price-note {
+            font-size: 0.9rem;
+            color: #666;
+            margin-bottom: 1.5rem;
+        }
+
+        .btn-cta {
+            background: #27ae60;
+            color: white;
+            padding: 1.1rem 3rem;
+            border-radius: 8px;
+            border: none;
+            font-size: 1.15rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: 'Inter', Arial, sans-serif;
+            display: inline-block;
+            text-decoration: none;
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .btn-cta:hover {
+            background: #229954;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(39, 174, 96, 0.3);
+        }
+
+        .btn-cta:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .cta-details {
+            margin-top: 1rem;
+            font-size: 0.8rem;
+            color: #999;
+        }
+
+        .deadline-banner {
+            background: #fff3e0;
+            border: 1px solid #ffe0b2;
+            border-radius: 8px;
+            padding: 1rem;
+            text-align: center;
+            margin-bottom: 1.5rem;
+            font-size: 0.9rem;
+            color: #e65100;
+            font-weight: 500;
+        }
+
+        /* Already paid state */
+        .paid-banner {
+            background: #e8f5e9;
+            border: 1px solid #c8e6c9;
+            border-radius: 8px;
+            padding: 1.5rem;
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .paid-banner h3 {
+            color: #27ae60;
+            margin-bottom: 0.5rem;
+        }
+
+        .paid-banner p {
+            color: #555;
+            font-size: 0.95rem;
+        }
+
+        /* Loading state */
+        .loading-state {
+            text-align: center;
+            padding: 6rem 2rem;
+            color: #999;
+            font-size: 1.1rem;
+        }
+
+        .error-state {
+            text-align: center;
+            padding: 6rem 2rem;
+        }
+
+        .error-state h2 {
+            color: #1a1a1a;
+            margin-bottom: 0.5rem;
+        }
+
+        .error-state p {
+            color: #666;
+        }
+
+        /* Report footer */
+        .report-footer {
+            text-align: center;
+            padding: 2rem;
+            color: #999;
+            font-size: 0.8rem;
+        }
+
+        .report-footer a {
+            color: #3171ef;
+            text-decoration: none;
+        }
+
+        @media (max-width: 768px) {
+            .savings-amount {
+                font-size: 2.5rem;
+            }
+
+            .report-content {
+                padding: 1.5rem 1rem 3rem;
+            }
+
+            .report-card {
+                padding: 1.5rem;
+            }
+
+            .comp-table th, .comp-table td {
+                padding: 0.6rem 0.5rem;
+                font-size: 0.85rem;
+            }
+
+            .btn-cta {
+                padding: 1rem 2rem;
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <div class="report-nav">
+        <a href="/" class="logo-link">🏡 LowerPropTax</a>
+        <div class="nav-contact">
+            Questions? <a href="tel:4703123330">(470) 312-3330</a>
+        </div>
+    </div>
+
+    <!-- Loading State -->
+    <div id="loading-state" class="loading-state">
+        Loading your savings report...
+    </div>
+
+    <!-- Error State -->
+    <div id="error-state" class="error-state hidden">
+        <h2>Report Not Found</h2>
+        <p>This link may be invalid or expired. Please check your letter and try again.</p>
+        <p style="margin-top: 1rem;"><a href="/" style="color: #3171ef;">Return to LowerPropTax</a></p>
+    </div>
+
+    <!-- Main Report Content (hidden until data loads) -->
+    <div id="report-content" class="hidden">
+        <!-- Savings Hero -->
+        <div class="savings-hero">
+            <div class="label">Your Estimated Annual Savings</div>
+            <div class="savings-amount" id="savings-amount">$0</div>
+            <div class="subtitle" id="savings-subtitle"></div>
+        </div>
+
+        <div class="report-content">
+            <!-- Deadline Banner -->
+            <div class="deadline-banner" id="deadline-banner">
+                Filing deadline: <strong id="deadline-date">April 1st</strong> — act now to save this year.
+            </div>
+
+            <!-- Already Paid Banner -->
+            <div class="paid-banner hidden" id="paid-banner">
+                <h3>Report Purchased</h3>
+                <p>Thank you! Your report has been sent to your email. <a id="report-download" href="#" target="_blank">Download your report here.</a></p>
+            </div>
+
+            <!-- Your Property -->
+            <div class="report-card">
+                <h2>Your Property</h2>
+                <p class="property-intro">
+                    <span id="recipient-greeting">Dear Homeowner</span>,<br><br>
+                    While reviewing <strong id="county-name">county</strong> public records, we compared your tax bill at
+                    <strong id="property-address">your address</strong> to nearby homes with a similar floor plan.
+                    Here's what we found:
+                </p>
+            </div>
+
+            <!-- Comparison Table -->
+            <div class="report-card">
+                <h2>Tax Comparison</h2>
+                <div style="overflow-x: auto;">
+                    <table class="comp-table">
+                        <thead>
+                            <tr>
+                                <th>Address</th>
+                                <th>Sq Ft</th>
+                                <th>2025 Property Tax</th>
+                            </tr>
+                        </thead>
+                        <tbody id="comp-tbody">
+                        </tbody>
+                    </table>
+                </div>
+                <p style="margin-top: 1rem; font-size: 0.85rem; color: #666;">
+                    Those homeowners filed for homestead and other exemptions that you may also qualify for.
+                    These exemptions are available to Georgia homeowners who use their property as a primary residence.
+                </p>
+            </div>
+
+            <!-- How It Works -->
+            <div class="report-card">
+                <h2>How It Works</h2>
+                <div class="steps">
+                    <div class="step">
+                        <div class="step-number">1</div>
+                        <div class="step-text">
+                            <h3>Get Your Report</h3>
+                            <p>Purchase your personalized savings report for a flat $99.</p>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">2</div>
+                        <div class="step-text">
+                            <h3>See Your Exemptions</h3>
+                            <p>Your report shows exactly which exemptions you qualify for and how much you'll save.</p>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">3</div>
+                        <div class="step-text">
+                            <h3>File Before the Deadline</h3>
+                            <p>Follow the step-by-step instructions to file online. It takes about 15 minutes.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CTA -->
+            <div class="report-card cta-section" id="cta-section">
+                <div class="price">$99</div>
+                <div class="price-note">Flat fee — no percentage of savings</div>
+                <button class="btn-cta" id="btn-purchase" onclick="startCheckout()">
+                    Get Your Savings Report
+                </button>
+                <div class="cta-details">
+                    Secure payment via Stripe. Report delivered instantly to your email.
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <div class="report-footer">
+                <p>LowerPropTax &middot; Your Neighbor in <span id="neighborhood-name">Georgia</span></p>
+                <p style="margin-top: 0.5rem;">
+                    <a href="mailto:shawn@lowerproptax.com">shawn@lowerproptax.com</a> &middot;
+                    <a href="tel:4703123330">(470) 312-3330</a>
+                </p>
+                <p style="margin-top: 0.75rem;">
+                    <a href="/terms.html">Terms of Service</a>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'https://lowerproptax.up.railway.app/api';
+        let recipientData = null;
+
+        // Get short code from URL path: /r/:code or /report.html?code=:code
+        function getShortCode() {
+            // Check URL path first (for /r/:code routing)
+            const pathMatch = window.location.pathname.match(/\/r\/([^/]+)/);
+            if (pathMatch) return pathMatch[1];
+            // Fallback to query param
+            const params = new URLSearchParams(window.location.search);
+            return params.get('code');
+        }
+
+        function formatCurrency(amount) {
+            const num = parseFloat(amount);
+            if (isNaN(num)) return '$0.00';
+            return '$' + num.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        }
+
+        function formatDeadline(dateStr) {
+            if (!dateStr) return 'April 1st';
+            const d = new Date(dateStr + 'T00:00:00');
+            const months = ['January', 'February', 'March', 'April', 'May', 'June',
+                          'July', 'August', 'September', 'October', 'November', 'December'];
+            const day = d.getDate();
+            const suffix = day === 1 || day === 21 || day === 31 ? 'st' :
+                          day === 2 || day === 22 ? 'nd' :
+                          day === 3 || day === 23 ? 'rd' : 'th';
+            return `${months[d.getMonth()]} ${day}${suffix}`;
+        }
+
+        // Sample data for demo/preview mode
+        const DEMO_DATA = {
+            shortCode: 'demo',
+            recipientName: 'Christopher & Heather Porcelli',
+            address: '6774 Encore Blvd',
+            city: 'Sandy Springs',
+            state: 'GA',
+            zipCode: '30328',
+            sqft: 2016,
+            annualTax: 9331.51,
+            estimatedSavings: 1870.21,
+            comparables: [
+                { address: '6765 Prelude Dr', sqft: 1900, annualTax: 7658.91 },
+                { address: '6781 Cadence Blvd', sqft: 2100, annualTax: 7492.30 },
+                { address: '6790 Overture Way', sqft: 1950, annualTax: 7810.44 }
+            ],
+            paymentStatus: 'unpaid',
+            reportUrl: null,
+            campaignName: 'Aria Feb 2026',
+            county: 'Fulton',
+            deadline: '2026-04-01'
+        };
+
+        async function loadReport() {
+            const code = getShortCode();
+            if (!code) {
+                showError();
+                return;
+            }
+
+            // Demo mode — render sample data without API call
+            if (code === 'demo') {
+                recipientData = DEMO_DATA;
+                displayReport();
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}/mail/r/${encodeURIComponent(code)}`);
+                if (!response.ok) {
+                    showError();
+                    return;
+                }
+
+                recipientData = await response.json();
+                displayReport();
+            } catch (error) {
+                console.error('Error loading report:', error);
+                showError();
+            }
+        }
+
+        function showError() {
+            document.getElementById('loading-state').classList.add('hidden');
+            document.getElementById('error-state').classList.remove('hidden');
+        }
+
+        function displayReport() {
+            document.getElementById('loading-state').classList.add('hidden');
+            document.getElementById('report-content').classList.remove('hidden');
+
+            const d = recipientData;
+
+            // Savings
+            document.getElementById('savings-amount').textContent = formatCurrency(d.estimatedSavings);
+            document.getElementById('savings-subtitle').textContent = `per year on your ${d.county || 'county'} property taxes`;
+
+            // Greeting
+            const nameParts = d.recipientName.split(' ');
+            // Check if the name contains an "&" (couple)
+            if (d.recipientName.includes('&')) {
+                const lastName = nameParts[nameParts.length - 1];
+                document.getElementById('recipient-greeting').textContent = `Dear Mr. & Mrs. ${lastName}`;
+            } else {
+                document.getElementById('recipient-greeting').textContent = `Dear ${d.recipientName}`;
+            }
+
+            // County
+            document.getElementById('county-name').textContent = `${d.county || d.state || 'county'}`;
+
+            // Address
+            const location = [d.city, d.state, d.zipCode].filter(Boolean).join(', ');
+            const fullAddress = location ? `${d.address}, ${location}` : d.address;
+            document.getElementById('property-address').textContent = d.address;
+
+            // Deadline
+            if (d.deadline) {
+                document.getElementById('deadline-date').textContent = formatDeadline(d.deadline);
+            }
+
+            // Comparison table
+            const tbody = document.getElementById('comp-tbody');
+            tbody.innerHTML = '';
+
+            // Add the recipient's property (highlighted)
+            const recipientRow = document.createElement('tr');
+            recipientRow.className = 'highlight';
+            recipientRow.innerHTML = `
+                <td>${d.address} <span class="you-badge">You</span></td>
+                <td>${d.sqft ? d.sqft.toLocaleString() : '--'}</td>
+                <td>${formatCurrency(d.annualTax)}</td>
+            `;
+            tbody.appendChild(recipientRow);
+
+            // Add comparables
+            if (d.comparables && Array.isArray(d.comparables)) {
+                d.comparables.forEach(comp => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${comp.address || '--'}</td>
+                        <td>${comp.sqft ? comp.sqft.toLocaleString() : '--'}</td>
+                        <td>${formatCurrency(comp.annualTax || comp.annual_tax)}</td>
+                    `;
+                    tbody.appendChild(row);
+                });
+            }
+
+            // Handle paid state
+            if (d.paymentStatus === 'paid') {
+                document.getElementById('cta-section').classList.add('hidden');
+                document.getElementById('paid-banner').classList.remove('hidden');
+                if (d.reportUrl) {
+                    document.getElementById('report-download').href = d.reportUrl;
+                } else {
+                    document.getElementById('report-download').style.display = 'none';
+                }
+            }
+
+            // Neighborhood name
+            if (d.campaignName) {
+                document.getElementById('neighborhood-name').textContent = d.campaignName.split(' ')[0] || 'Georgia';
+            }
+
+            // Update page title
+            document.title = `LowerPropTax - Save ${formatCurrency(d.estimatedSavings)}/yr at ${d.address}`;
+        }
+
+        async function startCheckout() {
+            const btn = document.getElementById('btn-purchase');
+            btn.disabled = true;
+            btn.textContent = 'Redirecting to payment...';
+
+            try {
+                const code = getShortCode();
+                const response = await fetch(`${API_BASE}/mail/r/${encodeURIComponent(code)}/checkout`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({})
+                });
+
+                if (!response.ok) {
+                    const data = await response.json();
+                    if (data.error === 'Report already purchased') {
+                        window.location.reload();
+                        return;
+                    }
+                    throw new Error(data.error || 'Checkout failed');
+                }
+
+                const data = await response.json();
+                if (data.checkoutUrl) {
+                    window.location.href = data.checkoutUrl;
+                } else {
+                    throw new Error('No checkout URL returned');
+                }
+            } catch (error) {
+                console.error('Checkout error:', error);
+                btn.disabled = false;
+                btn.textContent = 'Get Your Savings Report';
+                alert('Something went wrong. Please try again or call us at (470) 312-3330.');
+            }
+        }
+
+        // Load on page ready
+        loadReport();
+    </script>
+</body>
+</html>

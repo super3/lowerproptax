@@ -9,8 +9,8 @@ jest.unstable_mockModule('resend', () => ({
 }));
 
 describe('Email Service', () => {
-  let sendNewPropertyNotification;
-  let sendAssessmentReadyNotification;
+  let sendReferralVisitNotification;
+  let sendReportPurchasedNotification;
   let consoleSpy;
 
   beforeEach(() => {
@@ -28,65 +28,79 @@ describe('Email Service', () => {
       process.env.RESEND_API_KEY = 'test_api_key';
       jest.resetModules();
       const emailService = await import('../../src/services/emailService.js');
-      sendNewPropertyNotification = emailService.sendNewPropertyNotification;
-      sendAssessmentReadyNotification = emailService.sendAssessmentReadyNotification;
+      sendReferralVisitNotification = emailService.sendReferralVisitNotification;
+      sendReportPurchasedNotification = emailService.sendReportPurchasedNotification;
     });
 
     afterEach(() => {
       delete process.env.RESEND_API_KEY;
     });
 
-    it('should send email with full property details', async () => {
+    it('should send referral visit notification with all details', async () => {
       mockSend.mockResolvedValueOnce({ id: 'email_123' });
 
-      const property = {
-        id: 'prop_123',
-        address: '123 Main St',
-        city: 'Austin',
-        state: 'TX',
-        zipCode: '78701'
+      const recipient = {
+        address: '6774 Encore Blvd',
+        short_code: '6774e',
+        recipient_name: 'Christopher Porcelli'
       };
 
-      await sendNewPropertyNotification(property, 'user@example.com');
+      const visitInfo = {
+        ip_address: '192.168.1.1',
+        user_agent: 'Mozilla/5.0',
+        visited_at: '2026-03-19T10:00:00Z',
+        visit_count: 3
+      };
+
+      await sendReferralVisitNotification(recipient, visitInfo);
 
       expect(mockSend).toHaveBeenCalledWith({
         from: 'LowerPropTax <help@lowerproptax.com>',
         to: 'help@lowerproptax.com',
-        subject: 'New Property Added - 123 Main St',
-        text: expect.stringContaining('Property ID: prop_123')
+        subject: 'Mailer Link Opened - 6774 Encore Blvd',
+        text: expect.stringContaining('Owner: Christopher Porcelli')
       });
       expect(mockSend).toHaveBeenCalledWith(
         expect.objectContaining({
-          text: expect.stringContaining('Address: 123 Main St, Austin, TX, 78701')
+          text: expect.stringContaining('Short Code: 6774e')
         })
       );
       expect(mockSend).toHaveBeenCalledWith(
         expect.objectContaining({
-          text: expect.stringContaining('User Email: user@example.com')
+          text: expect.stringContaining('Visit #: 3')
         })
       );
-      expect(consoleSpy).toHaveBeenCalledWith('Email notification sent for property prop_123');
+      expect(consoleSpy).toHaveBeenCalledWith('Referral visit notification sent for 6774e');
     });
 
-    it('should send email with minimal property details', async () => {
-      mockSend.mockResolvedValueOnce({ id: 'email_123' });
+    it('should handle missing optional fields gracefully', async () => {
+      mockSend.mockResolvedValueOnce({ id: 'email_456' });
 
-      const property = {
-        id: 'prop_456',
-        address: '456 Oak Ave'
+      const recipient = {
+        address: '123 Main St',
+        short_code: '123m'
       };
 
-      await sendNewPropertyNotification(property, null);
+      const visitInfo = {
+        visited_at: '2026-03-19T10:00:00Z',
+        visit_count: 1
+      };
+
+      await sendReferralVisitNotification(recipient, visitInfo);
 
       expect(mockSend).toHaveBeenCalledWith(
         expect.objectContaining({
-          subject: 'New Property Added - 456 Oak Ave',
-          text: expect.stringContaining('Address: 456 Oak Ave')
+          text: expect.stringContaining('Owner: Unknown')
         })
       );
       expect(mockSend).toHaveBeenCalledWith(
         expect.objectContaining({
-          text: expect.stringContaining('User Email: Not available')
+          text: expect.stringContaining('IP: Unknown')
+        })
+      );
+      expect(mockSend).toHaveBeenCalledWith(
+        expect.objectContaining({
+          text: expect.stringContaining('User Agent: Unknown')
         })
       );
     });
@@ -95,112 +109,83 @@ describe('Email Service', () => {
       const errorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
       mockSend.mockRejectedValueOnce(new Error('SMTP connection failed'));
 
-      const property = {
-        id: 'prop_789',
-        address: '789 Elm St'
+      const recipient = {
+        address: '123 Main St',
+        short_code: '123m',
+        recipient_name: 'Test User'
       };
 
-      await sendNewPropertyNotification(property, 'user@example.com');
+      const visitInfo = {
+        ip_address: '10.0.0.1',
+        user_agent: 'TestBot',
+        visited_at: '2026-03-19T10:00:00Z',
+        visit_count: 1
+      };
 
-      expect(errorSpy).toHaveBeenCalledWith('Failed to send email notification:', 'SMTP connection failed');
+      await sendReferralVisitNotification(recipient, visitInfo);
+
+      expect(errorSpy).toHaveBeenCalledWith('Failed to send referral visit notification:', 'SMTP connection failed');
     });
 
-    describe('sendAssessmentReadyNotification', () => {
-      it('should send email with savings when positive', async () => {
-        mockSend.mockResolvedValueOnce({ id: 'email_123' });
+    it('should send report purchased notification', async () => {
+      mockSend.mockResolvedValueOnce({ id: 'email_789' });
 
-        const property = {
-          id: 'prop_123',
-          address: '123 Main St',
-          city: 'Austin',
-          state: 'TX',
-          zipCode: '78701'
-        };
+      const recipient = {
+        recipient_name: 'Christopher Porcelli',
+        address: '6774 Encore Blvd',
+        email: 'buyer@example.com'
+      };
 
-        const assessment = {
-          annualTax: 5000,
-          estimatedAnnualTax: 4000
-        };
+      await sendReportPurchasedNotification(recipient);
 
-        await sendAssessmentReadyNotification(property, assessment, 'user@example.com');
-
-        expect(mockSend).toHaveBeenCalledWith({
-          from: 'LowerPropTax <help@lowerproptax.com>',
-          to: 'user@example.com',
-          subject: 'Your Property Assessment is Ready - $1,000.00 in Potential Savings',
-          text: expect.stringContaining('Potential Annual Savings: $1,000.00')
-        });
-        expect(mockSend).toHaveBeenCalledWith(
-          expect.objectContaining({
-            text: expect.stringContaining('https://calendly.com/shawn-lowerproptax/new-meeting')
-          })
-        );
-        expect(consoleSpy).toHaveBeenCalledWith('Assessment ready notification sent for property prop_123 to user@example.com');
+      expect(mockSend).toHaveBeenCalledWith({
+        from: 'LowerPropTax <help@lowerproptax.com>',
+        to: 'help@lowerproptax.com',
+        subject: 'Report Purchased - 6774 Encore Blvd',
+        text: expect.stringContaining('Owner: Christopher Porcelli')
       });
+      expect(mockSend).toHaveBeenCalledWith(
+        expect.objectContaining({
+          text: expect.stringContaining('Email: buyer@example.com')
+        })
+      );
+      expect(consoleSpy).toHaveBeenCalledWith('Report purchased notification sent for 6774 Encore Blvd');
+    });
 
-      it('should send different email when no savings', async () => {
-        mockSend.mockResolvedValueOnce({ id: 'email_123' });
+    it('should handle missing optional fields in report purchased notification', async () => {
+      mockSend.mockResolvedValueOnce({ id: 'email_790' });
 
-        const property = {
-          id: 'prop_456',
-          address: '456 Oak Ave'
-        };
+      const recipient = {
+        address: '123 Main St'
+      };
 
-        const assessment = {
-          annualTax: 4000,
-          estimatedAnnualTax: 4500
-        };
+      await sendReportPurchasedNotification(recipient);
 
-        await sendAssessmentReadyNotification(property, assessment, 'user@example.com');
+      expect(mockSend).toHaveBeenCalledWith(
+        expect.objectContaining({
+          text: expect.stringContaining('Owner: Unknown')
+        })
+      );
+      expect(mockSend).toHaveBeenCalledWith(
+        expect.objectContaining({
+          text: expect.stringContaining('Email: Not provided')
+        })
+      );
+    });
 
-        expect(mockSend).toHaveBeenCalledWith(
-          expect.objectContaining({
-            subject: 'Your Property Assessment is Complete',
-            text: expect.stringContaining('we didn\'t find any savings opportunity')
-          })
-        );
-        expect(mockSend).toHaveBeenCalledWith(
-          expect.objectContaining({
-            text: expect.stringContaining('https://lowerproptax.com/dashboard.html')
-          })
-        );
-      });
+    it('should handle report purchased notification errors gracefully', async () => {
+      const errorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+      mockSend.mockRejectedValueOnce(new Error('SMTP failed'));
 
-      it('should handle missing tax values', async () => {
-        mockSend.mockResolvedValueOnce({ id: 'email_123' });
+      const recipient = {
+        recipient_name: 'Test',
+        address: '123 Main St',
+        email: 'test@example.com'
+      };
 
-        const property = {
-          id: 'prop_789',
-          address: '789 Elm St'
-        };
+      await sendReportPurchasedNotification(recipient);
 
-        const assessment = {};
-
-        await sendAssessmentReadyNotification(property, assessment, 'user@example.com');
-
-        // When tax values are missing, savings is 0, so it uses the no-savings email
-        expect(mockSend).toHaveBeenCalledWith(
-          expect.objectContaining({
-            subject: 'Your Property Assessment is Complete'
-          })
-        );
-      });
-
-      it('should handle email send errors gracefully', async () => {
-        const errorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
-        mockSend.mockRejectedValueOnce(new Error('SMTP connection failed'));
-
-        const property = {
-          id: 'prop_123',
-          address: '123 Main St'
-        };
-
-        const assessment = { annualTax: 5000, estimatedAnnualTax: 4000 };
-
-        await sendAssessmentReadyNotification(property, assessment, 'user@example.com');
-
-        expect(errorSpy).toHaveBeenCalledWith('Failed to send assessment ready notification:', 'SMTP connection failed');
-      });
+      expect(errorSpy).toHaveBeenCalledWith('Failed to send report purchased notification:', 'SMTP failed');
     });
   });
 
@@ -209,31 +194,35 @@ describe('Email Service', () => {
       delete process.env.RESEND_API_KEY;
       jest.resetModules();
       const emailService = await import('../../src/services/emailService.js');
-      sendNewPropertyNotification = emailService.sendNewPropertyNotification;
-      sendAssessmentReadyNotification = emailService.sendAssessmentReadyNotification;
+      sendReferralVisitNotification = emailService.sendReferralVisitNotification;
+      sendReportPurchasedNotification = emailService.sendReportPurchasedNotification;
     });
 
-    it('should log message and return early for new property notification', async () => {
-      const property = {
-        id: 'prop_123',
-        address: '123 Main St'
+    it('should log message and return early for referral visit notification', async () => {
+      const recipient = {
+        address: '123 Main St',
+        short_code: '123m'
       };
 
-      await sendNewPropertyNotification(property, 'user@example.com');
+      const visitInfo = {
+        visited_at: '2026-03-19T10:00:00Z',
+        visit_count: 1
+      };
+
+      await sendReferralVisitNotification(recipient, visitInfo);
 
       expect(consoleSpy).toHaveBeenCalledWith('Email service not configured (RESEND_API_KEY missing)');
       expect(mockSend).not.toHaveBeenCalled();
     });
 
-    it('should log message and return early for assessment ready notification', async () => {
-      const property = {
-        id: 'prop_123',
-        address: '123 Main St'
+    it('should log message and return early for report purchased notification', async () => {
+      const recipient = {
+        recipient_name: 'Test',
+        address: '123 Main St',
+        email: 'test@example.com'
       };
 
-      const assessment = { annualTax: 5000, estimatedAnnualTax: 4000 };
-
-      await sendAssessmentReadyNotification(property, assessment, 'user@example.com');
+      await sendReportPurchasedNotification(recipient);
 
       expect(consoleSpy).toHaveBeenCalledWith('Email service not configured (RESEND_API_KEY missing)');
       expect(mockSend).not.toHaveBeenCalled();

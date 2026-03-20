@@ -2,95 +2,60 @@ import { Resend } from 'resend';
 
 const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
 
-export async function sendNewPropertyNotification(property, userEmail) {
+export async function sendReferralVisitNotification(recipient, visitInfo) {
   if (!resend) {
     console.log('Email service not configured (RESEND_API_KEY missing)');
     return;
   }
 
-  const { id, address, city, state, zipCode } = property;
-  const location = [city, state, zipCode].filter(Boolean).join(', ');
-  const fullAddress = location ? `${address}, ${location}` : address;
+  const { address, short_code, recipient_name } = recipient;
+  const { ip_address, user_agent, visited_at, visit_count } = visitInfo;
 
   try {
     await resend.emails.send({
       from: 'LowerPropTax <help@lowerproptax.com>',
       to: 'help@lowerproptax.com',
-      subject: `New Property Added - ${address}`,
-      text: `A new property has been added to LowerPropTax:
+      subject: `Mailer Link Opened - ${address}`,
+      text: `Someone visited a direct mail referral link:
 
-Property ID: ${id}
-Address: ${fullAddress}
-User Email: ${userEmail || 'Not available'}
-Created: ${new Date().toISOString()}
+Property: ${address}
+Owner: ${recipient_name || 'Unknown'}
+Short Code: ${short_code}
+Link: lowerproptax.com/r/${short_code}
+Visit #: ${visit_count}
+Time: ${visited_at}
+IP: ${ip_address || 'Unknown'}
+User Agent: ${user_agent || 'Unknown'}
 `
     });
-    console.log(`Email notification sent for property ${id}`);
+    console.log(`Referral visit notification sent for ${short_code}`);
   } catch (error) {
-    console.error('Failed to send email notification:', error.message);
+    console.error('Failed to send referral visit notification:', error.message);
   }
 }
 
-export async function sendAssessmentReadyNotification(property, assessment, userEmail) {
+export async function sendReportPurchasedNotification(recipient) {
   if (!resend) {
     console.log('Email service not configured (RESEND_API_KEY missing)');
     return;
   }
 
-  const { id, address, city, state, zipCode } = property;
-  const location = [city, state, zipCode].filter(Boolean).join(', ');
-  const fullAddress = location ? `${address}, ${location}` : address;
-
-  // Calculate savings
-  const annualTax = parseFloat(assessment.annualTax) || 0;
-  const estimatedAnnualTax = parseFloat(assessment.estimatedAnnualTax) || 0;
-  const savings = annualTax - estimatedAnnualTax;
-  const savingsFormatted = savings > 0
-    ? `$${savings.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
-    : '$0.00';
-
-  const calendlyUrl = 'https://calendly.com/shawn-lowerproptax/new-meeting';
-  const dashboardUrl = 'https://lowerproptax.com/dashboard.html';
-
-  // Different email content based on whether there are savings
-  const emailContent = savings > 0
-    ? `Great news! Your property tax assessment is ready.
-
-Property: ${fullAddress}
-Potential Annual Savings: ${savingsFormatted}
-
-Schedule a free consultation to discuss your homestead exemption:
-${calendlyUrl}
-
-During the call, we'll confirm your details and help you apply for your exemption right then and there.
-
-Questions? Reply to this email and we'll be happy to help.
-
-- The LowerPropTax Team
-`
-    : `Your property tax assessment is complete.
-
-Property: ${fullAddress}
-
-Unfortunately, we didn't find any savings opportunity for this property. You can view your dashboard here:
-${dashboardUrl}
-
-Questions? Reply to this email and we'll be happy to help.
-
-- The LowerPropTax Team
-`;
+  const { recipient_name, address, email } = recipient;
 
   try {
     await resend.emails.send({
       from: 'LowerPropTax <help@lowerproptax.com>',
-      to: userEmail,
-      subject: savings > 0
-        ? `Your Property Assessment is Ready - ${savingsFormatted} in Potential Savings`
-        : `Your Property Assessment is Complete`,
-      text: emailContent
+      to: 'help@lowerproptax.com',
+      subject: `Report Purchased - ${address}`,
+      text: `A property tax savings report was purchased:
+
+Property: ${address}
+Owner: ${recipient_name || 'Unknown'}
+Email: ${email || 'Not provided'}
+`
     });
-    console.log(`Assessment ready notification sent for property ${id} to ${userEmail}`);
+    console.log(`Report purchased notification sent for ${address}`);
   } catch (error) {
-    console.error('Failed to send assessment ready notification:', error.message);
+    console.error('Failed to send report purchased notification:', error.message);
   }
 }

@@ -1,6 +1,5 @@
 import pool from '../db/connection.js';
-import { sendAssessmentReadyNotification } from '../services/emailService.js';
-import { emitEvent } from '../services/sseManager.js';
+import * as XLSX from 'xlsx';
 
 // Default report year - set to 2025 since 2026 bills aren't out yet
 const DEFAULT_REPORT_YEAR = 2025;
@@ -254,34 +253,161 @@ export async function updatePropertyDetails(req, res) {
       currentAssessment: assessmentResult.rows[0]
     };
 
-    // Emit SSE event for real-time notifications
-    const updatedProperty = propertyResult.rows[0];
-    emitEvent('property-updated', {
-      id: updatedProperty.id || id,
-      address: updatedProperty.address,
-      status: assessmentResult.rows[0]?.status || status,
-      updatedAt: updatedProperty.updated_at
-    });
-
-    // Send email notification if status was set to 'ready'
-    if (status === 'ready') {
-      const property = propertyResult.rows[0];
-      const assessment = {
-        annualTax: assessmentResult.rows[0].annual_tax,
-        estimatedAnnualTax: assessmentResult.rows[0].estimated_annual_tax
-      };
-
-      // Fetch user email from Clerk and send notification
-      const userEmail = await fetchUserEmailFromClerk(property.user_id);
-      if (userEmail) {
-        /* istanbul ignore next */
-        sendAssessmentReadyNotification(property, assessment, userEmail).catch(() => {});
-      }
-    }
-
     res.json(response);
   } catch (error) {
     console.error('Error updating property details:', error);
     res.status(500).json({ error: 'Failed to update property details' });
+  }
+}
+
+// Generate a short code from address (e.g. "6774 Encore Blvd" → "6774enc")
+function generateShortCode(address) {
+  const parts = address.trim().split(/\s+/);
+  const number = parts[0];
+  const street = parts.length > 1 ? parts[1].toLowerCase() : '';
+  return `${number}${street.substring(0, 3)}`;
+}
+
+// Upload XLSX with mailed properties into a campaign
+export async function uploadMailedProperties(req, res) {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ error: 'No file uploaded' });
+    }
+
+    const workbook = XLSX.read(req.file.buffer, { type: 'buffer' });
+    const sheetName = workbook.SheetNames[0];
+    const sheet = workbook.Sheets[sheetName];
+    const rows = XLSX.utils.sheet_to_json(sheet);
+
+    if (rows.length === 0) {
+      return res.status(400).json({ error: 'Spreadsheet is empty' });
+    }
+
+    // Create a campaign for this upload
+    const campaignName = req.body.campaignName || `Upload ${new Date().toISOString().split('T')[0]}`;
+    const campaignId = `camp_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
+
+    await pool.query(
+      `INSERT INTO campaigns (id, name, county, state, created_at, updated_at)
+       VALUES ($1, $2, $3, $4, NOW(), NOW())`,
+      [campaignId, campaignName, req.body.county || null, req.body.state || 'GA']
+    );
+
+    const results = { imported: 0, skipped: 0, errors: [] };
+
+    for (const row of rows) {
+      try {
+        // Flexible column mapping - try common column names
+        const address = row['Address'] || row['address'] || row['Street Address'] || row['street_address'] || '';
+        const city = row['City'] || row['city'] || '';
+        const state = row['State'] || row['state'] || 'GA';
+        const zipCode = row['Zip'] || row['zip'] || row['Zip Code'] || row['zip_code'] || '';
+        const recipientName = row['Owner'] || row['owner'] || row['Owner Name'] || row['owner_name'] || row['Name'] || row['name'] || '';
+        const sqft = parseInt(row['Sqft'] || row['sqft'] || row['SqFt'] || row['Square Feet'] || row['square_feet'] || 0) || null;
+        const annualTax = parseFloat(row['Tax'] || row['tax'] || row['Property Tax'] || row['property_tax'] || row['Annual Tax'] || row['annual_tax'] || row['2025 Property Tax'] || 0) || null;
+        const estimatedSavings = parseFloat(row['Estimated Savings'] || row['estimated_savings'] || row['Savings'] || row['savings'] || 0) || null;
+
+        // Comparable properties (up to 3)
+        const comps = [];
+        for (let i = 1; i <= 3; i++) {
+          const compAddr = row[`Comp ${i} Address`] || row[`comp_${i}_address`] || row[`Comp${i} Address`] || '';
+          const compSqft = parseInt(row[`Comp ${i} Sqft`] || row[`comp_${i}_sqft`] || row[`Comp${i} Sqft`] || 0) || null;
+          const compTax = parseFloat(row[`Comp ${i} Tax`] || row[`comp_${i}_tax`] || row[`Comp${i} Tax`] || 0) || null;
+          if (compAddr) {
+            comps.push({ address: compAddr, sqft: compSqft, tax: compTax });
+          }
+        }
+
+        if (!address) {
+          results.errors.push(`Row skipped: no address found`);
+          results.skipped++;
+          continue;
+        }
+
+        // Generate short code
+        let shortCode = (row['Short Code'] || row['short_code'] || row['Referral Code'] || row['referral_code'] || '').toString().trim();
+        if (!shortCode) {
+          shortCode = generateShortCode(address);
+        }
+
+        // Check if short code already exists
+        const existing = await pool.query('SELECT id FROM mail_recipients WHERE short_code = $1', [shortCode]);
+        if (existing.rows.length > 0) {
+          results.errors.push(`${address}: short code "${shortCode}" already exists, skipped`);
+          results.skipped++;
+          continue;
+        }
+
+        const recipientId = `mail_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
+
+        // Insert mail recipient
+        await pool.query(`
+          INSERT INTO mail_recipients (id, campaign_id, short_code, recipient_name, address, city, state, zip_code,
+            sqft, annual_tax, estimated_savings, comparables, created_at, updated_at)
+          VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, NOW(), NOW())
+        `, [recipientId, campaignId, shortCode, recipientName, address, city, state, zipCode,
+            sqft, annualTax, estimatedSavings, comps.length > 0 ? JSON.stringify(comps) : null]);
+
+        results.imported++;
+      } catch (rowError) {
+        results.errors.push(`Row error: ${rowError.message}`);
+        results.skipped++;
+      }
+    }
+
+    res.json({
+      message: `Import complete: ${results.imported} imported, ${results.skipped} skipped`,
+      campaignId,
+      ...results
+    });
+  } catch (error) {
+    console.error('Error uploading mailed properties:', error);
+    res.status(500).json({ error: 'Failed to process upload' });
+  }
+}
+
+// Get all mailed properties (across all campaigns)
+export async function getMailedProperties(req, res) {
+  try {
+    const query = `
+      SELECT
+        mr.id,
+        mr.address,
+        mr.city,
+        mr.state,
+        mr.zip_code,
+        mr.recipient_name,
+        mr.short_code,
+        mr.sqft,
+        mr.annual_tax,
+        mr.estimated_savings,
+        mr.payment_status,
+        mr.page_views,
+        mr.last_viewed_at,
+        mr.created_at,
+        c.name as campaign_name
+      FROM mail_recipients mr
+      JOIN campaigns c ON mr.campaign_id = c.id
+      ORDER BY mr.created_at DESC
+    `;
+
+    const result = await pool.query(query);
+
+    // Calculate stats
+    const totalMailed = result.rows.length;
+    const totalVisited = result.rows.filter(r => parseInt(r.page_views) > 0).length;
+
+    res.json({
+      properties: result.rows,
+      stats: {
+        totalMailed,
+        totalVisited,
+        visitRate: totalMailed > 0 ? ((totalVisited / totalMailed) * 100).toFixed(1) : '0.0'
+      }
+    });
+  } catch (error) {
+    console.error('Error fetching mailed properties:', error);
+    res.status(500).json({ error: 'Failed to fetch mailed properties' });
   }
 }

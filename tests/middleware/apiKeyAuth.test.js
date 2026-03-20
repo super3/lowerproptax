@@ -130,6 +130,37 @@ describe('API Key Authentication Middleware', () => {
       expect(next).toHaveBeenCalled();
     });
 
+    test('should return 500 when auth middleware encounters unexpected error', async () => {
+      // Make headers throw to trigger outer catch
+      const badReq = {
+        headers: Object.create(null, {
+          authorization: { get() { throw new Error('unexpected'); } },
+          'x-api-key': { value: undefined }
+        })
+      };
+      // Use a proxy to simulate error on header access
+      const proxyReq = new Proxy(req, {
+        get(target, prop) {
+          if (prop === 'headers') {
+            return new Proxy({}, {
+              get(t, p) {
+                if (p === 'x-api-key') return undefined;
+                if (p === 'authorization') throw new Error('unexpected header error');
+                return undefined;
+              }
+            });
+          }
+          return target[prop];
+        }
+      });
+
+      requireAuthOrApiKey(proxyReq, res, next);
+      await new Promise(resolve => setTimeout(resolve, 50));
+
+      expect(res.status).toHaveBeenCalledWith(500);
+      expect(res.json).toHaveBeenCalledWith({ error: 'Authentication error' });
+    });
+
     test('should return 403 via Clerk auth when user is not admin', async () => {
       req.headers.authorization = 'Bearer valid.session.token';
 

@@ -10,6 +10,12 @@ jest.unstable_mockModule('../../src/db/connection.js', () => ({
   }
 }));
 
+// Mock xlsx (needed by adminController)
+jest.unstable_mockModule('xlsx', () => ({
+  read: jest.fn(),
+  utils: { sheet_to_json: jest.fn() }
+}));
+
 // Mock Clerk SDK
 const mockGetUser = jest.fn();
 const mockGetSession = jest.fn();
@@ -27,8 +33,6 @@ jest.unstable_mockModule('@clerk/express', () => ({
 }));
 
 // Import routes after mocking
-const authModule = await import('../../src/middleware/auth.js');
-const adminAuthModule = await import('../../src/middleware/adminAuth.js');
 const adminRoutes = await import('../../src/routes/adminRoutes.js');
 
 describe('Admin Routes', () => {

@@ -1,5 +1,42 @@
-import { requireAuth } from './auth.js';
+import { clerkClient, verifyToken } from '@clerk/express';
 import { requireAdmin } from './adminAuth.js';
+
+/**
+ * Middleware that authenticates using Clerk JWT tokens.
+ * Verifies the token and attaches user info to req.user.
+ */
+async function requireClerkAuth(req, res, next) {
+  try {
+    const authHeader = req.headers.authorization;
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return res.status(401).json({ error: 'No authorization token provided' });
+    }
+
+    const sessionToken = authHeader.split(' ')[1];
+
+    try {
+      const payload = await verifyToken(sessionToken, {
+        secretKey: process.env.CLERK_SECRET_KEY
+      });
+
+      const user = await clerkClient.users.getUser(payload.sub);
+
+      req.user = {
+        id: user.id,
+        email: user.emailAddresses[0]?.emailAddress,
+        username: user.username
+      };
+
+      next();
+    } catch (error) {
+      console.error('Token verification failed:', error);
+      return res.status(401).json({ error: 'Invalid or expired token' });
+    }
+  } catch (error) {
+    console.error('Auth middleware error:', error);
+    return res.status(500).json({ error: 'Authentication error' });
+  }
+}
 
 /**
  * Middleware that authenticates using the x-api-key header.
@@ -27,8 +64,7 @@ export function requireAuthOrApiKey(req, res, next) {
   }
 
   // Fall through to Clerk auth, then admin check
-  requireAuth(req, res, (err) => {
-    if (err) return next(err);
+  requireClerkAuth(req, res, () => {
     requireAdmin(req, res, next);
   });
 }
