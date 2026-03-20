@@ -31,6 +31,9 @@ const corsOptions = {
 // Middleware
 app.use(cors(corsOptions));
 
+// Serve static files (HTML, CSS, JS) from project root — before auth middleware
+app.use(express.static(ROOT_DIR, { extensions: ['html'] }));
+
 // Stripe webhook needs raw body - must be before express.json()
 app.post('/api/webhooks/stripe', express.raw({ type: 'application/json' }), handleWebhook);
 
@@ -38,9 +41,6 @@ app.use(express.json());
 
 // Clerk middleware for authentication
 app.use(clerkMiddleware());
-
-// Serve static files (HTML, CSS, JS) from project root
-app.use(express.static(ROOT_DIR, { extensions: ['html'] }));
 
 // Health check endpoint
 app.get('/health', (req, res) => {
